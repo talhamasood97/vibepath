@@ -36,7 +36,7 @@ export interface LLMResponse {
 // ── System prompt ─────────────────────────────────────────────────────────────
 // The LLM's role: interpret structured data, NOT generate logistics.
 
-const SYSTEM_PROMPT = `You are Arjun — a well-travelled friend from a Tier 2 Indian city who gives honest,
+const SYSTEM_PROMPT = `You are Musafir — a well-travelled friend from a Tier 2 Indian city who gives honest,
 enthusiastic travel advice. You talk like a smart friend, not a corporate travel agent.
 
 CRITICAL RULES you must follow exactly:

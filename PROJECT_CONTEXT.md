@@ -70,7 +70,7 @@ itinerary-builder.ts
 groq-client.ts
   → generateAllNarratives(contexts[]) via Promise.allSettled (parallel)
   → model: llama-3.1-8b-instant, response_format: { type: "json_object" }
-  → persona: "Arjun" — smart friend, NOT corporate agent
+  → persona: "Musafir" — smart friend, NOT corporate agent
   → strict constraint: LLM must not alter any prices, train names, timings, distances
     │
     ▼
@@ -178,7 +178,7 @@ vibepath-app/
 │   │                           # generateItineraryNarrative(ctx) → LLMResponse
 │   │                           # generateAllNarratives(contexts[]) → parallel Promise.allSettled
 │   │                           # Model: llama-3.1-8b-instant, response_format: json_object
-│   │                           # Persona: "Arjun" — smart friend, desi phrases OK
+│   │                           # Persona: "Musafir" — smart friend, desi phrases OK
 │   └── itinerary-builder.ts    # buildItineraries(input) → GeneratedItinerary[]
 │                               # Orchestrates: match → transport → allocate → LLM → merge
 │                               # 3-card guarantee: fills gaps with multi-profile same destination
