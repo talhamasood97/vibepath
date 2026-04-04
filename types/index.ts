@@ -9,13 +9,17 @@ export type Vibe =
   | "relaxing"
   | "city";
 
+export type DiscoveryTag = "iconic" | "popular" | "offbeat" | "hidden-gem";
+
 export interface TripInput {
-  origin: string;        // NSE city name e.g. "Kanpur"
-  budget: number;        // total trip budget in INR per person
-  startDate: string;     // ISO date string
-  endDate: string;       // ISO date string
+  origin: string;              // city name e.g. "Kanpur"
+  budget: number;              // total trip budget in INR per person
+  startDate: string;           // ISO date string
+  endDate: string;             // ISO date string
   vibe: Vibe;
-  travelers: number;     // default 1
+  travelers: number;           // default 1
+  destinationOverride?: string; // Rec 4: user already knows where they want to go
+  recentlyShown?: string[];    // Rec 6: destination names shown in recent sessions
 }
 
 // ── Transport types ───────────────────────────────────────────────────────────
@@ -36,11 +40,11 @@ export interface TrainRoute {
     ac2: number;
   };
   frequency: string;       // "Daily" | "Mon,Wed,Fri"
-  note?: string;           // e.g. "Friday trains often sold out — book 2 weeks ahead"
+  note?: string;
 }
 
 export interface BusRoute {
-  operatorType: string;    // "UPSRTC" | "Private Volvo"
+  operatorType: string;
   price: { min: number; max: number };
   durationHours: number;
   frequency: string;
@@ -51,13 +55,57 @@ export interface TransportOption {
   mode: TransportMode;
   train?: TrainRoute;
   bus?: BusRoute;
-  firstMile: string;       // "Auto/Ola to Kanpur Central (~₹80, 20 min)"
-  lastMile: string;        // "Shared taxi to Rishikesh (~₹120, 45 min)"
+  firstMile: string;
+  lastMile: string;
   totalCostPerPerson: {
-    budget: number;        // cheapest class
+    budget: number;
     midrange: number;
     comfort: number;
   };
+}
+
+// ── Local Intelligence types ──────────────────────────────────────────────────
+
+export interface LocalFood {
+  name: string;
+  area: string;
+  knownFor?: string;
+  price: string;
+  tip?: string;
+}
+
+export interface LocalShopping {
+  what: string;
+  where: string;
+  priceRange: string;
+  tip?: string;
+}
+
+export interface LocalHiddenGem {
+  name: string;
+  what: string;
+  why: string;
+  bestTime?: string;
+}
+
+export interface LocalTiming {
+  activity: string;
+  bestTime: string;
+  avoidTime?: string;
+  tip?: string;
+}
+
+export interface LocalIntelligence {
+  destination: string;
+  mustEat: LocalFood[];
+  streetFood: LocalFood[];
+  shopping: LocalShopping[];
+  hiddenGems: LocalHiddenGem[];
+  avoid: string[];            // tourist traps / honest warnings
+  timingTips: LocalTiming[];
+  localTransport: string;     // how to get around locally
+  knowBeforeYouGo: string[];  // packing / prep / entry rules
+  stayAreas: { area: string; why: string; bestFor: string }[];
 }
 
 // ── Destination types ─────────────────────────────────────────────────────────
@@ -67,7 +115,10 @@ export interface Destination {
   state: string;
   tagline: string;
   vibes: Vibe[];
-  bestMonths: number[];    // 1-12
+  primaryVibe: Vibe;
+  vibeStrength: Partial<Record<Vibe, number>>;  // 0-1 score per vibe
+  discovery: DiscoveryTag;
+  bestMonths: number[];        // 1-12
   distanceKm: number;
   typicalStayNights: number;
   accommodation: {
@@ -76,11 +127,11 @@ export interface Destination {
     midrange: { min: number; max: number };
   };
   food: {
-    dailyBudget: number;   // per person per day
+    dailyBudget: number;
     dailyMidrange: number;
   };
-  mustDo: string[];        // top 3-5 activities
-  avgActivityCost: number; // per person total for a typical trip
+  mustDo: string[];
+  avgActivityCost: number;
 }
 
 // ── Budget types ──────────────────────────────────────────────────────────────
@@ -98,7 +149,7 @@ export interface BudgetAllocation {
   utilizationPct: number;
   trainClass: TrainClass;
   accommodationType: "hostel" | "budget" | "midrange";
-  tradeoffNote?: string;   // e.g. "Friday train saves ₹300 vs Saturday"
+  tradeoffNote?: string;
 }
 
 // ── Itinerary types ───────────────────────────────────────────────────────────
@@ -109,14 +160,14 @@ export interface StructuredItinerary {
   transport: TransportOption;
   allocation: BudgetAllocation;
   nights: number;
-  headline: string;        // e.g. "Budget Rishikesh — ₹6,800 total"
+  headline: string;
   activities: string[];
 }
 
 export interface GeneratedItinerary extends StructuredItinerary {
-  narrative: string;       // LLM-generated story (no prices in here — those come from structured data)
-  dayPlan: string;         // LLM-generated day-by-day
-  tradeoffs: string[];     // LLM-formatted from structured tradeoffs
+  narrative: string;
+  dayPlan: string;
+  tradeoffs: string[];
 }
 
 // ── API types ─────────────────────────────────────────────────────────────────
@@ -128,6 +179,7 @@ export interface GenerateResponse {
   origin: string;
   generatedAt: string;
   provider: "groq" | "fallback";
+  mode?: "discovery" | "destination";
 }
 
 export interface GenerateError {

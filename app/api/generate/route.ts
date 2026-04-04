@@ -3,13 +3,12 @@
  *
  * Receives TripInput, runs the full pipeline, returns 3 GeneratedItineraries.
  *
- * GOVERNANCE rules applied:
- * - NODE RUNTIME: native Groq SDK + file system access require Node, not Edge
- * - ENV VARS FAIL LOUD: GROQ_API_KEY checked in groq-client.ts — will throw 500 with clear message
- * - VERIFY BEFORE CODING: Groq free tier confirmed (14,400 RPD), static data confirmed reliable
+ * GOVERNANCE:
+ * - EDGE RUNTIME: groq-sdk uses fetch() only — safe for CF Pages + nodejs_compat
+ * - ENV VARS FAIL LOUD: GROQ_API_KEY checked in groq-client.ts
+ * - Supports both DISCOVERY mode (vibe-based) and DESTINATION mode (destinationOverride)
  */
 
-// CLOUDFLARE PAGES: groq-sdk uses fetch() only — no native binaries. Safe for Edge + nodejs_compat.
 export const runtime = "edge";
 
 import { NextRequest, NextResponse } from "next/server";
@@ -32,11 +31,10 @@ function validateInput(body: unknown): GenerateRequest | GenerateError {
 
   const b = body as Record<string, unknown>;
 
+  // Origin
   if (!b.origin || typeof b.origin !== "string") {
-    return { error: "origin is required (e.g. 'Kanpur').", code: "INVALID_INPUT" };
+    return { error: "origin is required (e.g. 'Lucknow').", code: "INVALID_INPUT" };
   }
-
-  // Normalise to title case and validate
   const origin = (b.origin as string).trim();
   const matchedOrigin = SUPPORTED_ORIGINS.find(
     (o) => o.toLowerCase() === origin.toLowerCase()
@@ -48,24 +46,26 @@ function validateInput(body: unknown): GenerateRequest | GenerateError {
     };
   }
 
+  // Budget
   if (!b.budget || typeof b.budget !== "number" || b.budget < 2000) {
-    return {
-      error: "budget must be a number ≥ ₹2,000.",
-      code: "INVALID_INPUT",
-    };
+    return { error: "budget must be a number \u2265 \u20b92,000.", code: "INVALID_INPUT" };
   }
 
-  if (!b.vibe || !VALID_VIBES.includes(b.vibe as Vibe)) {
-    return {
-      error: `vibe must be one of: ${VALID_VIBES.join(", ")}.`,
-      code: "INVALID_INPUT",
-    };
+  // Vibe — only required when NOT in destination override mode
+  const hasDestOverride = typeof b.destinationOverride === "string" && (b.destinationOverride as string).trim().length > 0;
+  if (!hasDestOverride) {
+    if (!b.vibe || !VALID_VIBES.includes(b.vibe as Vibe)) {
+      return {
+        error: `vibe must be one of: ${VALID_VIBES.join(", ")}.`,
+        code: "INVALID_INPUT",
+      };
+    }
   }
 
+  // Dates
   if (!b.startDate || !b.endDate) {
     return { error: "startDate and endDate are required (YYYY-MM-DD).", code: "INVALID_INPUT" };
   }
-
   const start = new Date(b.startDate as string);
   const end = new Date(b.endDate as string);
   if (isNaN(start.getTime()) || isNaN(end.getTime())) {
@@ -75,13 +75,23 @@ function validateInput(body: unknown): GenerateRequest | GenerateError {
     return { error: "endDate must be after startDate.", code: "INVALID_INPUT" };
   }
 
+  // recentlyShown (optional array of strings for freshness scoring)
+  const recentlyShown =
+    Array.isArray(b.recentlyShown)
+      ? (b.recentlyShown as unknown[]).filter((s) => typeof s === "string") as string[]
+      : [];
+
   return {
     origin: matchedOrigin,
     budget: b.budget as number,
     startDate: b.startDate as string,
     endDate: b.endDate as string,
-    vibe: b.vibe as Vibe,
+    vibe: (b.vibe as Vibe) ?? "relaxing",
     travelers: typeof b.travelers === "number" ? b.travelers : 1,
+    destinationOverride: hasDestOverride
+      ? (b.destinationOverride as string).trim()
+      : undefined,
+    recentlyShown,
   };
 }
 
@@ -102,6 +112,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
 
   const input = validated as GenerateRequest;
+  const mode = input.destinationOverride ? "destination" : "discovery";
 
   try {
     const itineraries = await buildItineraries(input);
@@ -111,13 +122,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       origin: input.origin,
       generatedAt: new Date().toISOString(),
       provider: "groq",
+      mode,
     };
 
     return NextResponse.json(response);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
 
-    // GROQ_API_KEY missing — explicit 500 with clear message (not silent undefined)
     if (message.includes("GROQ_API_KEY")) {
       return NextResponse.json<GenerateError>(
         { error: message, code: "MISSING_KEY" },
@@ -125,8 +136,12 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       );
     }
 
-    // No routes found
-    if (message.includes("No routes found") || message.includes("Budget too tight")) {
+    if (
+      message.includes("No routes found") ||
+      message.includes("Budget too tight") ||
+      message.includes("not yet in Musafir") ||
+      message.includes("No direct transport")
+    ) {
       return NextResponse.json<GenerateError>(
         { error: message, code: "NO_ROUTES" },
         { status: 422 }
