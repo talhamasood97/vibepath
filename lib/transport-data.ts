@@ -9,7 +9,7 @@
  * that were missing (Ayodhya, Mathura, Orchha, Ujjain, Sanchi, etc.)
  */
 
-import type { TrainRoute, BusRoute, TransportOption } from "@/types";
+import type { TrainRoute, BusRoute, TransportOption, LastMileData } from "@/types";
 
 // ── Train routes ──────────────────────────────────────────────────────────────
 // Key format: "ORIGIN_DESTINATION" (uppercase, spaces as underscore)
@@ -1213,6 +1213,34 @@ const LAST_MILE: Record<string, string> = {
   Mandu: "Jeep/taxi from Indore or Mhow to Mandu (\u20b9600\u20131,200). Mandu village is inside the fort.",
 };
 
+// ── Structured last-mile data (budget vs comfort, with duration) ──────────────
+// Gives users a "price shield" against local scams — they know the fair fare upfront.
+
+const LAST_MILE_DATA: Record<string, LastMileData> = {
+  Ayodhya:    { budget: "E-rickshaw \u20b930 (10 min)", comfort: "Auto/cab \u20b980\u2013120 (10 min)", duration: "10 min" },
+  Mathura:    { budget: "Auto to Vishram Ghat \u20b960 (10 min)", comfort: "Cab \u20b9200 (10 min)", duration: "10 min" },
+  Rishikesh:  { budget: "Shared taxi from Haridwar \u20b980\u2013120/person (30 min)", comfort: "Private cab \u20b9600\u2013800 (30 min)", duration: "30 min" },
+  Agra:       { budget: "Auto to Taj area \u20b9100\u2013150 (20 min)", comfort: "Cab \u20b9250\u2013350 (20 min)", duration: "20 min" },
+  Varanasi:   { budget: "Auto to Ghats \u20b980\u2013100 (20 min)", comfort: "Cab \u20b9200\u2013300 (20 min)", duration: "20\u201330 min" },
+  Jaipur:     { budget: "Auto to hotel \u20b980\u2013120 (15 min)", comfort: "Ola/cab \u20b9200\u2013300 (15 min)", duration: "15\u201325 min" },
+  Delhi:      { budget: "Metro \u20b930\u201360 (varies)", comfort: "Cab \u20b9300\u2013600 (varies)", duration: "20\u201345 min" },
+  Haridwar:   { budget: "Auto to Har Ki Pauri \u20b950\u201380 (10 min)", comfort: "Cab \u20b9150\u2013200 (10 min)", duration: "10 min" },
+  Mussoorie:  { budget: "Shared Sumo from Dehradun \u20b9120/person (1.5 hrs)", comfort: "Private cab \u20b9800\u20131,000 (1.5 hrs)", duration: "1.5 hrs" },
+  Nainital:   { budget: "Shared cab from Kathgodam \u20b9150\u2013200/person (1.5 hrs)", comfort: "Private cab \u20b9700\u20131,000 (1.5 hrs)", duration: "1.5 hrs" },
+  Shimla:     { budget: "Shared cab from Kalka \u20b9200/person (2 hrs)", comfort: "Private cab \u20b91,200\u20131,500 (2 hrs)", duration: "2 hrs" },
+  Orchha:     { budget: "Shared auto from Jhansi \u20b940 (40 min)", comfort: "Cab \u20b9350\u2013500 (40 min)", duration: "40 min" },
+  Pushkar:    { budget: "Shared jeep from Ajmer \u20b920\u201330/person (30 min)", comfort: "Private cab \u20b9300\u2013400 (30 min)", duration: "30 min" },
+  Ujjain:     { budget: "Auto to Mahakaleshwar \u20b940\u201360 (10 min)", comfort: "Cab \u20b9150 (10 min)", duration: "10 min" },
+  "Bodh Gaya":{ budget: "Auto from Gaya \u20b9150\u2013200 (20 min)", comfort: "Cab \u20b9400\u2013500 (20 min)", duration: "20 min" },
+  Rajgir:     { budget: "Hot springs 5-min walk from station", comfort: "Auto \u20b940 (5 min)", duration: "5 min" },
+  Pachmarchi: { budget: "Auto to hotel \u20b960\u2013100 (10 min)", comfort: "Full-day jeep \u20b91,000\u20131,200", duration: "10 min" },
+  Ranthambore:{ budget: "Auto to park gate \u20b980 (10 min)", comfort: "Cab \u20b9200\u2013300 (10 min)", duration: "10 min" },
+  Chitrakoot: { budget: "Auto to Ramghat \u20b960 (10 min)", comfort: "Cab \u20b9150\u2013200 (10 min)", duration: "10 min" },
+  Lansdowne:  { budget: "Shared taxi from Kotdwar \u20b9100/person (1 hr)", comfort: "Private cab \u20b9700\u2013900 (1 hr)", duration: "1 hr" },
+  Jabalpur:   { budget: "Auto to Bhedaghat \u20b9300\u2013350 (30 min)", comfort: "Cab \u20b9500\u2013600 (30 min)", duration: "30 min" },
+  Pench:      { budget: "Pre-arranged hotel transfer \u20b9500", comfort: "Private cab from Nagpur \u20b91,500\u20132,000", duration: "2\u20133 hrs" },
+};
+
 // ── Lookup function ───────────────────────────────────────────────────────────
 
 export function getTransportOptions(
@@ -1227,6 +1255,7 @@ export function getTransportOptions(
   const bus = BUS_ROUTES[key];
   const firstMile = FIRST_MILE[origin] ?? `Auto/Ola to ${origin} station (~\u20b980\u2013130)`;
   const lastMile = LAST_MILE[destination] ?? `Auto/Cab from ${destination} station (~\u20b9100\u2013200)`;
+  const lastMileData = LAST_MILE_DATA[destination];
 
   const options: TransportOption[] = [];
 
@@ -1236,6 +1265,7 @@ export function getTransportOptions(
       train,
       firstMile,
       lastMile,
+      lastMileData,
       totalCostPerPerson: {
         budget: train.price.sleeper || train.price.ac3,
         midrange: train.price.ac3 || train.price.ac2,
@@ -1250,6 +1280,7 @@ export function getTransportOptions(
       bus,
       firstMile,
       lastMile,
+      lastMileData,
       totalCostPerPerson: {
         budget: bus.price.min,
         midrange: Math.round((bus.price.min + bus.price.max) / 2),
@@ -1261,4 +1292,4 @@ export function getTransportOptions(
   return options;
 }
 
-export { TRAIN_ROUTES, BUS_ROUTES, FIRST_MILE, LAST_MILE };
+export { TRAIN_ROUTES, BUS_ROUTES, FIRST_MILE, LAST_MILE, LAST_MILE_DATA };

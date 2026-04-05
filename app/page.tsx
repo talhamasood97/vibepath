@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef } from "react";
-import type { GeneratedItinerary, TripInput, GenerateResponse, GenerateError } from "@/types";
-import SearchForm from "@/components/SearchForm";
+import { useState, useRef, useEffect } from "react";
+import type { GeneratedItinerary, TripInput, Vibe, GenerateResponse, GenerateError } from "@/types";
+import SearchForm, { saveShownDestinations } from "@/components/SearchForm";
 import ItineraryCard from "@/components/ItineraryCard";
 
 // ── Logo SVG ─────────────────────────────────────────────────────────────────
@@ -35,17 +35,42 @@ function LogoMark({ size = 34 }: { size?: number }) {
   );
 }
 
-// ── Skeleton loading card ─────────────────────────────────────────────────────
-function SkeletonCard() {
+// ── Step-by-step loading display ─────────────────────────────────────────────
+const LOADING_STEPS = [
+  { icon: "\ud83d\ude82", text: "Finding trains and buses\u2026",     sub: "Checking routes from your city" },
+  { icon: "\ud83d\uddfa\ufe0f", text: "Scoring 33 destinations\u2026", sub: "Vibe, season, distance, freshness" },
+  { icon: "\ud83d\udcb0", text: "Allocating your budget\u2026",       sub: "Transport \xb7 Stay \xb7 Food \xb7 Activities" },
+  { icon: "\u270d\ufe0f", text: "Musafir is writing your plan\u2026",  sub: "Almost there, dost" },
+];
+
+function LoadingSteps({ origin }: { origin?: string }) {
+  const [step, setStep] = useState(0);
+
+  useEffect(() => {
+    const timings = [1800, 3500, 5500]; // advance at 1.8s, 3.5s, 5.5s
+    const timers = timings.map((delay, i) =>
+      setTimeout(() => setStep(i + 1), delay)
+    );
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
+  const current = LOADING_STEPS[Math.min(step, LOADING_STEPS.length - 1)];
+
   return (
-    <div className="itinerary-card">
-      <div className="card-image shimmer" />
-      <div className="card-body" style={{ gap: "0.75rem" }}>
-        <div className="shimmer" style={{ height: 18, borderRadius: 6, width: "70%" }} />
-        <div className="shimmer" style={{ height: 12, borderRadius: 6, width: "90%" }} />
-        <div className="shimmer" style={{ height: 8, borderRadius: 999, width: "100%" }} />
-        <div className="shimmer" style={{ height: 56, borderRadius: 10 }} />
-        <div className="shimmer" style={{ height: 40, borderRadius: 10 }} />
+    <div className="cards-grid" style={{ gridColumn: "1 / -1" }}>
+      <div style={{ gridColumn: "1 / -1" }}>
+        <div className="loading-steps">
+          <div className="loading-step-icon">{current.icon}</div>
+          <div className="loading-step-text">
+            {step === 0 && origin ? `Finding trains from ${origin}\u2026` : current.text}
+          </div>
+          <div className="loading-step-sub">{current.sub}</div>
+          <div className="loading-progress" aria-hidden="true">
+            {LOADING_STEPS.map((_, i) => (
+              <div key={i} className={`loading-dot${i <= step ? " active" : ""}`} />
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -97,11 +122,27 @@ export default function HomePage() {
   const [error,       setError]       = useState<string | null>(null);
   const [itineraries, setItineraries] = useState<GeneratedItinerary[]>([]);
   const [lastVibe,    setLastVibe]    = useState<string>("adventure");
+  const [lastOrigin,  setLastOrigin]  = useState<string | undefined>(undefined);
+  const [prefill,     setPrefill]     = useState<{ vibe?: Vibe; budget?: number } | null>(null);
+  const [showSticky,  setShowSticky]  = useState(false);
 
   const resultsRef = useRef<HTMLElement | null>(null);
   const searchRef  = useRef<HTMLDivElement | null>(null);
 
+  useEffect(() => {
+    function onScroll() {
+      setShowSticky(window.scrollY > 480);
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   function scrollToSearch() {
+    searchRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  function handleSampleCardClick(vibe: Vibe, budget: number) {
+    setPrefill({ vibe, budget });
     searchRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
@@ -109,6 +150,7 @@ export default function HomePage() {
     setLoading(true);
     setError(null);
     setLastVibe(input.vibe);
+    setLastOrigin(input.origin);
 
     try {
       const res = await fetch("/api/generate", {
@@ -122,7 +164,10 @@ export default function HomePage() {
         setError("error" in data ? data.error : "Something went wrong. Try again.");
         setItineraries([]);
       } else {
-        setItineraries((data as GenerateResponse).itineraries);
+        const result = (data as GenerateResponse).itineraries;
+        setItineraries(result);
+        // Wire saveShownDestinations — persists to localStorage for freshness anti-repetition
+        saveShownDestinations(result.map((it) => it.destination.name));
         setTimeout(
           () => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
           100
@@ -140,6 +185,13 @@ export default function HomePage() {
 
   return (
     <>
+      {/* ── STICKY PLAN CTA ── */}
+      <div className={`sticky-plan-btn${showSticky ? " visible" : ""}`}>
+        <button type="button" onClick={scrollToSearch}>
+          Plan a weekend ↑
+        </button>
+      </div>
+
       {/* ── HEADER ── */}
       <header>
         <div className="page-shell nav" aria-label="Primary navigation">
@@ -176,7 +228,7 @@ export default function HomePage() {
             {/* Left: copy */}
             <div>
               <div className="hero-eyebrow fade-up">
-                For weekend trips across India · Tier 2, Tier 3 &amp; beyond
+                For weekend trips across India · Tier 2, Tier 3 & beyond
               </div>
               <h1 className="hero-title fade-up fade-up-d1" id="hero-heading">
                 One form. Three itineraries.<br />Zero tab chaos.
@@ -212,7 +264,7 @@ export default function HomePage() {
             {/* Right: search card */}
             <aside className="hero-right fade-up fade-up-d2" aria-label="Trip search">
               <div ref={searchRef}>
-                <SearchForm onSubmit={handleSearch} loading={loading} />
+                <SearchForm onSubmit={handleSearch} loading={loading} prefill={prefill} />
               </div>
             </aside>
           </div>
@@ -282,11 +334,7 @@ export default function HomePage() {
             {/* Cards */}
             <div className="cards-grid" aria-label="Three itinerary options">
               {loading ? (
-                <>
-                  <SkeletonCard />
-                  <SkeletonCard />
-                  <SkeletonCard />
-                </>
+                <LoadingSteps origin={lastOrigin} />
               ) : hasResults ? (
                 itineraries.map((it, i) => (
                   <ItineraryCard key={`${it.destination.name}-${it.profile}`} itinerary={it} index={i} vibe={lastVibe} />
@@ -312,18 +360,19 @@ export default function HomePage() {
                       </div>
                       <p className="card-desc">Rafting at Shivpuri, Laxman Jhula walk, camp under the stars. The evening bus gets you there overnight — more time in the hills.</p>
                       <div className="route-pills">
-                        <span className="route-pill"><span className="route-dot" />Fri: Evening bus → Rishikesh</span>
-                        <span className="route-pill"><span className="route-dot" />Sat: Rafting + cafes</span>
-                        <span className="route-pill"><span className="route-dot" />Sun: Late-afternoon return</span>
+                        <span className="route-pill" data-tip="~7h overnight bus from Lucknow · saves a hotel night · arrive early morning"><span className="route-dot" />Fri: Evening bus → Rishikesh</span>
+                        <span className="route-pill" data-tip="Shivpuri rapids Grade 3–4 · ₹600–800 per person · 16km stretch"><span className="route-dot" />Sat: Rafting + cafes</span>
+                        <span className="route-pill" data-tip="Last bus back ~4pm · reach Lucknow by midnight"><span className="route-dot" />Sun: Late-afternoon return</span>
                       </div>
                       <div className="tradeoff-box tradeoff-blue">
                         <span className="tradeoff-icon">💡</span>
                         <span>Leave Friday after work, return Sunday night. You trade sleep for one full extra day in the destination.</span>
                       </div>
                       <div className="card-footer">
-                        <button className="btn btn-outline btn-sm" type="button" onClick={scrollToSearch}>Search your trip</button>
-                        <div className="card-footnote">Sample data · search for live results</div>
+                        <button className="btn btn-outline btn-sm" type="button" onClick={() => handleSampleCardClick("mountains", 8000)}>{"Try this vibe \u2192"}</button>
+                        <div className="card-footnote">{"Sample data \xb7 search for live results"}</div>
                       </div>
+                      <div className="sample-card-cta-hint">{"↑ Click to pre-fill your search"}</div>
                     </div>
                   </article>
 
@@ -337,25 +386,29 @@ export default function HomePage() {
                     <div className="card-body">
                       <div className="card-header-row">
                         <h3 className="card-title">Sleeper train, hostel dorm, street food trail</h3>
-                        <div className="budget-number" style={{ color: "var(--accent-teal)" }}>₹6,180<br />77%</div>
+                        <div className="budget-number" style={{ color: "var(--accent-teal)" }}>{"\u20b96,180"}<br />77%</div>
                       </div>
                       <div className="budget-line">
                         <span style={{ fontSize: "0.75rem", color: "var(--text-soft)" }}>Budget usage</span>
                         <div className="budget-bar-shell"><div className="budget-bar-fill" style={{ width: "77%" }} /></div>
                       </div>
-                      <p className="card-desc">You under-spend. VibePath suggests upgrades — better stay or an extra activity — instead of leaving money idle.</p>
+                      <p className="card-desc">{"You under-spend. VibePath suggests upgrades \u2014 better stay or an extra activity \u2014 instead of leaving money idle."}</p>
                       <div className="route-pills">
-                        <span className="route-pill"><span className="route-dot" style={{ background: "var(--accent-teal)" }} />Sleeper train both ways</span>
-                        <span className="route-pill"><span className="route-dot" style={{ background: "var(--accent-teal)" }} />Hostel in main market</span>
+                        <span className="route-pill" data-tip="Overnight Sleeper (SL) · ~₹300 one way · ~9h · saves Friday hotel"><span className="route-dot" style={{ background: "var(--accent-teal)" }} />Sleeper train both ways</span>
+                        <span className="route-pill" data-tip="Mallital or Tallital area · ₹400–600/night dorm · walking distance to Mall Road"><span className="route-dot" style={{ background: "var(--accent-teal)" }} />Hostel in main market</span>
                       </div>
                       <div className="tradeoff-box tradeoff-teal">
-                        <span className="tradeoff-icon">💰</span>
-                        <span>Shift ₹1,000 from transport savings into a quieter stay or one marquee activity.</span>
+                        <span className="tradeoff-icon">{"\ud83d\udcb0"}</span>
+                        <div>
+                          <div className="tradeoff-label">Smart Save</div>
+                          <span>{"Shift \u20b91,000 from transport savings into a quieter stay or one marquee activity."}</span>
+                        </div>
                       </div>
                       <div className="card-footer">
-                        <button className="btn btn-outline btn-sm" type="button" onClick={scrollToSearch}>Find your trip</button>
+                        <button className="btn btn-outline btn-sm" type="button" onClick={() => handleSampleCardClick("relaxing", 6000)}>{"Try this vibe \u2192"}</button>
                         <div className="card-footnote">Good for students.</div>
                       </div>
+                      <div className="sample-card-cta-hint">{"↑ Click to pre-fill your search"}</div>
                     </div>
                   </article>
 
@@ -369,7 +422,7 @@ export default function HomePage() {
                     <div className="card-body">
                       <div className="card-header-row">
                         <h3 className="card-title">Morning Volvo, boutique stay, slower pace</h3>
-                        <div className="budget-number" style={{ color: "var(--accent-warm)" }}>₹8,450<br />106%</div>
+                        <div className="budget-number" style={{ color: "var(--accent-warm)" }}>{"\u20b98,450"}<br />106%</div>
                       </div>
                       <div className="budget-line">
                         <span style={{ fontSize: "0.75rem", color: "var(--text-soft)" }}>Budget usage</span>
@@ -377,17 +430,21 @@ export default function HomePage() {
                       </div>
                       <p className="card-desc">Gently overshoots budget. VibePath calls it out and shows exactly what to drop to return within budget.</p>
                       <div className="route-pills">
-                        <span className="route-pill"><span className="route-dot" style={{ background: "var(--accent-gold)" }} />AC bus both ways</span>
-                        <span className="route-pill"><span className="route-dot" style={{ background: "var(--accent-gold)" }} />Boutique homestay</span>
+                        <span className="route-pill" data-tip="Volvo/AC sleeper · ~₹700 one way · departs 6am · scenic route via Dehradun"><span className="route-dot" style={{ background: "var(--accent-gold)" }} />AC bus both ways</span>
+                        <span className="route-pill" data-tip="Landour or Library Road area · ₹1,800–2,500/night · quieter than mall zone"><span className="route-dot" style={{ background: "var(--accent-gold)" }} />Boutique homestay</span>
                       </div>
                       <div className="tradeoff-box tradeoff-warm">
-                        <span className="tradeoff-icon">✂️</span>
-                        <span>Drop one paid experience → save ~₹1,200 → back within budget without touching comfort.</span>
+                        <span className="tradeoff-icon">{"\u2702\ufe0f"}</span>
+                        <div>
+                          <div className="tradeoff-label">Pro Tip</div>
+                          <span>{"Drop one paid experience \u2192 save ~\u20b91,200 \u2192 back within budget without touching comfort."}</span>
+                        </div>
                       </div>
                       <div className="card-footer">
-                        <button className="btn btn-outline btn-sm" type="button" onClick={scrollToSearch}>Plan your trip</button>
+                        <button className="btn btn-outline btn-sm" type="button" onClick={() => handleSampleCardClick("city", 10000)}>{"Try this vibe \u2192"}</button>
                         <div className="card-footnote">For comfort-first travelers.</div>
                       </div>
+                      <div className="sample-card-cta-hint">{"↑ Click to pre-fill your search"}</div>
                     </div>
                   </article>
                 </>
@@ -468,7 +525,7 @@ export default function HomePage() {
                     <div className={`proof-avatar ${p.av}`}>{p.init}</div>
                     <div style={{ textAlign: "left" }}>
                       <div className="proof-name">{p.name}</div>
-                      <div className="proof-meta">{p.meta}</div>
+                      <div className="proof-meta-badge">{p.meta}</div>
                     </div>
                   </div>
                 </div>

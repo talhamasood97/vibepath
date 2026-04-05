@@ -313,9 +313,9 @@ const DESTINATIONS: Destination[] = [
     },
     food: { dailyBudget: 250, dailyMidrange: 500 },
     mustDo: [
-      "Taj Mahal at sunrise (\u20b91,100 entry, skip 10 AM\u20132 PM crowds)",
-      "Agra Fort (\u20b9650 entry)",
-      "Mehtab Bagh sunset \u2014 best free Taj view across the Yamuna",
+      "Taj Mahal at sunrise (\u20b950 entry + \u20b9200 inner mausoleum, skip 10 AM\u20132 PM crowds)",
+      "Agra Fort (\u20b940 entry)",
+      "Mehtab Bagh sunset \u2014 best Taj view across the Yamuna (\u20b930 entry)",
       "Kinari Bazaar for marble inlay and petha",
       "Bedai and jalebi at Paliwal Restaurant (breakfast)",
     ],
@@ -342,7 +342,7 @@ const DESTINATIONS: Destination[] = [
     mustDo: [
       "Amber Fort (8\u201310 AM before tour buses)",
       "Hawa Mahal (exterior photo from Wind View Cafe rooftop)",
-      "Jantar Mantar (\u20b9200 entry)",
+      "Jantar Mantar (\u20b950 entry)",
       "Pyaaz kachori at Rawat Misthan Bhandar (9 AM)",
       "Johari Bazaar block print shopping",
     ],

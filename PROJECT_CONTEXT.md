@@ -10,13 +10,14 @@
 | Field | Value |
 |---|---|
 | Name | VibePath |
-| AI Persona | **Musafir** (renamed from Arjun) |
+| AI Persona | **Musafir** |
 | Tagline | Weekend trip planning without 5 open tabs |
 | Live URL | https://vibepath.pages.dev |
 | GitHub | https://github.com/talhamasood97/vibepath |
 | Package Name | `vibepath-app` v0.1.0 |
 | Local Dev Port | 3001 |
 | Cloudflare Account | Masoodtalha95@gmail.com |
+| CF Pages Project | `vibepath` (NOT `vibepath-app` — that is a stale test project) |
 
 ## 2. Product Summary
 
@@ -34,18 +35,28 @@ VibePath is a constraint-based weekend trip planner for Tier 2/3 India. It opera
 | Framework | Next.js App Router | 16.2.2 | SSR + API routes |
 | Language | TypeScript | ^5 | Strict types throughout |
 | Styling | Tailwind CSS | ^4 | Utility-first, custom design tokens |
-| LLM | Groq — `llama-3.1-8b-instant` | groq-sdk ^1.1.2 | Free 14,400 RPD, no credit card |
+| LLM — Narrative | Groq — `llama-3.1-8b-instant` | groq-sdk ^1.1.2 | Free 14,400 RPD, "Fast Brain" |
+| LLM — Validation | Gemini 2.0 Flash | REST API (no npm pkg) | Google Search Grounding, "Live Eyes" |
 | Hosting | Cloudflare Pages | — | Free, unlimited bandwidth, global CDN |
-| Font | Inter (Google Fonts via `next/font`) | — | Consistent with opus design |
+| Font | Inter (Google Fonts via `next/font`) | — | Consistent design |
 | Node | v20.20.1 | — | Managed via nvm |
 
-**Zero-cost stack:** No paid APIs, no database, no auth. Entire product runs on static data + Groq free tier.
+**Zero-cost stack:** Groq free tier (14,400 RPD) + Gemini 2.0 Flash free tier (5,000 grounded prompts/month). No paid APIs, no database, no auth.
 
 ## 4. Architecture
 
-### Core Pattern: Structured Generation
+### Core Pattern: "Fast Brain + Live Eyes"
 
-The LLM (**Musafir** persona) **only writes narrative**. All prices, routes, timings, and logistics come from deterministic static data. This guarantees accuracy and prevents hallucinated prices.
+Two LLMs run in **parallel**, each doing only what it does best:
+
+| Phase | Tool | Role | Data Source |
+|---|---|---|---|
+| Logistics | Static code | Transport, budget, routing | `transport-data.ts`, `budget-allocator.ts` |
+| Narrative | Groq (Musafir) | Write the trip story, day plan, tradeoffs | Static `.ts` files + local intelligence |
+| Validation | Gemini 2.0 Flash | Real-time alerts: weather, closures, bandhs | Google Search Grounding (live web) |
+| Display | Frontend | Show itinerary + optional live alert badge | Combined output |
+
+**Groq is "blind"** — Llama only knows training data (6–12 months old). It cannot browse the web. Gemini has "Live Eyes" via Google Search Grounding. Neither blocks the other — they race in `Promise.all()`.
 
 ### DISCOVERY MODE Pipeline
 
@@ -55,24 +66,20 @@ TripInput (origin, budget, dates, vibe, recentlyShown?)
     ▼
 destination-matcher.ts → matchDestinations(input)
   → filter DESTINATIONS catalogue (33 entries) by route existence
-  → for each candidate: scoreDestination() → 5-factor score
+  → scoreDestination() → 5-factor score per candidate
   → selectDiverseTop3() → top 3 diverse Destination objects
     │
     ▼
 transport-data.ts → getTransportOptions(origin, dest) → TransportOption[]
-    │
-    ▼
 budget-allocator.ts → allocateAllProfiles(dest, transport, budget, nights)
-  → Value = sleeper + hostel | Balanced = 3AC + budget hotel | Comfort = 2AC + midrange
-    │
-    ▼
 local-intelligence.ts → getLocalIntelligence(dest.name) → LocalIntelligence | null
-  (curated food/gems/warnings injected into LLM prompt)
     │
     ▼
-groq-client.ts → generateAllNarratives(contexts[]) — parallel Promise.allSettled
-  → DISCOVERY_SYSTEM_PROMPT: Musafir as "smart dost who's been there"
-  → model: llama-3.1-8b-instant, response_format: json_object
+Promise.all([
+  groq-client.ts → generateAllNarratives(contexts[])       ← "Fast Brain"
+  gemini-validator.ts → getLiveAlert(dest, state, date)    ← "Live Eyes" per unique dest
+])
+  → Gemini always fails silently — never blocks Groq results
     │
     ▼
 POST /api/generate → GenerateResponse { itineraries[3], mode: "discovery" }
@@ -84,25 +91,30 @@ POST /api/generate → GenerateResponse { itineraries[3], mode: "discovery" }
 TripInput (origin, budget, dates, destinationOverride)
     │
     ▼
-destination-matcher.ts → findDestinationByName(name) → Destination | null
+findDestinationByName(name) → Destination | null
+getTransportOptions(origin, dest)
+allocateAllProfiles × 3 (Value/Balanced/Comfort for SAME dest)
     │
     ▼
-transport-data.ts → getTransportOptions(origin, dest)
-    │
-    ▼
-budget-allocator.ts → allocateAllProfiles × 3 (Value/Balanced/Comfort for SAME dest)
-    │
-    ▼
-local-intelligence.ts → getLocalIntelligence(dest.name)
-    │
-    ▼
-groq-client.ts → generateAllNarratives(contexts[])
-  → DESTINATION_SYSTEM_PROMPT: Musafir as "local expert who's been here 5 times"
-  → higher token budget (800 vs 650), temp 0.8 vs 0.7
+Promise.all([
+  generateAllNarratives(contexts[3])     ← 3 narratives, different profiles
+  getLiveAlert(dest, state, date)        ← 1 Gemini call (same dest × 3 profiles)
+])
     │
     ▼
 POST /api/generate → GenerateResponse { itineraries[3], mode: "destination" }
 ```
+
+**Deduplication:** In discovery mode, 3 different destinations → up to 3 Gemini calls. In destination mode, 1 destination × 3 profiles → exactly 1 Gemini call. Uses `new Set(destNames)`.
+
+### Gemini Live Alert Details (`lib/gemini-validator.ts`)
+
+- **API:** Direct `fetch` to `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=...` — no npm package (avoids Edge Runtime compatibility issues)
+- **Tool:** `{ google_search: {} }` — enables real-time web grounding
+- **Timeout:** 8-second `AbortSignal.timeout`
+- **Scope (narrow by design):** IMD weather red/orange alerts, landslides, road closures, floods, bandhs/strikes, official monument/park closures in the last 7 days. NOT cafe hours, hotel reviews, or general travel tips.
+- **Silent failure:** Any error (timeout, parse failure, missing key, API down) → returns `null` → Groq results returned as-is
+- **Free tier:** 5,000 grounded prompts/month — at ~2 searches/user → covers 2,500 users at $0
 
 ### 5-Factor Scoring Engine (`lib/destination-scorer.ts`)
 
@@ -113,24 +125,12 @@ Score = VibeDepth×0.30 + TripFit×0.25 + Freshness×0.20 + RouteQuality×0.15 +
 | Factor | Computation |
 |---|---|
 | **VibeDepth** | `dest.vibeStrength[vibe]` — 0 to 1 |
-| **TripFit** | Proximity: Ring 1 (≤200km)=1.0, Ring 2 (≤400km)=0.75, Ring 3 (≤600km)=0.5, far=0.3. Adjusted for `typicalStayNights` fit |
-| **Freshness** | Base: hidden-gem=0.95, offbeat=0.80, popular=0.50, iconic=0.30. Penalty from localStorage: -0.4 (last session), -0.2 (2 ago), -0.1 (3 ago) |
+| **TripFit** | Ring 1 (≤200km)=1.0, Ring 2 (≤400km)=0.75, Ring 3 (≤600km)=0.5, far=0.3 |
+| **Freshness** | hidden-gem=0.95, offbeat=0.80, popular=0.50, iconic=0.30. Penalty from localStorage: -0.4/-0.2/-0.1 for recent sessions |
 | **RouteQuality** | train overnight=1.0, train daytime=0.8, bus=0.5, no route=0 |
-| **SeasonalBoost** | +0.2 if current month in `dest.bestMonths`, +0.1 if adjacent month |
+| **SeasonalBoost** | +0.2 if current month in `dest.bestMonths`, +0.1 if adjacent |
 
 `selectDiverseTop3()` ensures no two cards show the same destination in discovery mode.
-
-### Transport Data Key Format
-
-`TRAIN_ROUTES` and `BUS_ROUTES` keyed as `"ORIGIN_DESTINATION"` uppercase, e.g. `"LUCKNOW_AYODHYA"`. ~60+ routes total (up from 25 at MVP).
-
-### First/Last Mile
-
-Every `TransportOption` includes `firstMile` and `lastMile` strings for door-to-destination routing (from `FIRST_MILE` / `LAST_MILE` maps in `transport-data.ts`).
-
-### Anti-Repetition (Freshness, Rec 6)
-
-localStorage key `"vp_recently_shown"` stores last 5 sessions as `string[][]`. `loadRecentlyShown()` in `SearchForm` flattens these and passes as `recentlyShown` in `TripInput`. Scorer applies freshness penalty so users don't see same destinations repeatedly.
 
 ## 5. Data & Schemas
 
@@ -138,106 +138,82 @@ localStorage key `"vp_recently_shown"` stores last 5 sessions as `string[][]`. `
 
 `Kanpur`, `Lucknow`, `Varanasi`, `Jaipur`, `Indore`, `Nagpur`, `Bhopal`, `Patna`, `Agra`, `Prayagraj`
 
-Validation in `route.ts` — returns 400 with full list if origin not matched.
-
 ### Destination Catalogue (33, in `lib/destination-matcher.ts`)
 
-Each destination has: `name`, `state`, `tagline`, `vibes[]`, `primaryVibe`, `vibeStrength` (per-vibe 0–1 scores), `discovery` tag, `bestMonths[]`, `distanceKm`, `typicalStayNights`, `accommodation` (hostel/budget/midrange min-max), `food` (daily budgets), `mustDo[]`, `avgActivityCost`.
+**CRITICAL: All monument/entry prices are INDIAN NATIONAL (domestic) rates.** ASI has two-tier pricing; domestic tourists pay far less. Key corrections applied:
 
-| Destination | State | Primary Vibe | Discovery Tag |
-|---|---|---|---|
-| Ayodhya | Uttar Pradesh | spiritual | iconic |
-| Mathura | Uttar Pradesh | spiritual | popular |
-| Varanasi | Uttar Pradesh | spiritual | iconic |
-| Haridwar | Uttarakhand | spiritual | popular |
-| Rishikesh | Uttarakhand | adventure | popular |
-| Ujjain | Madhya Pradesh | spiritual | offbeat |
-| Pushkar | Rajasthan | spiritual | offbeat |
-| Bodh Gaya | Bihar | spiritual | offbeat |
-| Rajgir | Bihar | spiritual | hidden-gem |
-| Chitrakoot | Uttar Pradesh | spiritual | hidden-gem |
-| Agra | Uttar Pradesh | historical | iconic |
-| Jaipur | Rajasthan | historical | iconic |
-| Delhi | Delhi | city | iconic |
-| Orchha | Madhya Pradesh | historical | offbeat |
-| Khajuraho | Madhya Pradesh | historical | popular |
-| Gwalior | Madhya Pradesh | historical | offbeat |
-| Sanchi | Madhya Pradesh | historical | hidden-gem |
-| Bundi | Rajasthan | historical | hidden-gem |
-| Udaipur | Rajasthan | relaxing | popular |
-| Jodhpur | Rajasthan | historical | popular |
-| Mandu | Madhya Pradesh | historical | hidden-gem |
-| Mussoorie | Uttarakhand | mountains | popular |
-| Nainital | Uttarakhand | mountains | popular |
-| Shimla | Himachal Pradesh | mountains | popular |
-| Lansdowne | Uttarakhand | mountains | hidden-gem |
-| Pachmarchi | Madhya Pradesh | mountains | offbeat |
-| Ranthambore | Rajasthan | adventure | popular |
-| Pench | Madhya Pradesh | adventure | offbeat |
-| Jabalpur | Madhya Pradesh | adventure | offbeat |
-| Corbett | Uttarakhand | adventure | popular |
-| Pushkar | Rajasthan | spiritual | offbeat |
-| Tadoba | Maharashtra | adventure | offbeat |
-| Kanha | Madhya Pradesh | adventure | offbeat |
+| Monument | Old (wrong — foreign rate) | Correct (Indian national rate) |
+|---|---|---|
+| Taj Mahal | ₹1,100 | ₹50 entry + ₹200 inner mausoleum |
+| Agra Fort | ₹650 | ₹40 |
+| Mehtab Bagh | ₹300 | ₹30 |
+| Jantar Mantar (Jaipur) | ₹200 | ₹50 |
+| Itimad-ud-Daulah | ₹310 | ₹30 |
 
 ### Local Intelligence Coverage (`lib/local-intelligence.ts`)
 
-13 destinations have curated hyper-local data injected into LLM prompts:
+13 destinations with curated hyper-local data injected into Groq prompts:
 
 **Ayodhya, Varanasi, Rishikesh, Agra, Jaipur, Mathura, Orchha, Ujjain, Pushkar, Bodh Gaya, Rajgir, Pachmarchi, Ranthambore, Delhi**
 
-Each entry contains:
-- `mustEat[]` — named restaurants/dhabas with `area`, `knownFor`, `price`, `tip?`
-- `streetFood[]` — street snacks with `area`, `price`, `tip?`
-- `shopping[]` — craft/souvenir spots with `what`, `where`, `priceRange`, `tip?`
-- `hiddenGems[]` — off-the-beaten-path spots with `name`, `what`, `why`, `bestTime?`
-- `avoid[]` — honest tourist trap warnings (strings)
-- `timingTips[]` — when to visit specific sites, what to avoid
-- `localTransport` — how to get around locally (string)
-- `knowBeforeYouGo[]` — dress codes, entry rules, packing tips
-- `stayAreas[]` — recommended neighbourhoods per profile
+Each entry: `mustEat[]`, `streetFood[]`, `shopping[]`, `hiddenGems[]`, `avoid[]`, `timingTips[]`, `localTransport`, `knowBeforeYouGo[]`, `stayAreas[]`
+
+**Fact corrections applied:**
+
+| Location | Was | Now |
+|---|---|---|
+| Rishikesh — Lakshman Jhula | "Cross the bridge" | Original demolished 2019–2020; points to Ram Jhula or new footbridge |
+| Jaipur — Elephant rides | "Banned in 2022" | "Legally contested since 2019" |
+| Ranthambore — Tiger sighting | 70–80% | 50–60% (realistic average) |
+| Ranthambore — Booking URL | `rajasthan.gov.in/forest` | `rajasthanwildlife.in` |
+| Delhi — Agrasen Ki Baoli | "UNESCO listed" | "ASI-protected monument" |
+| Delhi — Metro day pass | ₹100 | ₹200 (1-day Tourist Card) |
+
+**Groq system prompts** include: *"All entry prices in the data are INDIAN NATIONAL rates. Do not substitute or mention foreign national prices."*
 
 ### Vibes (7)
 
-`mountains` · `beach` (**disabled — "SOON" pill in UI**) · `historical` · `adventure` · `spiritual` · `relaxing` · `city`
+`mountains` · `beach` (**pill disabled, "SOON" badge**) · `historical` · `adventure` · `spiritual` · `relaxing` · `city`
 
 ### Budget Profiles (3)
 
 | Profile | Train Class | Accommodation | Badge |
 |---|---|---|---|
-| `value` | sleeper | hostel | Best Value (teal) |
-| `balanced` | 3AC | budget hotel | Best Match (purple, featured) |
-| `comfort` | 2AC | midrange | Comfort (gold) |
+| `value` | Sleeper | Hostel | Best Value (teal) |
+| `balanced` | 3AC | Budget hotel | Best Match (purple, featured) |
+| `comfort` | 2AC | Midrange | Comfort (gold) |
 
 ### Key TypeScript Interfaces (`types/index.ts`)
 
 ```typescript
 type Vibe = "mountains" | "beach" | "historical" | "adventure" | "spiritual" | "relaxing" | "city"
-type DiscoveryTag = "iconic" | "popular" | "offbeat" | "hidden-gem"
+type TravelerType = "solo-male" | "solo-female" | "couple" | "friends" | "family"
 
 interface TripInput {
   origin: string; budget: number; startDate: string; endDate: string;
-  vibe: Vibe; travelers: number;
-  destinationOverride?: string;   // DESTINATION mode
-  recentlyShown?: string[];       // freshness anti-repetition
+  vibe: Vibe; travelers: number; travelerType?: TravelerType;
+  destinationOverride?: string;
+  recentlyShown?: string[];
 }
 
-interface Destination {
-  name, state, tagline, vibes: Vibe[], primaryVibe: Vibe,
-  vibeStrength: Partial<Record<Vibe, number>>,  // 0-1 per vibe
-  discovery: DiscoveryTag, bestMonths: number[],
-  distanceKm, typicalStayNights, accommodation, food, mustDo, avgActivityCost
+interface LiveAlert {
+  text: string;      // one concise sentence from Gemini Search Grounding
+  source?: string;   // e.g. "IMD", "NHAI"
 }
 
-interface LocalFood { name: string; area: string; knownFor?: string; price: string; tip?: string; }
-interface LocalShopping { what: string; where: string; priceRange: string; tip?: string; }
-interface LocalIntelligence { destination, mustEat, streetFood, shopping, hiddenGems, avoid, timingTips, localTransport, knowBeforeYouGo, stayAreas }
+interface GeneratedItinerary extends StructuredItinerary {
+  narrative: string;
+  dayPlan: string;
+  tradeoffs: string[];
+  monsoonWarning?: string;
+  liveAlert?: LiveAlert;   // absent = no alert found (Gemini returned null)
+}
 
-interface BudgetAllocation { profile, totalBudget, transport, accommodation, food, activities, buffer, utilizationPct, trainClass, accommodationType, tradeoffNote? }
-interface GeneratedItinerary extends StructuredItinerary { narrative: string; dayPlan: string; tradeoffs: string[]; }
-
-interface GenerateResponse { itineraries: GeneratedItinerary[]; origin: string; generatedAt: string; provider: "groq"; mode: "discovery" | "destination"; }
-interface GenerateError { error: string; code: "MISSING_KEY" | "RATE_LIMIT" | "INVALID_INPUT" | "NO_ROUTES" | "LLM_ERROR"; }
+interface GenerateResponse {
+  itineraries: GeneratedItinerary[];
+  origin: string; generatedAt: string;
+  provider: "groq"; mode: "discovery" | "destination";
+}
 ```
 
 ## 6. File Map
@@ -245,221 +221,195 @@ interface GenerateError { error: string; code: "MISSING_KEY" | "RATE_LIMIT" | "I
 ```
 vibepath-app/
 ├── app/
-│   ├── layout.tsx              # Root layout: Inter font (next/font/google), imports globals.css
-│   ├── page.tsx                # Full single-page app: header, hero, stats, results, how-it-works,
-│   │                           # social proof, cities, footer CTA, footer. "use client".
-│   ├── globals.css             # Full design system. CSS vars, all component classes.
-│   │                           # --primary #5b3fd9, --accent-warm #ff6a3c, --accent-teal #00c9a7
-│   │                           # --accent-gold #FFB547, --bg #f6f5ff
-│   └── api/generate/route.ts   # POST /api/generate. runtime = "edge". Validates origin, budget,
-│                               # vibe (optional in dest mode), startDate, endDate,
-│                               # destinationOverride?, recentlyShown?
-│                               # Returns GenerateResponse with mode: "discovery" | "destination"
+│   ├── layout.tsx              # Root layout: Inter font, imports globals.css
+│   ├── page.tsx                # Full SPA ("use client"). Features:
+│   │                           #   - Sticky "Plan a weekend ↑" fixed button (visible scrollY > 480)
+│   │                           #   - Sample cards with data-tip route pill tooltips
+│   │                           #   - Hover hint "↑ Click to pre-fill your search" on sample cards
+│   │                           #   - Social proof with proof-meta-badge for institution names
+│   │                           #   - LoadingSteps animation (4 steps, 1.8s intervals)
+│   ├── globals.css             # Full design system. Key classes:
+│   │                           #   .sticky-plan-btn (position:fixed bottom-right, fade-in)
+│   │                           #   .route-pill[data-tip]::after (CSS-only tooltip on hover)
+│   │                           #   .sample-card-cta-hint (fades in on card hover)
+│   │                           #   .pill[data-vibe][data-active="true"] (per-vibe glow/border)
+│   │                           #   .proof-meta-badge (pill badge for institution names)
+│   │                           #   .live-alert + .live-alert-badge (Gemini alert block)
+│   │                           #   .monsoon-warning (amber caution)
+│   └── api/generate/route.ts   # POST /api/generate. runtime="edge". Validates all inputs.
 │
 ├── components/
-│   ├── SearchForm.tsx          # "use client". Origin dropdown (10 cities), budget slider
-│   │                           # (₹2k–25k step 500, default ₹8,000), date pickers (night count),
-│   │                           # 7 vibe pills (beach=disabled "SOON"),
-│   │                           # destination override toggle + combobox (29 known dests),
-│   │                           # freshness: loadRecentlyShown() + saveShownDestinations() exported
-│   └── ItineraryCard.tsx       # "use client". Gradient header per profile+vibe, budget bar,
-│                               # narrative, route pills, day plan, activity pills, tradeoff box,
-│                               # IRCTC CTA link.
+│   ├── SearchForm.tsx          # Origin (10 cities), budget slider (₹2k–25k, default ₹8k),
+│   │                           # date pickers with night count, 7 vibe pills (beach=SOON),
+│   │                           # traveler type pills, destination override combobox (29 dests),
+│   │                           # saveShownDestinations() exported for freshness
+│   └── ItineraryCard.tsx       # Gradient header (profile+vibe), stacked budget bar + legend,
+│                               # narrative, last-mile display, monsoon warning,
+│                               # liveAlert block (🔴 Live Check badge — only when present),
+│                               # route pills, day plan, activity pills, tradeoff box, IRCTC CTA
 │
 ├── lib/
-│   ├── destination-matcher.ts  # DESTINATIONS catalogue (33 entries, all with primaryVibe,
-│   │                           # vibeStrength, discovery tag).
-│   │                           # matchDestinations(input) → top 3 scored Destination[]
-│   │                           # findDestinationByName(name) → Destination | null
-│   ├── destination-scorer.ts   # NEW: 5-factor scoring engine.
-│   │                           # scoreDestination(dest, vibe, transport, nights, recentlyShown, month)
-│   │                           # selectDiverseTop3(scored[]) → diverse top 3
-│   ├── local-intelligence.ts   # NEW: curated hyper-local data for 13 destinations.
-│   │                           # getLocalIntelligence(name) → LocalIntelligence | null
-│   │                           # Injected into Groq prompts — real restaurant names, hidden gems,
-│   │                           # tourist trap warnings, timing tips.
-│   ├── transport-data.ts       # Static TRAIN_ROUTES + BUS_ROUTES (~60+ routes).
-│   │                           # Key: "ORIGIN_DESTINATION" uppercase.
-│   │                           # FIRST_MILE / LAST_MILE per city.
-│   │                           # getTransportOptions(origin, dest) → TransportOption[]
-│   ├── budget-allocator.ts     # allocateBudget({ profile, dest, transport, budget, nights })
-│   │                           # allocateAllProfiles(...) → 3 BudgetAllocation[]
-│   ├── groq-client.ts          # Fail-loud env check. Musafir persona.
-│   │                           # DISCOVERY_SYSTEM_PROMPT: "smart dost from Tier 2 city"
-│   │                           # DESTINATION_SYSTEM_PROMPT: "local expert who's been here 5 times"
-│   │                           # formatLocalIntelligence(intel, profile) injects curated data
-│   │                           # generateAllNarratives(contexts[]) → parallel Promise.allSettled
-│   │                           # Model: llama-3.1-8b-instant, temp 0.7/0.8, tokens 650/800
-│   └── itinerary-builder.ts    # buildItineraries(input) → routes to discovery or destination mode
-│                               # buildDiscoveryItineraries: match → score → transport → allocate → LLM
-│                               # buildDestinationItineraries: find → transport → 3 profiles → LLM
-│                               # Both inject localIntelligence into LLM context
+│   ├── destination-matcher.ts  # 33-entry catalogue. Indian national prices.
+│   │                           # matchDestinations() | findDestinationByName()
+│   ├── destination-scorer.ts   # 5-factor scorer. selectDiverseTop3().
+│   ├── local-intelligence.ts   # Curated data, 13 destinations. Fact-checked.
+│   ├── transport-data.ts       # ~60+ TRAIN/BUS routes. FIRST_MILE/LAST_MILE maps.
+│   ├── budget-allocator.ts     # allocateAllProfiles() → 3 BudgetAllocation[]
+│   ├── groq-client.ts          # Musafir persona. Discovery + Destination system prompts.
+│   │                           # Rule: "All prices are INDIAN NATIONAL rates."
+│   │                           # generateAllNarratives() → parallel Promise.allSettled
+│   ├── gemini-validator.ts     # "Live Eyes" layer. fetch() to Gemini 2.0 Flash REST API.
+│   │                           # google_search tool. 8s timeout. Always fails silently.
+│   └── itinerary-builder.ts    # Orchestrates everything. Promise.all([Groq, Gemini]).
+│                               # Deduplicates dest names for Gemini calls.
 │
-├── types/index.ts              # All shared types (see §5 above)
-├── wrangler.toml               # name=vibepath-app, compatibility_date=2024-09-23,
-│                               # compatibility_flags=["nodejs_compat"],
-│                               # pages_build_output_dir=.vercel/output/static
-├── next.config.ts              # Minimal (empty config). No setupDevPlatform.
-└── package.json                # scripts: dev, build, pages:build, deploy
+├── types/index.ts              # All shared types. LiveAlert + liveAlert on GeneratedItinerary.
+├── wrangler.toml               # name="vibepath". MUST match CF Pages project name.
+├── next.config.ts              # Minimal (empty).
+└── package.json                # dev | build | pages:build | deploy
 ```
 
 ## 7. API Contract
 
-### POST /api/generate
-
-**Discovery mode request:**
+**Discovery request:**
 ```json
-{
-  "origin": "Lucknow",
-  "budget": 8000,
-  "startDate": "2026-04-11",
-  "endDate": "2026-04-13",
-  "vibe": "spiritual",
-  "travelers": 1,
-  "recentlyShown": ["Ayodhya", "Varanasi"]
-}
+{ "origin": "Lucknow", "budget": 8000, "startDate": "2026-04-11", "endDate": "2026-04-13",
+  "vibe": "spiritual", "travelers": 1, "recentlyShown": ["Ayodhya"] }
 ```
 
-**Destination mode request:**
+**Destination request:**
 ```json
-{
-  "origin": "Lucknow",
-  "budget": 8000,
-  "startDate": "2026-04-11",
-  "endDate": "2026-04-13",
-  "vibe": "relaxing",
-  "travelers": 1,
-  "destinationOverride": "Ayodhya"
-}
+{ "origin": "Lucknow", "budget": 8000, "startDate": "2026-04-11", "endDate": "2026-04-13",
+  "vibe": "relaxing", "travelers": 1, "destinationOverride": "Ayodhya" }
 ```
 
-**Success response (200):**
-```json
-{
-  "itineraries": [ ...3x GeneratedItinerary... ],
-  "origin": "Lucknow",
-  "generatedAt": "2026-04-05T10:00:00.000Z",
-  "provider": "groq",
-  "mode": "discovery"
-}
-```
+**Success (200):** `{ itineraries[3], origin, generatedAt, provider: "groq", mode }`
 
-**Error responses:**
-| Code | HTTP | Trigger |
-|---|---|---|
-| `MISSING_KEY` | 500 | GROQ_API_KEY not set |
-| `INVALID_INPUT` | 400 | Bad origin / budget / vibe / dates |
-| `NO_ROUTES` | 422 | No transport data, dest not in catalog, budget too tight |
-| `LLM_ERROR` | 500 | Groq request failed |
+`liveAlert` is absent (not `null`) when no alert found. Frontend renders `🔴 Live Check` only when field exists.
+
+**Errors:** `MISSING_KEY` (500) · `INVALID_INPUT` (400) · `NO_ROUTES` (422) · `LLM_ERROR` (500)
+
+Gemini errors are **never** surfaced to the API consumer.
 
 ## 8. UI Design System
 
-**Color tokens:**
-- `--primary: #5b3fd9` (purple), `--primary-strong: #4025b0`
-- `--accent-warm: #ff6a3c` (orange), `--accent-teal: #00c9a7`, `--accent-gold: #FFB547`
-- `--bg: #f6f5ff`, `--surface: #ffffff`, `--text-main: #1d1436`, `--text-muted: #787194`
+**Color tokens:** `--primary: #5b3fd9` · `--accent-warm: #ff6a3c` · `--accent-teal: #00c9a7` · `--accent-gold: #FFB547` · `--bg: #f6f5ff`
 
-**Gradient classes per profile:**
-- `grad-hills` (green) — balanced/mountains
-- `grad-budget` (blue) — value/beach
-- `grad-comfort` (gold) — comfort/historical
-- `grad-spiritual` (red/maroon), `grad-purple`, `grad-city` (dark)
+**Vibe pill glow (active state):**
+- mountains → `#134e5e` border + shadow
+- adventure → `var(--accent-warm)` border + shadow
+- historical → `#f7971e` border + shadow
+- spiritual → `#c0392b` border + shadow
+- relaxing → `var(--accent-teal)` border + shadow
+- city → `#4a5568` border + shadow
 
-**Badge classes:** `badge-best` (purple) · `badge-value` (teal) · `badge-comfort` (gold)
+**Route pill tooltips:** `.route-pill[data-tip]` → CSS `::after { content: attr(data-tip) }`. No JS. Fades in on hover.
 
-**Tradeoff box classes:** `tradeoff-blue` · `tradeoff-teal` · `tradeoff-warm`
-
-**Page structure (page.tsx):** sticky header → hero (2-col: copy + search card) → stats bar → results section (live or sample) → how-it-works + Budget Engine sidebar → social proof → cities grid → footer CTA → footer
-
-**SearchForm defaults:** origin=Lucknow, budget=₹8,000, vibe=spiritual, dates=next weekend
+**Page structure:** sticky header → sticky-plan-btn (fixed bottom-right, visible after 480px) → hero (copy + search card) → stats bar → results/sample cards → how-it-works + Budget Engine → social proof → cities → footer CTA → footer
 
 ## 9. Deployment
 
-### Cloudflare Pages
+### CRITICAL — Two CF Pages Projects
 
-| Setting | Value |
-|---|---|
-| Build command | `npx @cloudflare/next-on-pages@1` |
-| Output directory | `.vercel/output/static` |
-| Framework preset | Next.js |
-| Node version | 20 |
+| Project | URL | Status |
+|---|---|---|
+| `vibepath` | `vibepath.pages.dev` | **PRODUCTION — always deploy here** |
+| `vibepath-app` | `vibepath-app.pages.dev` | Stale test project — ignore |
 
-**Why `npx` not devDependency:** `@cloudflare/next-on-pages` has peer dep conflict with Next.js 16. CF Pages invokes it via npx at build time.
+`wrangler.toml` has `name = "vibepath"` → `npm run deploy` goes to correct place automatically.
 
-**Why `runtime = "edge"`:** CF Workers uses V8 isolates. `groq-sdk` is pure fetch — no native binaries — so Edge + `nodejs_compat` flag works fine.
+**Verify after deploy:**
+```bash
+curl -s "https://vibepath.pages.dev" | grep -o 'chunks/[^"]*\.js' | sort
+ls .vercel/output/static/_next/static/chunks/ | sort
+# Chunk names must match
+```
+
+**Manual deploy (if needed):**
+```bash
+npm run pages:build
+npx wrangler pages deploy .vercel/output/static --project-name vibepath --branch=main
+```
 
 ### Environment Variables
 
-| Variable | Purpose |
-|---|---|
-| `GROQ_API_KEY` | Groq API key — throws explicit 500 if missing (fail-loud) |
-| `NODE_VERSION` | `20` — set in CF Pages dashboard |
+| Variable | Required | Purpose |
+|---|---|---|
+| `GROQ_API_KEY` | Yes — throws 500 if missing | Groq LLM |
+| `GEMINI_API_KEY` | Optional — missing = no live alerts | Gemini 2.0 Flash. Get free at aistudio.google.com |
+| `NODE_VERSION` | Yes (CF Pages) | `20` |
+
+Set in CF Pages dashboard (Settings → Environment Variables) AND in `.env.local` for local dev.
 
 ### Auto-Deploy
 
-Every `git push origin main` triggers a new Cloudflare Pages deployment automatically.
+Every `git push origin main` → CF Pages rebuilds and deploys `vibepath.pages.dev` automatically.
 
 ## 10. GOVERNANCE Rules
 
-1. **`export const runtime = "edge"`** on all API routes
-2. **ENV VARS FAIL LOUD:** `groq-client.ts` throws explicit error if `GROQ_API_KEY` missing
-3. **MINIMAL CONFIG:** `next.config.ts` starts empty — no `setupDevPlatform`
-4. **STRUCTURED GENERATION ONLY:** LLM (Musafir) writes narrative only — never prices, routes, or logistics
-5. **No worktree edits** — always edit directly in the repo directory
-6. **Unicode in JSX:** use `\uXXXX` for ₹, curly quotes, apostrophes inside template literals (Turbopack issue with Next.js 16)
-7. **Specific git add** — never `git add -A`; list files explicitly
-8. **Build check before push** — `npm run build` must pass clean
+1. `export const runtime = "edge"` on all API routes
+2. **Groq key fails loud** — explicit 500 if `GROQ_API_KEY` missing. Gemini key is optional.
+3. **STRUCTURED GENERATION ONLY** — Groq/Musafir writes narrative only, never prices or logistics
+4. **INDIAN NATIONAL PRICES** — all ASI entry prices are domestic tourist rates
+5. **Gemini scope is narrow** — only real-time safety/closure alerts, not reviews or tips
+6. **Unicode in JSX** — `\uXXXX` must be inside `{}` JS expressions, never bare JSX text (Turbopack renders them literally otherwise)
+7. **Deploy to correct project** — `wrangler.toml` `name = "vibepath"`. Verify with `wrangler pages project list`.
+8. **Specific git add** — never `git add -A`
+9. **Build before push** — `npm run build` must pass clean
 
-## 11. Coding Standards
+## 11. Current State (as of 2026-04-05)
 
-- **TypeScript strict mode** via tsconfig. Path alias `@/*` → project root.
-- **`"use client"`** on all interactive components (`SearchForm`, `ItineraryCard`, `page.tsx`)
-- **No Tailwind utility classes in JSX** for layout — use CSS custom classes from `globals.css`
+### Working
+- Full site live at `vibepath.pages.dev`
+- Discovery mode (33 destinations, 5-factor scoring, anti-repetition)
+- Destination mode (override combobox, deep local-expert plan)
+- Local intelligence injected into Groq (13 destinations, fact-checked)
+- Groq + Gemini parallel ("Fast Brain + Live Eyes")
+- `🔴 Live Check` badge when Gemini finds an alert
+- Monsoon warnings (Jun–Sep, mountain/beach destinations)
+- Train frequency filter (excludes trains not running on departure date)
+- Overnight train detection
+- Correct Indian monument prices throughout
+- Vibe pill glow per-vibe color
+- Sticky "Plan a weekend ↑" CTA
+- Route pill CSS tooltips on sample cards
+- Sample card hover hint
+- Social proof institution badges
+- ~60+ transport routes
 
-## 12. Current State
+### Pending
+- No real-time train availability
+- No user accounts, saved itineraries, or WhatsApp share
+- Budget Engine sidebar shows static demo data
+- No custom domain
 
-### What Is Working (as of 2026-04-05)
-- Full website live at `vibepath.pages.dev`
-- **DISCOVERY mode:** 33-destination catalog, 5-factor scoring (VibeDepth+TripFit+Freshness+RouteQuality+SeasonalBoost), Ayodhya correctly surfaces for spiritual from Lucknow
-- **DESTINATION mode:** "Already have a destination in mind?" toggle with combobox, deep local-expert itinerary for chosen destination
-- **Local Intelligence:** 13 destinations have curated food/gems/warnings injected into Groq prompts — Musafir references real specific places
-- **Freshness:** localStorage tracks last 5 sessions, anti-repetition penalty in scorer
-- **Beach vibe:** greyed out with "SOON" badge, tooltip lists upcoming destinations
-- **60+ transport routes** covering all new destinations including Ayodhya, Mathura, Orchha, Ujjain, Bodh Gaya, Ranthambore, Pachmarchi etc.
-- 3-card guarantee — never fewer than 3 results
-- Cloudflare Pages CI/CD via GitHub
+## 12. Rolling Version Log
 
-### Known Limitations / Pending Items
-- `saveShownDestinations()` exported from `SearchForm` but **not yet wired** in `app/page.tsx` — freshness data not actually being persisted after search results arrive
-- No real-time train availability (prices are static estimates)
-- No user accounts, no saved itineraries, no WhatsApp share
-- Budget Engine sidebar (How It Works) shows static demo data, not live allocation
-- No custom domain yet — `vibepath.pages.dev` subdomain
+| Date | Summary |
+|---|---|
+| 2026-04-05 | Gemini "Live Eyes" — `gemini-validator.ts`, parallel `Promise.all`, `LiveAlert` type, `🔴 Live Check` badge |
+| 2026-04-05 | Indian monument prices fixed (Taj ₹50, Agra Fort ₹40, Jantar Mantar ₹50, etc.) |
+| 2026-04-05 | Local intelligence fact-check (Rishikesh bridge, Ranthambore stats, Delhi metro, Agrasen Ki Baoli) |
+| 2026-04-05 | UI: sticky CTA, vibe pill glow, route pill tooltips, sample card hover hint, proof badges |
+| 2026-04-05 | Deploy fix: `wrangler.toml` `name` → `vibepath` (was `vibepath-app`) |
+| 2026-04-05 | feat: 33 destinations, 5-factor scorer, local intelligence, destination mode, freshness, 60+ routes |
+| 2026-04-03 | feat: rename Arjun → Musafir |
+| 2026-04-03 | feat: VibePath MVP, Cloudflare Pages |
 
-## 13. Rolling Version Log
+## 13. Agent Operating Instructions
 
-| Date | Commit | Summary |
-|---|---|---|
-| 2026-04-05 | `655a197` | feat: implement all 6 recommendation improvements (Rec 1-6) — 33 destinations, 5-factor scorer, local intelligence, destination mode, beach pill SOON, freshness anti-repetition, 60+ transport routes |
-| 2026-04-03 | `13793a4` | feat: rename Arjun → Musafir persona throughout |
-| 2026-04-03 | `56a3889` | fix: use npx for @cloudflare/next-on-pages |
-| 2026-04-03 | `30d031f` | fix: simplify next.config.ts |
-| 2026-04-03 | `2a95412` | feat: VibePath MVP — opus UI + Cloudflare Pages deploy config |
-| 2026-04-03 | `09f8209` | Initial commit from Create Next App |
-
-## 14. Agent Operating Instructions
-
-1. **Never use worktrees.** Edit files directly in `/Users/mohdtalhamasood/Downloads/VibePath(itinerary)/vibepath-app/`.
-2. **Node commands** prefix with `PATH="$HOME/.nvm/versions/node/v20.20.1/bin:$PATH"` if nvm not active.
-3. **Definition of Done:** files edited → `npm run build` passes → `git add <specific files>` → commit → `git push origin main` → CF Pages auto-deploys.
-4. **Adding a new origin city:** add to `SUPPORTED_ORIGINS` in `route.ts`, add `FIRST_MILE`/`LAST_MILE` in `transport-data.ts`, add at least one route entry.
-5. **Adding a new destination:** add to `DESTINATIONS` array in `destination-matcher.ts` with full interface (including `primaryVibe`, `vibeStrength`, `discovery`), add transport routes in `transport-data.ts`, optionally add local intelligence in `local-intelligence.ts`.
-6. **Adding a new vibe:** add to `Vibe` union in `types/index.ts`, to `VALID_VIBES` in `route.ts`, add pill in `SearchForm.tsx`, add gradient in `globals.css` and `VIBE_GRADIENTS` in `ItineraryCard.tsx`.
-7. **Unicode in JSX:** use `\uXXXX` for curly quotes (`\u201c`, `\u201d`), apostrophes (`\u2019`), and ₹ (`\u20b9`) inside template literals.
-8. **Build check before push:** `npm run build` must pass clean.
-9. **Scorer tweak:** to change how a destination ranks for a vibe, adjust `vibeStrength` values in `destination-matcher.ts` for that destination. Primary vibe should be 0.9+, secondary 0.4–0.7, unrelated vibes 0.0–0.2.
-10. **Local intelligence:** if adding a new destination to local-intelligence.ts, use `area:` (not `where:`) for `streetFood[]` items and `mustEat[]` items. Use `where:` for `shopping[]` items. `knownFor` is optional in `LocalFood`.
+1. **Never use worktrees.** Edit in `/Users/mohdtalhamasood/Downloads/VibePath(itinerary)/vibepath-app/` directly.
+2. **Node prefix if needed:** `PATH="$HOME/.nvm/versions/node/v20.20.1/bin:$PATH"`
+3. **Definition of Done:** edit → `npm run build` passes → `git add <files>` → commit → push → CF Pages auto-deploys.
+4. **Deploy verification:** compare chunk names between live site and local build (see §9).
+5. **Always deploy to `vibepath`.** Confirm project: `wrangler pages project list`.
+6. **Adding origin city:** `SUPPORTED_ORIGINS` in `route.ts` + `FIRST_MILE`/`LAST_MILE` + route entries.
+7. **Adding destination:** `DESTINATIONS` in `destination-matcher.ts` (full interface) + transport routes + optional local intelligence.
+8. **Adding vibe:** `Vibe` union in `types/index.ts` + `VALID_VIBES` in `route.ts` + pill in `SearchForm` + gradient in `globals.css` + `VIBE_GRADIENTS` in `ItineraryCard` + active color in `globals.css`.
+9. **Unicode in JSX:** `{"\u20b9"}` or `` {`\u20b9${expr}`} `` — never bare in JSX text.
+10. **Gemini is optional.** Missing key = no alerts, product still 100% functional.
+11. **Prices = Indian national rates.** Verify ASI domestic rates when adding entry prices.
 
 ---
 
-*This document is the single source of truth for the VibePath project. Update it when architecture, data, or key decisions change.*
+*Update this document whenever architecture, data, or key decisions change.*

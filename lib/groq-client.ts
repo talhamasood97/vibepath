@@ -10,7 +10,7 @@
  */
 
 import Groq from "groq-sdk";
-import type { LocalIntelligence } from "@/types";
+import type { LocalIntelligence, TravelerType } from "@/types";
 
 // ── Fail loud on missing key ──────────────────────────────────────────────────
 
@@ -43,11 +43,13 @@ enthusiastic travel advice. You talk like a smart dost, not a corporate travel a
 CRITICAL RULES:
 1. DO NOT change any prices, train names, timings, or distances from the structured data given to you.
 2. DO NOT invent new facts, hotels, restaurants, or attractions not explicitly provided in the data.
-3. Write like a friend who has actually BEEN there. Reference the specific local intelligence given.
-4. DO NOT use formal language. Use "you should", "don't miss", "go for it", "bilkul worth it".
-5. Keep narrative under 90 words. Each day plan item under 25 words.
-6. Use English naturally with occasional desi phrases (dost, scene hai, bilkul, bhai, yaar) where they fit.
-7. The tradeoffs should be honest — tell them what this profile GIVES UP vs other options too.`;
+3. STRICTLY — do not mention any landmark, restaurant, activity, or attraction not listed in TOP THINGS TO DO or LOCAL INTELLIGENCE. If unsure, stick to general descriptions.
+4. All entry prices in the data are INDIAN NATIONAL rates. Do not substitute or mention foreign national prices.
+4. Write like a friend who has actually BEEN there. Reference the specific local intelligence given.
+5. DO NOT use formal language. Use "you should", "don't miss", "go for it", "bilkul worth it".
+6. Keep narrative under 90 words. Each day plan item under 25 words.
+7. Use English naturally with occasional desi phrases (dost, scene hai, bilkul, bhai, yaar) where they fit.
+8. The tradeoffs should be honest — tell them what this profile GIVES UP vs other options too.`;
 
 // ── Destination mode system prompt ───────────────────────────────────────────
 // Used when user has already chosen their destination
@@ -57,13 +59,15 @@ The user already knows WHERE they're going. They need YOUR local expertise on HO
 
 CRITICAL RULES:
 1. DO NOT change any prices, train names, timings from the structured data given to you.
-2. Use the LOCAL INTELLIGENCE data provided to give hyper-specific recommendations.
+2. STRICTLY — do not mention any landmark, restaurant, activity, or attraction not listed in TOP THINGS TO DO or LOCAL INTELLIGENCE. If unsure, stick to general descriptions.
+3. All entry prices in the data are INDIAN NATIONAL rates. Do not substitute or mention foreign national prices.
+3. Use the LOCAL INTELLIGENCE data provided to give hyper-specific recommendations.
    Reference actual place names, timing tips, and hidden gems from the data.
-3. Be the friend who says "skip the overpriced place near the tourist gate, walk 5 mins to THIS spot".
-4. Write like you lived there for 6 months. Specific, opinionated, honest.
-5. Keep narrative under 100 words. Each day plan item under 30 words.
-6. Mix English with natural desi phrases. Sound warm, not formal.
-7. The tradeoffs should compare what each profile experience FEELS like, not just the budget difference.`;
+4. Be the friend who says "skip the overpriced place near the tourist gate, walk 5 mins to THIS spot".
+5. Write like you lived there for 6 months. Specific, opinionated, honest.
+6. Keep narrative under 100 words. Each day plan item under 30 words.
+7. Mix English with natural desi phrases. Sound warm, not formal.
+8. The tradeoffs should compare what each profile experience FEELS like, not just the budget difference.`;
 
 // ── Context interfaces ────────────────────────────────────────────────────────
 
@@ -93,6 +97,8 @@ export interface ItineraryContext {
   tradeoffNote?: string;
   localIntelligence?: LocalIntelligence | null;  // injected for richer narrative
   isDestinationMode?: boolean;                    // true when user chose destination directly
+  travelerType?: TravelerType;                    // shapes safety/style of recommendations
+  monsoonWarning?: string;                        // seasonal safety flag if applicable
 }
 
 // ── Local intelligence formatter ──────────────────────────────────────────────
@@ -175,7 +181,24 @@ export async function generateItineraryNarrative(
     ? `\nThe user specifically chose ${ctx.destination} — they know they want to go here. Be their local expert.`
     : "";
 
-  const userPrompt = `Here is the structured data for a ${ctx.profile} trip to ${ctx.destination}, ${ctx.state}:${destinationModeNote}
+  const travelerPersonaNote = ctx.travelerType
+    ? (() => {
+        const notes: Record<TravelerType, string> = {
+          "solo-female": "TRAVELER: Solo female. Prioritise well-lit, central stays, female-friendly hostels, and safe timings for evening activities. Mention any safety tips relevant to this destination.",
+          "solo-male":   "TRAVELER: Solo male. Emphasis on budget-stretching, meeting fellow travelers, local street food trails, and independent exploration.",
+          "couple":      "TRAVELER: Couple. Highlight romantic stays, quiet cafes, scenic spots, and experiences that are better shared than done solo.",
+          "friends":     "TRAVELER: Friends group. Emphasise shared dorm/hostel experience, group activities, nightlife or late-night street food, and affordable splits.",
+          "family":      "TRAVELER: Family with kids/elders. Prioritise comfort, early check-ins, child/elder-friendly activities, and avoid long treks or risky adventures.",
+        };
+        return `\n${notes[ctx.travelerType]}`;
+      })()
+    : "";
+
+  const monsoonNote = ctx.monsoonWarning
+    ? `\nSEASONAL NOTE: ${ctx.monsoonWarning} Acknowledge this naturally in the narrative — be honest but not alarmist.`
+    : "";
+
+  const userPrompt = `Here is the structured data for a ${ctx.profile} trip to ${ctx.destination}, ${ctx.state}:${destinationModeNote}${travelerPersonaNote}${monsoonNote}
 
 DESTINATION: ${ctx.destination} — "${ctx.tagline}"
 TRANSPORT: ${ctx.transportMode}${ctx.trainName ? ` (${ctx.trainName})` : ""}
@@ -228,25 +251,27 @@ Respond in this exact JSON format:
 
   const raw = response.choices[0]?.message?.content ?? "{}";
 
-  let parsed: { narrative?: string; dayPlan?: string[]; tradeoffs?: string[] };
+  let parsed: { narrative?: unknown; dayPlan?: unknown; tradeoffs?: unknown };
   try {
     parsed = JSON.parse(raw);
   } catch {
     parsed = {};
   }
 
-  return {
-    narrative:
-      parsed.narrative ??
-      `${ctx.destination} is a great ${ctx.profile}-budget pick from here. Worth every rupee.`,
-    dayPlan: parsed.dayPlan ?? [
-      `Day 1: Arrive and explore. Day ${ctx.nights + 1}: Return home.`,
-    ],
-    tradeoffs: parsed.tradeoffs ?? [
-      "Prices verified at time of planning \u2014 confirm on IRCTC/RedBus before booking.",
-    ],
-    provider: "groq",
-  };
+  // Validate and sanitise — reject fields that aren't the right type
+  const narrative = typeof parsed.narrative === "string" && parsed.narrative.trim().length > 0
+    ? parsed.narrative.trim()
+    : `${ctx.destination} is a great ${ctx.profile}-budget pick from here. Worth every rupee.`;
+
+  const dayPlan = Array.isArray(parsed.dayPlan) && parsed.dayPlan.every((d) => typeof d === "string")
+    ? (parsed.dayPlan as string[])
+    : [`Day 1: Arrive and explore. Day ${ctx.nights + 1}: Return home.`];
+
+  const tradeoffs = Array.isArray(parsed.tradeoffs) && parsed.tradeoffs.every((t) => typeof t === "string")
+    ? (parsed.tradeoffs as string[])
+    : ["Prices verified at time of planning \u2014 confirm on IRCTC/RedBus before booking."];
+
+  return { narrative, dayPlan, tradeoffs, provider: "groq" };
 }
 
 // ── Batch generation ──────────────────────────────────────────────────────────

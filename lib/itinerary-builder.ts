@@ -21,12 +21,14 @@ import type {
   GeneratedItinerary,
   Destination,
   TransportOption,
+  TravelerType,
 } from "@/types";
 import { matchDestinations, findDestinationByName } from "./destination-matcher";
 import { getTransportOptions } from "./transport-data";
 import { allocateAllProfiles } from "./budget-allocator";
 import { generateAllNarratives, type ItineraryContext } from "./groq-client";
 import { getLocalIntelligence } from "./local-intelligence";
+import { getLiveAlert } from "./gemini-validator";
 
 function calcNights(startDate: string, endDate: string): number {
   return Math.max(
@@ -36,6 +38,39 @@ function calcNights(startDate: string, endDate: string): number {
         (1000 * 60 * 60 * 24)
     )
   );
+}
+
+// Returns true if a train with this frequency string runs on the given date.
+// Prevents recommending a Mon/Wed/Fri-only train for a Saturday departure.
+function trainRunsOnDate(frequency: string, dateStr: string): boolean {
+  if (frequency === "Daily") return true;
+  const dayOfWeek = new Date(dateStr).getDay(); // 0=Sun,1=Mon,...,6=Sat
+  const dayMap: Record<string, number> = {
+    Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6,
+  };
+  return frequency
+    .split(",")
+    .map((d) => dayMap[d.trim()])
+    .filter((d) => d !== undefined)
+    .includes(dayOfWeek);
+}
+
+// Generates a monsoon/seasonal warning for mountain/hill-station destinations
+// in Jun–Sep. Shown in the card as an amber caution badge.
+function getMonsoonWarning(dest: Destination, startDate: string): string | undefined {
+  const month = new Date(startDate).getMonth() + 1; // 1-12
+  if (month < 6 || month > 9) return undefined;
+
+  const heavyMonsoonStates = ["Uttarakhand", "Himachal Pradesh", "Goa", "Kerala", "Sikkim"];
+  if (!heavyMonsoonStates.includes(dest.state)) return undefined;
+
+  if (dest.primaryVibe === "mountains" || dest.primaryVibe === "adventure") {
+    return `Active monsoon season (Jun\u2013Sep) in ${dest.state}. Landslide alerts and road closures are common \u2014 check NHAI / local news before travel.`;
+  }
+  if (dest.primaryVibe === "beach") {
+    return `Monsoon season (Jun\u2013Sep) in ${dest.state}. Beaches may be rough and water sports suspended. Great for offseason rates but plan for rain.`;
+  }
+  return undefined;
 }
 
 function buildHeadline(
@@ -53,24 +88,35 @@ function buildHeadline(
 
 function pickBestTransport(
   options: TransportOption[],
-  profile: string
+  profile: string,
+  startDate?: string
 ): TransportOption | null {
   if (options.length === 0) return null;
 
+  // Filter out trains that don't run on the departure date — prevents "ghost train" bookings
+  const validOptions = startDate
+    ? options.filter((o) =>
+        o.train ? trainRunsOnDate(o.train.frequency, startDate) : true
+      )
+    : options;
+
+  // Fall back to all options if the date filter eliminated everything
+  const pool = validOptions.length > 0 ? validOptions : options;
+
   if (profile === "value") {
-    const overnight = options.find((o) => o.train?.overnight);
+    const overnight = pool.find((o) => o.train?.overnight);
     if (overnight) return overnight;
-    return [...options].sort(
+    return [...pool].sort(
       (a, b) => a.totalCostPerPerson.budget - b.totalCostPerPerson.budget
     )[0];
   }
   if (profile === "comfort") {
-    return [...options].sort(
+    return [...pool].sort(
       (a, b) => b.totalCostPerPerson.comfort - a.totalCostPerPerson.comfort
     )[0];
   }
   // balanced: prefer train, then bus
-  return options.find((o) => o.mode === "train") ?? options[0];
+  return pool.find((o) => o.mode === "train") ?? pool[0];
 }
 
 // ── DISCOVERY MODE ────────────────────────────────────────────────────────────
@@ -115,10 +161,10 @@ async function buildDiscoveryItineraries(
   for (const { dest, profile } of pairs) {
     const transportOptions = getTransportOptions(input.origin, dest.name);
     if (transportOptions.length === 0) continue;
-    const transport = pickBestTransport(transportOptions, profile);
+    const transport = pickBestTransport(transportOptions, profile, input.startDate);
     if (!transport) continue;
 
-    const allocations = allocateAllProfiles(dest, transport, input.budget, nights);
+    const allocations = allocateAllProfiles(dest, transport, input.budget, nights, input.startDate);
     const allocation = allocations.find((a) => a.profile === profile) ?? allocations[0];
     if (!allocation) continue;
 
@@ -175,10 +221,10 @@ async function buildDestinationItineraries(
   const structured: StructuredItinerary[] = [];
 
   for (const profile of profiles) {
-    const transport = pickBestTransport(transportOptions, profile);
+    const transport = pickBestTransport(transportOptions, profile, input.startDate);
     if (!transport) continue;
 
-    const allocations = allocateAllProfiles(dest, transport, input.budget, nights);
+    const allocations = allocateAllProfiles(dest, transport, input.budget, nights, input.startDate);
     const allocation = allocations.find((a) => a.profile === profile) ?? allocations[0];
     if (!allocation) continue;
 
@@ -217,8 +263,8 @@ async function buildAndGenerateNarratives(
     const totalSpent =
       s.allocation.transport + s.allocation.accommodation + s.allocation.food + s.allocation.activities;
 
-    // Inject local intelligence for richer narratives
     const localIntelligence = getLocalIntelligence(s.destination.name);
+    const monsoonWarning = getMonsoonWarning(s.destination, input.startDate);
 
     return {
       profile: s.profile,
@@ -246,17 +292,48 @@ async function buildAndGenerateNarratives(
       tradeoffNote: s.allocation.tradeoffNote,
       localIntelligence,
       isDestinationMode,
+      travelerType: input.travelerType as TravelerType | undefined,
+      monsoonWarning,
     };
   });
 
-  const narratives = await generateAllNarratives(contexts);
+  // Build a deduplicated set of destinations to query Gemini once per destination
+  // (discovery mode has 3 different destinations; destination mode has 1)
+  const uniqueDestNames = [...new Set(structured.map((s) => s.destination.name))];
 
-  return structured.map((s, i) => ({
-    ...s,
-    narrative: narratives[i]?.narrative ?? "",
-    dayPlan: narratives[i]?.dayPlan?.join("\n") ?? "",
-    tradeoffs: narratives[i]?.tradeoffs ?? [],
-  }));
+  // Run Groq narratives AND Gemini live-alert checks in parallel.
+  // Gemini failure (timeout, missing key, API error) is always silent.
+  const [narratives, alertMap] = await Promise.all([
+    generateAllNarratives(contexts),
+    (async () => {
+      const map = new Map<string, import("@/types").LiveAlert | null>();
+      await Promise.all(
+        uniqueDestNames.map(async (destName) => {
+          const s = structured.find((x) => x.destination.name === destName)!;
+          const alert = await getLiveAlert(
+            destName,
+            s.destination.state,
+            input.startDate
+          );
+          map.set(destName, alert);
+        })
+      );
+      return map;
+    })(),
+  ]);
+
+  return structured.map((s, i) => {
+    const monsoonWarning = getMonsoonWarning(s.destination, input.startDate);
+    const liveAlert = alertMap.get(s.destination.name) ?? undefined;
+    return {
+      ...s,
+      narrative: narratives[i]?.narrative ?? "",
+      dayPlan: narratives[i]?.dayPlan?.join("\n") ?? "",
+      tradeoffs: narratives[i]?.tradeoffs ?? [],
+      monsoonWarning,
+      liveAlert: liveAlert ?? undefined,
+    };
+  });
 }
 
 // ── Main export ───────────────────────────────────────────────────────────────

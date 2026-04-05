@@ -254,6 +254,66 @@ footer { padding: 1.5rem 0 1.75rem; font-size: 0.78rem; color: var(--text-soft);
 /* ── ERROR / LOADING ── */
 .error-box { background: rgba(255,106,60,0.06); border: 1px solid rgba(255,106,60,0.25); border-radius: 16px; padding: 1.5rem; text-align: center; }
 
+/* ── STACKED BUDGET BAR (on itinerary cards) ── */
+.budget-stack { display: flex; height: 8px; border-radius: 999px; overflow: hidden; gap: 1px; }
+.budget-stack-seg { height: 100%; min-width: 2px; transition: width 0.4s ease; }
+.bseg-transport { background: linear-gradient(90deg, var(--primary), #7B65E8); }
+.bseg-stay      { background: linear-gradient(90deg, var(--accent-warm), #FF8A5C); }
+.bseg-food      { background: linear-gradient(90deg, var(--accent-teal), #4EDBC4); }
+.bseg-activities{ background: linear-gradient(90deg, var(--accent-gold), #FFCC70); }
+.budget-stack-legend { display: flex; flex-wrap: wrap; gap: 0.35rem 0.75rem; margin-top: 0.35rem; }
+.bleg { display: flex; align-items: center; gap: 0.25rem; font-size: 0.68rem; color: var(--text-muted); }
+.bleg-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── VIBE PILL COLORS (active state per vibe) — with glow ── */
+.pill[data-vibe="mountains"][data-active="true"]  { background: rgba(19,78,94,0.09); color: #134e5e; border-color: #134e5e; box-shadow: 0 0 0 3px rgba(19,78,94,0.12), 0 2px 8px rgba(19,78,94,0.18); }
+.pill[data-vibe="adventure"][data-active="true"]  { background: rgba(255,106,60,0.09); color: #b84300; border-color: var(--accent-warm); box-shadow: 0 0 0 3px rgba(255,106,60,0.12), 0 2px 8px rgba(255,106,60,0.2); }
+.pill[data-vibe="historical"][data-active="true"] { background: rgba(247,151,30,0.1); color: #7a4a00; border-color: #f7971e; box-shadow: 0 0 0 3px rgba(247,151,30,0.12), 0 2px 8px rgba(247,151,30,0.2); }
+.pill[data-vibe="spiritual"][data-active="true"]  { background: rgba(192,57,43,0.08); color: #8b1a0e; border-color: #c0392b; box-shadow: 0 0 0 3px rgba(192,57,43,0.12), 0 2px 8px rgba(192,57,43,0.18); }
+.pill[data-vibe="relaxing"][data-active="true"]   { background: rgba(0,201,167,0.08); color: #0a6655; border-color: var(--accent-teal); box-shadow: 0 0 0 3px rgba(0,201,167,0.12), 0 2px 8px rgba(0,201,167,0.2); }
+.pill[data-vibe="city"][data-active="true"]       { background: rgba(44,62,80,0.08); color: #2c3e50; border-color: #4a5568; box-shadow: 0 0 0 3px rgba(44,62,80,0.1), 0 2px 8px rgba(44,62,80,0.15); }
+
+/* ── LOADING STEPS ANIMATION ── */
+@keyframes stepFade {
+  0%   { opacity: 0; transform: translateY(6px); }
+  15%  { opacity: 1; transform: translateY(0); }
+  85%  { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-6px); }
+}
+.loading-steps { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.25rem; padding: 2.5rem 1rem; min-height: 220px; }
+.loading-step-icon { font-size: 2rem; animation: stepFade 2s ease-in-out infinite; }
+.loading-step-text { font-size: 0.88rem; color: var(--text-muted); font-weight: 500; text-align: center; animation: stepFade 2s ease-in-out infinite; }
+.loading-step-sub  { font-size: 0.76rem; color: var(--text-soft); text-align: center; margin-top: -0.75rem; }
+.loading-progress  { display: flex; gap: 0.4rem; margin-top: 0.25rem; }
+.loading-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border-strong); transition: background 0.3s; }
+.loading-dot.active { background: var(--primary); }
+
+/* ── TRAVELER TYPE PILLS ── */
+.traveler-pills { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.2rem; }
+
+/* ── TRADEOFF LABEL ── */
+.tradeoff-label { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.2rem; opacity: 0.75; }
+
+/* ── MONSOON WARNING ── */
+.monsoon-warning { display: flex; align-items: flex-start; gap: 0.45rem; padding: 0.55rem 0.75rem; border-radius: var(--radius-sm); font-size: 0.76rem; line-height: 1.45; background: rgba(247,151,30,0.08); border: 1px solid rgba(247,151,30,0.3); color: #7a4a00; }
+.monsoon-warning-icon { font-size: 0.95rem; flex-shrink: 0; margin-top: 1px; }
+
+/* ── LAST MILE STRUCTURED ── */
+.last-mile-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.1rem; }
+.last-mile-chip { padding: 0.15rem 0.5rem; border-radius: 999px; font-size: 0.7rem; border: 1px solid var(--border-subtle); background: var(--surface-soft); color: var(--text-muted); display: inline-flex; align-items: center; gap: 0.2rem; }
+.last-mile-chip.budget-chip { border-color: rgba(0,201,167,0.3); color: #0a6655; }
+.last-mile-chip.comfort-chip { border-color: rgba(91,63,217,0.25); color: var(--primary-strong); }
+
+/* ── LIVE ALERT (Gemini Search Grounding) ── */
+.live-alert { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 0.4rem 0.5rem; padding: 0.55rem 0.75rem; border-radius: var(--radius-sm); font-size: 0.76rem; line-height: 1.45; background: rgba(220,38,38,0.05); border: 1px solid rgba(220,38,38,0.2); color: #7a1c1c; }
+.live-alert-badge { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(220,38,38,0.1); color: #dc2626; border-radius: 4px; padding: 1px 6px; flex-shrink: 0; align-self: center; white-space: nowrap; }
+.live-alert-text { flex: 1; min-width: 0; }
+.live-alert-source { font-size: 0.68rem; opacity: 0.6; width: 100%; text-align: right; }
+
+/* ── FREQUENCY PILL ── */
+.freq-pill { font-size: 0.68rem; padding: 0.15rem 0.5rem; border-radius: 999px; border: 1px solid var(--border-subtle); background: var(--surface-soft); color: var(--text-soft); display: inline-flex; align-items: center; gap: 0.2rem; }
+.freq-pill.not-daily { border-color: rgba(247,151,30,0.4); color: #7a4a00; background: rgba(247,151,30,0.06); }
+
 /* ── RESPONSIVE ── */
 @media (max-width: 960px) {
   .hero-layout, .how-layout { grid-template-columns: 1fr; }
@@ -266,8 +326,131 @@ footer { padding: 1.5rem 0 1.75rem; font-size: 0.78rem; color: var(--text-soft);
   .search-form-grid { grid-template-columns: 1fr; }
   .footer-card { padding: 2rem 1.5rem; }
 }
+@media (max-width: 560px) {
+  /* Vibe pills: allow horizontal scroll instead of wrapping awkwardly on small screens */
+  .vibe-pills { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 0.25rem; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .vibe-pills::-webkit-scrollbar { display: none; }
+  /* Traveler pills same treatment */
+  .traveler-pills { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 0.25rem; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .traveler-pills::-webkit-scrollbar { display: none; }
+}
 @media (max-width: 480px) {
   .hero-title { font-size: 2rem; }
   .stats-bar { gap: 1.5rem; }
   .stat-number { font-size: 1.3rem; }
+  /* Keep Plan a weekend button visible when nav-links are hidden */
+  .nav-cta-group .btn-ghost { display: none; }
+}
+
+/* ── STICKY PLAN CTA ── */
+.sticky-plan-btn {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 100;
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+  transition: opacity 220ms ease-out, transform 220ms ease-out;
+}
+.sticky-plan-btn.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.sticky-plan-btn button {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.65rem 1.25rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 8px 28px rgba(91,63,217,0.5);
+  font-family: inherit;
+  transition: transform 140ms ease-out, box-shadow 140ms ease-out;
+}
+.sticky-plan-btn button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 36px rgba(91,63,217,0.6);
+}
+
+/* ── SAMPLE CARD CLICK HINT ── */
+.sample-card-cta-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.7rem;
+  color: var(--primary);
+  font-weight: 600;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 160ms ease-out, transform 160ms ease-out;
+  margin-top: 0.2rem;
+}
+.itinerary-card:hover .sample-card-cta-hint {
+  opacity: 1;
+  transform: translateY(0);
+}
+.itinerary-card[data-featured="true"] .sample-card-cta-hint {
+  color: var(--primary-strong);
+}
+
+/* ── ROUTE PILL TOOLTIP ── */
+.route-pill[data-tip] { position: relative; cursor: default; }
+.route-pill[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: #1a1530;
+  color: #fff;
+  font-size: 0.7rem;
+  line-height: 1.45;
+  padding: 0.35rem 0.6rem;
+  border-radius: 7px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 140ms ease-out, transform 140ms ease-out;
+  z-index: 20;
+  max-width: 220px;
+  white-space: normal;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+.route-pill[data-tip]:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ── PROOF SECTION ENHANCEMENTS ── */
+.proof-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+.proof-meta-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(91,63,217,0.18);
+  color: rgba(200,190,255,0.9);
+  margin-top: 0.2rem;
 }

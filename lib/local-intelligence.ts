@@ -275,9 +275,9 @@ const LOCAL_INTEL: Record<string, LocalIntelligence> = {
         tip: "16 km stretch (Shivpuri to Rishikesh) is the best value and most fun.",
       },
       {
-        activity: "Lakshman Jhula crossing",
+        activity: "Lakshman Jhula area",
         bestTime: "Early morning 6\u20138 AM or evening 5\u20137 PM",
-        avoidTime: "Midday \u2014 bridge is extremely crowded and wobbles dramatically",
+        tip: "The original iron suspension bridge was closed in 2020 and demolished. The locality and cafes still exist. Use the new footbridge nearby or Ram Jhula (2 km south).",
       },
     ],
     localTransport: "Everything between Ram Jhula and Lakshman Jhula is walkable (2 km). Shared autos run \u20b910\u201320. Bikes on rent: \u20b9300\u2013500/day (great for exploring Neelkanth road, Beatles Ashram).",
@@ -329,14 +329,14 @@ const LOCAL_INTEL: Record<string, LocalIntelligence> = {
     hiddenGems: [
       {
         name: "Mehtab Bagh at sunset",
-        what: "A garden directly across the Yamuna from the Taj. The best free Taj Mahal view.",
-        why: "Entry \u20b9300. You get a symmetrical, straight-on Taj view at sunset across the river. Almost no crowds vs the Taj itself.",
+        what: "A garden directly across the Yamuna from the Taj. The best Taj Mahal view for a fraction of the cost.",
+        why: "Entry \u20b930 (Indians). You get a symmetrical, straight-on Taj view at sunset across the river. Almost no crowds vs the Taj itself.",
         bestTime: "4:30\u20136 PM",
       },
       {
         name: "Itimad-ud-Daulah (Baby Taj)",
         what: "The mausoleum that inspired the Taj. Smaller, more intricate marble work, built 12 years before the Taj.",
-        why: "Most tourists skip it. You\u2019ll have it almost to yourself. Entry \u20b9310.",
+        why: "Most tourists skip it. You\u2019ll have it almost to yourself. Entry \u20b930 (Indians).",
         bestTime: "Morning",
       },
       {
@@ -426,7 +426,7 @@ const LOCAL_INTEL: Record<string, LocalIntelligence> = {
       },
     ],
     avoid: [
-      "Elephant rides at Amber Fort. Banned in 2022 but some operators still try. They\u2019re not legal and the animals are mistreated.",
+      "Elephant rides at Amber Fort. Legally contested since 2019 with multiple court orders — avoid them regardless of current status. The animals are mistreated and the practice is ethically problematic.",
       "\u2018Government-approved\u2019 emporiums near Hawa Mahal. They\u2019re not government-run. Prices are 4x bazaar rates.",
       "Jeep safaris to Amber Fort. The walk up is free, scenic, and takes 15 mins. Save the \u20b9500.",
     ],
@@ -862,14 +862,14 @@ const LOCAL_INTEL: Record<string, LocalIntelligence> = {
     ],
     avoid: [
       "Zone booking without research. Zones 1-5 are the core zones with higher tiger sighting probability. Zones 6-10 are buffer zones \u2014 cheaper but much lower sighting chances.",
-      "Buying safari tickets from touts near the gate. Book on rajasthan.gov.in/forest officially.",
+      "Buying safari tickets from touts near the gate. Book on rajasthanwildlife.in officially.",
     ],
     timingTips: [
       { activity: "Tiger safari", bestTime: "Morning safari (6 AM, Oct\u2013Mar) has highest sighting probability", tip: "Canters (shared) are cheaper (\u20b9700\u2013900) but gypsies (private jeep, \u20b91,500\u20132,500) give better access and are worth the upgrade." },
     ],
     localTransport: "Sawai Madhopur town is 12 km from the park gate. Autos available. Book accommodation near the gate zone to save on daily transport.",
     knowBeforeYouGo: [
-      "Tiger sighting is never guaranteed. Probability in core zones: ~70-80% per safari in peak season (Nov\u2013Mar).",
+      "Tiger sighting is never guaranteed. Probability in core zones: ~50-60% per safari in peak season (Nov\u2013Mar). Never let anyone promise you a sighting.",
       "Safari slots must be booked online in advance. Very popular on weekends \u2014 book 2+ weeks ahead.",
       "Park closed during monsoon (Jul\u2013Sep 30). Open Oct 1 onwards.",
     ],
@@ -920,7 +920,7 @@ const LOCAL_INTEL: Record<string, LocalIntelligence> = {
       },
       {
         name: "Agrasen Ki Baoli (stepwell)",
-        what: "A 60-step ancient stepwell in the middle of Connaught Place. UNESCO listed.",
+        what: "A 60-step ancient stepwell in the middle of Connaught Place. ASI-protected monument.",
         why: "Free entry. Eerie, beautiful, and somehow sitting between office buildings. Takes 20 mins, worth every minute.",
         bestTime: "Weekday morning",
       },
@@ -933,7 +933,7 @@ const LOCAL_INTEL: Record<string, LocalIntelligence> = {
       { activity: "Chandni Chowk food walk", bestTime: "10 AM\u20131 PM (before afternoon heat and crowds)", tip: "Walk from Red Fort end towards Fatehpuri Mosque. Every 20 metres is a different speciality." },
       { activity: "Qutub Minar", bestTime: "8\u2013930 AM for empty foreground shots", tip: "Entry \u20b940 Indians. The light at opening time on the red sandstone is unbeatable." },
     ],
-    localTransport: "Delhi Metro is the answer to everything. Day pass: \u20b9100. Ola/Uber for late nights and luggage. Auto only if you love negotiating.",
+    localTransport: "Delhi Metro is the answer to everything. 1-day Tourist Card: \u20b9200 (unlimited rides). Ola/Uber for late nights and luggage. Auto only if you love negotiating.",
     knowBeforeYouGo: [
       "Delhi is vast \u2014 pick 1 zone per day (Old Delhi, Central Delhi, South Delhi, Lutyens\u2019 zone). Don\u2019t try to cover everything in 2 days.",
       "Best months: Oct\u2013Feb. Summer (Apr\u2013Jun) is brutal (40\u201345\u00b0C). Monsoon is actually beautiful but humid.",

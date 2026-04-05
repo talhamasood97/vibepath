@@ -25,6 +25,13 @@ interface ProfileInput {
   transport: TransportOption;
   budget: number;
   nights: number;
+  startDate?: string;  // used to apply weekend price buffer
+}
+
+// Weekend travel (Fri/Sat/Sun departures) inflates hotel prices ~20%
+function isWeekendTravel(startDate: string): boolean {
+  const day = new Date(startDate).getDay(); // 0=Sun,1=Mon,...,6=Sat
+  return day === 5 || day === 6 || day === 0;
 }
 
 function roundToHundred(n: number): number {
@@ -131,12 +138,19 @@ export function allocateBudget({
   transport,
   budget,
   nights,
+  startDate,
 }: ProfileInput): BudgetAllocation {
   const { cost: transportCost, trainClass } = calcTransportCost(
     transport,
     profile
   );
   const accommodationData = calcAccommodationCost(destination, profile, nights);
+
+  // Apply 1.2x weekend buffer on accommodation — hotel prices genuinely spike Fri–Sun
+  if (startDate && isWeekendTravel(startDate)) {
+    accommodationData.cost = Math.round(accommodationData.cost * 1.2);
+    accommodationData.perNight = Math.round(accommodationData.perNight * 1.2);
+  }
   const foodCost = calcFoodCost(destination, profile, nights);
 
   // Activities: use what's left, capped at destination average
@@ -172,12 +186,13 @@ export function allocateAllProfiles(
   destination: Destination,
   transport: TransportOption,
   budget: number,
-  nights: number
+  nights: number,
+  startDate?: string
 ): BudgetAllocation[] {
   const profiles: BudgetProfile[] = ["value", "balanced", "comfort"];
   return profiles
     .map((profile) =>
-      allocateBudget({ profile, destination, transport, budget, nights })
+      allocateBudget({ profile, destination, transport, budget, nights, startDate })
     )
     .filter((a) => a.transport + a.accommodation + a.food < budget); // only feasible profiles
 }

@@ -11,6 +11,8 @@ export type Vibe =
 
 export type DiscoveryTag = "iconic" | "popular" | "offbeat" | "hidden-gem";
 
+export type TravelerType = "solo-male" | "solo-female" | "couple" | "friends" | "family";
+
 export interface TripInput {
   origin: string;              // city name e.g. "Kanpur"
   budget: number;              // total trip budget in INR per person
@@ -18,6 +20,7 @@ export interface TripInput {
   endDate: string;             // ISO date string
   vibe: Vibe;
   travelers: number;           // default 1
+  travelerType?: TravelerType; // who's traveling — affects safety/stay recommendations
   destinationOverride?: string; // Rec 4: user already knows where they want to go
   recentlyShown?: string[];    // Rec 6: destination names shown in recent sessions
 }
@@ -51,12 +54,19 @@ export interface BusRoute {
   note?: string;
 }
 
+export interface LastMileData {
+  budget: string;   // cheapest option e.g. "Shared auto (₹40, 15 min)"
+  comfort: string;  // comfortable option e.g. "Ola/cab (₹250, 15 min)"
+  duration: string; // approx time e.g. "10–15 min"
+}
+
 export interface TransportOption {
   mode: TransportMode;
   train?: TrainRoute;
   bus?: BusRoute;
   firstMile: string;
   lastMile: string;
+  lastMileData?: LastMileData;  // structured last-mile breakdown
   totalCostPerPerson: {
     budget: number;
     midrange: number;
@@ -164,10 +174,17 @@ export interface StructuredItinerary {
   activities: string[];
 }
 
+export interface LiveAlert {
+  text: string;
+  source?: string;
+}
+
 export interface GeneratedItinerary extends StructuredItinerary {
   narrative: string;
   dayPlan: string;
   tradeoffs: string[];
+  monsoonWarning?: string;  // seasonal safety warning for mountain/coastal destinations
+  liveAlert?: LiveAlert;    // real-time Gemini Search Grounding alert (road closures, weather etc.)
 }
 
 // ── API types ─────────────────────────────────────────────────────────────────

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import type { TripInput, Vibe } from "@/types";
+import type { TripInput, Vibe, TravelerType } from "@/types";
 
 const ORIGINS = [
   "Kanpur", "Lucknow", "Varanasi", "Jaipur", "Indore",
@@ -30,6 +30,14 @@ const VIBES: { value: Vibe; label: string; emoji: string; comingSoon?: boolean }
   { value: "relaxing",   label: "Chill",      emoji: "\ud83c\udf3f" },
   { value: "city",       label: "City",       emoji: "\ud83c\udf06" },
   { value: "beach",      label: "Beach",      emoji: "\ud83c\udfd6\ufe0f", comingSoon: true },
+];
+
+const TRAVELER_TYPES: { value: TravelerType; label: string; emoji: string }[] = [
+  { value: "solo-male",   label: "Solo",         emoji: "\ud83d\udeb6" },
+  { value: "solo-female", label: "Solo \u2640\ufe0f",   emoji: "\ud83d\udeb6\u200d\u2640\ufe0f" },
+  { value: "couple",      label: "Couple",       emoji: "\ud83d\udc8c" },
+  { value: "friends",     label: "Friends",      emoji: "\ud83e\udd1d" },
+  { value: "family",      label: "Family",       emoji: "\ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc67" },
 ];
 
 function getTodayStr(): string {
@@ -83,15 +91,17 @@ export function saveShownDestinations(destinationNames: string[]) {
 interface Props {
   onSubmit: (input: TripInput) => void;
   loading: boolean;
+  prefill?: { vibe?: Vibe; budget?: number } | null;
 }
 
-export default function SearchForm({ onSubmit, loading }: Props) {
+export default function SearchForm({ onSubmit, loading, prefill }: Props) {
   const nextWeekend = getNextWeekend();
-  const [origin,    setOrigin]    = useState("Lucknow");
-  const [budget,    setBudget]    = useState(8000);
-  const [startDate, setStartDate] = useState(nextWeekend.start);
-  const [endDate,   setEndDate]   = useState(nextWeekend.end);
-  const [vibe,      setVibe]      = useState<Vibe>("spiritual");
+  const [origin,       setOrigin]       = useState("Lucknow");
+  const [budget,       setBudget]       = useState(8000);
+  const [startDate,    setStartDate]    = useState(nextWeekend.start);
+  const [endDate,      setEndDate]      = useState(nextWeekend.end);
+  const [vibe,         setVibe]         = useState<Vibe>("spiritual");
+  const [travelerType, setTravelerType] = useState<TravelerType>("friends");
 
   // Rec 4: Destination override state
   const [destMode, setDestMode]       = useState(false);
@@ -106,6 +116,13 @@ export default function SearchForm({ onSubmit, loading }: Props) {
   useEffect(() => {
     setRecentlyShown(loadRecentlyShown());
   }, []);
+
+  // Apply prefill values from parent (e.g. sample card clicks)
+  useEffect(() => {
+    if (!prefill) return;
+    if (prefill.vibe) setVibe(prefill.vibe);
+    if (prefill.budget) setBudget(prefill.budget);
+  }, [prefill]);
 
   // Close suggestions on outside click
   useEffect(() => {
@@ -152,8 +169,9 @@ export default function SearchForm({ onSubmit, loading }: Props) {
       budget,
       startDate,
       endDate,
-      vibe: destMode ? "relaxing" : vibe,   // vibe irrelevant in dest mode
+      vibe: destMode ? "relaxing" : vibe,
       travelers: 1,
+      travelerType,
       destinationOverride: destMode && destInput.trim() ? destInput.trim() : undefined,
       recentlyShown,
     });
@@ -186,7 +204,7 @@ export default function SearchForm({ onSubmit, loading }: Props) {
             <label className="field-label" htmlFor="budgetRange">
               Budget per person&nbsp;
               <strong style={{ color: "var(--primary)" }}>
-                \u20b9{budget.toLocaleString("en-IN")}
+                {`\u20b9${budget.toLocaleString("en-IN")}`}
               </strong>
             </label>
             <input
@@ -200,8 +218,8 @@ export default function SearchForm({ onSubmit, loading }: Props) {
               style={{ accentColor: "var(--primary)", width: "100%", marginTop: "0.45rem" }}
             />
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.72rem", color: "var(--text-soft)" }}>
-              <span>\u20b92,000</span>
-              <span>\u20b925,000</span>
+              <span>{"\u20b92,000"}</span>
+              <span>{"\u20b925,000"}</span>
             </div>
           </div>
 
@@ -223,7 +241,7 @@ export default function SearchForm({ onSubmit, loading }: Props) {
             <label className="field-label" htmlFor="endDate">
               To {nights > 0 && (
                 <span style={{ color: "var(--primary)", fontWeight: 600 }}>
-                  \xb7 {nights}N/{nights + 1}D
+                  {"\xb7"} {nights}N/{nights + 1}D
                 </span>
               )}
             </label>
@@ -285,6 +303,7 @@ export default function SearchForm({ onSubmit, loading }: Props) {
                     type="button"
                     className="pill"
                     data-active={vibe === v.value ? "true" : "false"}
+                    data-vibe={v.value}
                     onClick={() => setVibe(v.value)}
                   >
                     {v.emoji} {v.label}
@@ -294,6 +313,25 @@ export default function SearchForm({ onSubmit, loading }: Props) {
             </div>
           </div>
         )}
+
+        {/* Traveler type */}
+        <div className="field-group" style={{ marginBottom: "0.85rem" }}>
+          <span className="field-label">{"Who\u2019s going?"}</span>
+          <div className="traveler-pills" role="group" aria-label="Who is traveling">
+            {TRAVELER_TYPES.map((t) => (
+              <button
+                key={t.value}
+                type="button"
+                className="pill"
+                data-active={travelerType === t.value ? "true" : "false"}
+                onClick={() => setTravelerType(t.value)}
+                aria-pressed={travelerType === t.value}
+              >
+                {t.emoji} {t.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
         {/* Rec 4: Destination override toggle + input */}
         <div style={{ marginBottom: "0.9rem" }}>
@@ -426,7 +464,7 @@ export default function SearchForm({ onSubmit, loading }: Props) {
         <p className="search-hint">
           {destMode
             ? "Musafir will give you Value, Balanced, and Comfort plans for your destination."
-            : "Results show 3 trade-offs across budget, comfort &amp; timing."
+            : "Results show 3 trade-offs across budget, comfort & timing."
           }
         </p>
       </form>
