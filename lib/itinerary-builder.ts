@@ -36,6 +36,7 @@ import { allocateAllProfiles } from "./budget-allocator";
 import {
   generateAllNarratives,
   generateAllLLMOnly,
+  validateDestinationForTravel,
   type ItineraryContext,
   type LLMOnlyContext,
   type LLMOnlyBudgetEstimate,
@@ -231,23 +232,38 @@ async function buildLLMOnlyItineraries(
   input: TripInput,
   destinationName: string
 ): Promise<GeneratedItinerary[]> {
+  // Validate before burning 3 Groq calls on a non-destination
+  const validation = await validateDestinationForTravel(destinationName, input.origin);
+
+  if (!validation.isValid) {
+    throw new Error(
+      `"${destinationName}" doesn\u2019t appear to be a travel destination${validation.reason ? ` \u2014 ${validation.reason}` : ""}. ` +
+      `Try destinations like Manali, Hampi, Gokarna, Coorg, or use vibe-based search to discover places.`
+    );
+  }
+
+  // Use the canonical name going forward (corrects capitalisation + typos)
+  const canonicalName = validation.canonicalName || destinationName;
+
   const nights = calcNights(input.startDate, input.endDate);
   const profiles = ["value", "balanced", "comfort"] as const;
 
   const contexts: LLMOnlyContext[] = profiles.map((profile) => ({
     profile,
-    destination: destinationName,
+    destination: canonicalName,
     origin: input.origin,
     budget: input.budget,
     nights,
     travelerType: input.travelerType as TravelerType | undefined,
     startDate: input.startDate,
+    destinationType: validation.destinationType,
+    state: validation.state,
   }));
 
   // Groq (3 profiles) + Gemini live alert check run in parallel
   const [llmResults, liveAlert] = await Promise.all([
     generateAllLLMOnly(contexts),
-    getLiveAlert(destinationName, "", input.startDate),
+    getLiveAlert(canonicalName, validation.state, input.startDate),
   ]);
 
   return profiles.map((profile, i): GeneratedItinerary => {
@@ -256,8 +272,8 @@ async function buildLLMOnlyItineraries(
 
     // Synthetic destination for type compatibility
     const synthDest: Destination = {
-      name: destinationName,
-      state: be.state,
+      name: canonicalName,
+      state: be.state || validation.state,
       tagline: llm.narrative.split(".")[0]?.trim() ?? destinationName,
       vibes: ["relaxing"],
       primaryVibe: "relaxing",
@@ -314,7 +330,7 @@ async function buildLLMOnlyItineraries(
       tradeoffNote:      be.transportDescription,
     };
 
-    const headline = `${profile === "value" ? "Budget" : profile === "comfort" ? "Comfort" : "Balanced"} ${destinationName} \u2014 ~\u20b9${Math.round(totalSpent).toLocaleString("en-IN")} total`;
+    const headline = `${profile === "value" ? "Budget" : profile === "comfort" ? "Comfort" : "Balanced"} ${canonicalName} \u2014 ~\u20b9${Math.round(totalSpent).toLocaleString("en-IN")} total`;
 
     return {
       profile,

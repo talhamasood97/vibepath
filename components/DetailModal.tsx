@@ -9,9 +9,9 @@ interface Props {
 }
 
 const PROFILE_CONFIG = {
-  value:    { label: "Best Value",  color: "var(--accent-teal)",  icon: "\ud83d\udcb0" },
-  balanced: { label: "Best Match",  color: "var(--primary)",       icon: "\u2728" },
-  comfort:  { label: "Comfort",     color: "var(--accent-warm)",   icon: "\ud83c\udfeb" },
+  value:    { label: "Best Value",  color: "var(--accent-teal)",  icon: "💰" },
+  balanced: { label: "Best Match",  color: "var(--primary)",       icon: "✨" },
+  comfort:  { label: "Comfort",     color: "var(--accent-warm)",   icon: "🏨" },
 } as const;
 
 export default function DetailModal({ itinerary, onClose }: Props) {
@@ -59,7 +59,7 @@ export default function DetailModal({ itinerary, onClose }: Props) {
         <div className="detail-header">
           <div className="detail-header-left">
             <span className="detail-dest">{itinerary.destination.name}</span>
-            {itinerary.destination.state && (
+            {itinerary.destination.state && itinerary.destination.state !== "India" && (
               <span className="detail-state">{itinerary.destination.state}</span>
             )}
           </div>
@@ -68,7 +68,7 @@ export default function DetailModal({ itinerary, onClose }: Props) {
               {cfg.icon} {cfg.label}
             </span>
             {itinerary.isAIEstimated && (
-              <span className="detail-ai-badge">\u2248 AI-estimated</span>
+              <span className="detail-ai-badge">{"≈ AI-estimated"}</span>
             )}
             <button
               className="detail-close-btn"
@@ -76,7 +76,7 @@ export default function DetailModal({ itinerary, onClose }: Props) {
               aria-label="Close"
               type="button"
             >
-              \u2715
+              {"✕"}
             </button>
           </div>
         </div>
@@ -87,37 +87,37 @@ export default function DetailModal({ itinerary, onClose }: Props) {
           {/* ── Budget summary strip ── */}
           <div className="detail-budget-strip">
             <div className="detail-budget-item">
-              <span className="detail-budget-icon">\ud83d\ude82</span>
+              <span className="detail-budget-icon">{"🚂"}</span>
               <div>
                 <div className="detail-budget-label">Transport</div>
-                <div className="detail-budget-val">\u20b9{tCost.toLocaleString("en-IN")}</div>
+                <div className="detail-budget-val">{`\u20b9${tCost.toLocaleString("en-IN")}`}</div>
               </div>
             </div>
             <div className="detail-budget-item">
-              <span className="detail-budget-icon">\ud83c\udfe8</span>
+              <span className="detail-budget-icon">{"🏨"}</span>
               <div>
                 <div className="detail-budget-label">Stay ({itinerary.nights}N)</div>
-                <div className="detail-budget-val">\u20b9{aCost.toLocaleString("en-IN")}</div>
+                <div className="detail-budget-val">{`\u20b9${aCost.toLocaleString("en-IN")}`}</div>
               </div>
             </div>
             <div className="detail-budget-item">
-              <span className="detail-budget-icon">\ud83c\udf5c</span>
+              <span className="detail-budget-icon">{"🍜"}</span>
               <div>
                 <div className="detail-budget-label">Food</div>
-                <div className="detail-budget-val">\u20b9{fCost.toLocaleString("en-IN")}</div>
+                <div className="detail-budget-val">{`\u20b9${fCost.toLocaleString("en-IN")}`}</div>
               </div>
             </div>
             <div className="detail-budget-item">
-              <span className="detail-budget-icon">\ud83c\udfaf</span>
+              <span className="detail-budget-icon">{"🎯"}</span>
               <div>
                 <div className="detail-budget-label">Activities</div>
-                <div className="detail-budget-val">\u20b9{actCost.toLocaleString("en-IN")}</div>
+                <div className="detail-budget-val">{`\u20b9${actCost.toLocaleString("en-IN")}`}</div>
               </div>
             </div>
             <div className="detail-budget-total">
               <div className="detail-budget-label">Total</div>
               <div className="detail-budget-total-val" style={{ color: cfg.color }}>
-                \u20b9{totalSpent.toLocaleString("en-IN")}
+                {itinerary.isAIEstimated ? "~" : ""}{`\u20b9${totalSpent.toLocaleString("en-IN")}`}
               </div>
               <div className="detail-budget-pct">{itinerary.allocation.utilizationPct}% of budget</div>
             </div>
@@ -128,7 +128,7 @@ export default function DetailModal({ itinerary, onClose }: Props) {
             {train ? (
               <>
                 <span className="detail-transport-pill">
-                  \ud83d\ude82 {train.trainName} \u00b7 {train.departure}\u2013{train.arrival}
+                  {"🚂"} {train.trainName} {"\u00b7"} {train.departure}{"\u2013"}{train.arrival}
                   {train.overnight && " \u00b7 overnight"}
                 </span>
                 <span className="detail-transport-pill">
@@ -136,28 +136,28 @@ export default function DetailModal({ itinerary, onClose }: Props) {
                 </span>
                 {train.frequency !== "Daily" && (
                   <span className="detail-transport-pill" style={{ color: "var(--accent-warm)" }}>
-                    \u26a0\ufe0f {train.frequency}
+                    {"⚠️"} {train.frequency}
                   </span>
                 )}
               </>
             ) : itinerary.isAIEstimated && itinerary.allocation.tradeoffNote ? (
               <span className="detail-transport-pill">
-                \ud83d\ude8c {itinerary.allocation.tradeoffNote}
+                {"🚌"} {itinerary.allocation.tradeoffNote}
               </span>
             ) : (
               <span className="detail-transport-pill">
-                \ud83d\ude8c Bus route
+                {"🚌"} Bus route
               </span>
             )}
             <span className="detail-transport-pill">
-              \ud83c\udfe8 {itinerary.allocation.accommodationType} \u00b7 {itinerary.nights} night{itinerary.nights > 1 ? "s" : ""}
+              {"🏨"} {itinerary.allocation.accommodationType} {"\u00b7"} {itinerary.nights} night{itinerary.nights > 1 ? "s" : ""}
             </span>
           </div>
 
           {/* Live alert */}
           {itinerary.liveAlert && (
             <div className="detail-live-alert">
-              <span className="live-alert-badge">\ud83d\udd34 Live Check</span>
+              <span className="live-alert-badge">{"🔴 Live Check"}</span>
               <span>{itinerary.liveAlert.text}</span>
               {itinerary.liveAlert.source && (
                 <span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>
@@ -170,7 +170,7 @@ export default function DetailModal({ itinerary, onClose }: Props) {
           {/* Monsoon warning */}
           {itinerary.monsoonWarning && (
             <div className="monsoon-warning" style={{ margin: "0 0 1rem" }}>
-              <span className="monsoon-warning-icon">\u26a0\ufe0f</span>
+              <span className="monsoon-warning-icon">{"⚠️"}</span>
               <span>{itinerary.monsoonWarning}</span>
             </div>
           )}
@@ -184,7 +184,7 @@ export default function DetailModal({ itinerary, onClose }: Props) {
 
           {/* ── DAY-BY-DAY PLAN ── */}
           <section className="detail-section">
-            <h2 className="detail-section-title">\ud83d\uddfa\ufe0f Day-by-Day Itinerary</h2>
+            <h2 className="detail-section-title">{"🗺️ Day-by-Day Itinerary"}</h2>
             {itinerary.detailedDays.length > 0 ? (
               itinerary.detailedDays.map((day) => (
                 <div key={day.day} className="detail-day-card">
@@ -195,21 +195,21 @@ export default function DetailModal({ itinerary, onClose }: Props) {
 
                   <div className="detail-day-sections">
                     <div className="detail-day-block">
-                      <span className="detail-day-block-icon">\ud83c\udf05</span>
+                      <span className="detail-day-block-icon">{"🌅"}</span>
                       <div>
                         <div className="detail-day-block-label">Morning</div>
                         <p className="detail-day-block-text">{day.morning}</p>
                       </div>
                     </div>
                     <div className="detail-day-block">
-                      <span className="detail-day-block-icon">\u2600\ufe0f</span>
+                      <span className="detail-day-block-icon">{"☀️"}</span>
                       <div>
                         <div className="detail-day-block-label">Afternoon</div>
                         <p className="detail-day-block-text">{day.afternoon}</p>
                       </div>
                     </div>
                     <div className="detail-day-block">
-                      <span className="detail-day-block-icon">\ud83c\udf19</span>
+                      <span className="detail-day-block-icon">{"🌙"}</span>
                       <div>
                         <div className="detail-day-block-label">Evening</div>
                         <p className="detail-day-block-text">{day.evening}</p>
@@ -219,14 +219,14 @@ export default function DetailModal({ itinerary, onClose }: Props) {
 
                   {/* Eat row */}
                   <div className="detail-eat-row">
-                    <span className="detail-eat-icon">\ud83c\udf7d\ufe0f</span>
+                    <span className="detail-eat-icon">{"🍽️"}</span>
                     <span className="detail-eat-text">{day.eat}</span>
                   </div>
 
                   {/* Hidden gem */}
                   {day.hiddenGem && (
                     <div className="detail-gem-row">
-                      <span className="detail-gem-icon">\ud83d\udc8e</span>
+                      <span className="detail-gem-icon">{"💎"}</span>
                       <span className="detail-gem-text">{day.hiddenGem}</span>
                     </div>
                   )}
@@ -234,14 +234,13 @@ export default function DetailModal({ itinerary, onClose }: Props) {
                   {/* Tip */}
                   {day.tip && (
                     <div className="detail-tip-row">
-                      <span className="detail-tip-icon">\ud83d\udca1</span>
+                      <span className="detail-tip-icon">{"💡"}</span>
                       <span className="detail-tip-text">{day.tip}</span>
                     </div>
                   )}
                 </div>
               ))
             ) : (
-              // Fallback to compact dayPlan if detailedDays is empty
               itinerary.dayPlan.split("\n").filter(Boolean).map((line, i) => (
                 <div key={i} className="detail-day-card">
                   <p style={{ margin: 0, fontSize: "0.88rem" }}>{line}</p>
@@ -253,10 +252,9 @@ export default function DetailModal({ itinerary, onClose }: Props) {
           {/* ── LOCAL INTELLIGENCE (for catalog destinations) ── */}
           {intel && (
             <>
-              {/* Must Eat */}
               {intel.mustEat.length > 0 && (
                 <section className="detail-section">
-                  <h2 className="detail-section-title">\ud83c\udf7d\ufe0f Must Eat</h2>
+                  <h2 className="detail-section-title">{"🍽️ Must Eat"}</h2>
                   <div className="detail-intel-grid">
                     {intel.mustEat.map((f, i) => (
                       <div key={i} className="detail-intel-card">
@@ -264,17 +262,16 @@ export default function DetailModal({ itinerary, onClose }: Props) {
                         <div className="detail-intel-area">{f.area}</div>
                         {f.knownFor && <div className="detail-intel-sub">{f.knownFor}</div>}
                         <div className="detail-intel-price">{f.price}</div>
-                        {f.tip && <div className="detail-intel-tip">\ud83d\udca1 {f.tip}</div>}
+                        {f.tip && <div className="detail-intel-tip">{"💡 "}{f.tip}</div>}
                       </div>
                     ))}
                   </div>
                 </section>
               )}
 
-              {/* Street Food */}
               {intel.streetFood.length > 0 && (
                 <section className="detail-section">
-                  <h2 className="detail-section-title">\ud83c\udf2e Street Food</h2>
+                  <h2 className="detail-section-title">{"🌮 Street Food"}</h2>
                   <div className="detail-intel-grid">
                     {intel.streetFood.map((f, i) => (
                       <div key={i} className="detail-intel-card">
@@ -282,42 +279,40 @@ export default function DetailModal({ itinerary, onClose }: Props) {
                         <div className="detail-intel-area">{f.area}</div>
                         {f.knownFor && <div className="detail-intel-sub">{f.knownFor}</div>}
                         <div className="detail-intel-price">{f.price}</div>
-                        {f.tip && <div className="detail-intel-tip">\ud83d\udca1 {f.tip}</div>}
+                        {f.tip && <div className="detail-intel-tip">{"💡 "}{f.tip}</div>}
                       </div>
                     ))}
                   </div>
                 </section>
               )}
 
-              {/* Hidden Gems */}
               {intel.hiddenGems.length > 0 && (
                 <section className="detail-section">
-                  <h2 className="detail-section-title">\ud83d\udc8e Hidden Gems</h2>
+                  <h2 className="detail-section-title">{"💎 Hidden Gems"}</h2>
                   {intel.hiddenGems.map((g, i) => (
                     <div key={i} className="detail-gem-card">
                       <div className="detail-gem-card-name">{g.name}</div>
                       <div className="detail-gem-card-what">{g.what}</div>
                       <div className="detail-gem-card-why">{g.why}</div>
                       {g.bestTime && (
-                        <div className="detail-gem-card-time">\ud83d\udd52 Best time: {g.bestTime}</div>
+                        <div className="detail-gem-card-time">{"🕒 Best time: "}{g.bestTime}</div>
                       )}
                     </div>
                   ))}
                 </section>
               )}
 
-              {/* Timing Tips */}
               {intel.timingTips.length > 0 && (
                 <section className="detail-section">
-                  <h2 className="detail-section-title">\u23f0 Timing Tips</h2>
+                  <h2 className="detail-section-title">{"⏰ Timing Tips"}</h2>
                   <div className="detail-tips-list">
                     {intel.timingTips.map((t, i) => (
                       <div key={i} className="detail-timing-row">
                         <strong>{t.activity}</strong>
-                        <span> \u2014 Best: {t.bestTime}</span>
-                        {t.tip && <span>. {t.tip}</span>}
+                        {" \u2014 Best: "}{t.bestTime}
+                        {t.tip && <>. {t.tip}</>}
                         {t.avoidTime && (
-                          <span style={{ color: "var(--accent-warm)" }}> Avoid: {t.avoidTime}</span>
+                          <span style={{ color: "var(--accent-warm)" }}>{" Avoid: "}{t.avoidTime}</span>
                         )}
                       </div>
                     ))}
@@ -325,27 +320,25 @@ export default function DetailModal({ itinerary, onClose }: Props) {
                 </section>
               )}
 
-              {/* Shopping */}
               {intel.shopping.length > 0 && (
                 <section className="detail-section">
-                  <h2 className="detail-section-title">\ud83d\udecd\ufe0f Shopping</h2>
+                  <h2 className="detail-section-title">{"🛍️ Shopping"}</h2>
                   <div className="detail-intel-grid">
                     {intel.shopping.map((s, i) => (
                       <div key={i} className="detail-intel-card">
                         <div className="detail-intel-name">{s.what}</div>
                         <div className="detail-intel-area">{s.where}</div>
                         <div className="detail-intel-price">{s.priceRange}</div>
-                        {s.tip && <div className="detail-intel-tip">\ud83d\udca1 {s.tip}</div>}
+                        {s.tip && <div className="detail-intel-tip">{"💡 "}{s.tip}</div>}
                       </div>
                     ))}
                   </div>
                 </section>
               )}
 
-              {/* Know Before You Go */}
               {intel.knowBeforeYouGo.length > 0 && (
                 <section className="detail-section">
-                  <h2 className="detail-section-title">\ud83e\uddf3 Know Before You Go</h2>
+                  <h2 className="detail-section-title">{"🧳 Know Before You Go"}</h2>
                   <ul className="detail-kbyg-list">
                     {intel.knowBeforeYouGo.map((k, i) => (
                       <li key={i}>{k}</li>
@@ -354,34 +347,31 @@ export default function DetailModal({ itinerary, onClose }: Props) {
                 </section>
               )}
 
-              {/* Local Transport */}
               {intel.localTransport && (
                 <section className="detail-section">
-                  <h2 className="detail-section-title">\ud83d\ude8c Getting Around</h2>
+                  <h2 className="detail-section-title">{"🚌 Getting Around"}</h2>
                   <p className="detail-local-transport">{intel.localTransport}</p>
                 </section>
               )}
 
-              {/* Stay Areas */}
               {intel.stayAreas && intel.stayAreas.length > 0 && (
                 <section className="detail-section">
-                  <h2 className="detail-section-title">\ud83c\udfe8 Where to Stay</h2>
+                  <h2 className="detail-section-title">{"🏨 Where to Stay"}</h2>
                   <div className="detail-intel-grid">
                     {intel.stayAreas.map((a, i) => (
                       <div key={i} className="detail-intel-card">
                         <div className="detail-intel-name">{a.area}</div>
                         <div className="detail-intel-sub">{a.why}</div>
-                        <div className="detail-intel-tip">Best for: {a.bestFor}</div>
+                        <div className="detail-intel-tip">{"Best for: "}{a.bestFor}</div>
                       </div>
                     ))}
                   </div>
                 </section>
               )}
 
-              {/* Avoid / Honest Warnings */}
               {intel.avoid.length > 0 && (
                 <section className="detail-section">
-                  <h2 className="detail-section-title">\u26a0\ufe0f Tourist Traps to Avoid</h2>
+                  <h2 className="detail-section-title">{"⚠️ Tourist Traps to Avoid"}</h2>
                   <ul className="detail-avoid-list">
                     {intel.avoid.map((a, i) => (
                       <li key={i}>{a}</li>
@@ -395,7 +385,9 @@ export default function DetailModal({ itinerary, onClose }: Props) {
           {/* ── Tradeoffs ── */}
           {itinerary.tradeoffs.length > 0 && (
             <section className="detail-section">
-              <h2 className="detail-section-title">\u2696\ufe0f {itinerary.profile === "value" ? "Smart Save" : itinerary.profile === "comfort" ? "Pro Tips" : "Smart Move"}</h2>
+              <h2 className="detail-section-title">
+                {"⚖️ "}{itinerary.profile === "value" ? "Smart Save" : itinerary.profile === "comfort" ? "Pro Tips" : "Smart Move"}
+              </h2>
               <div className="detail-tradeoffs">
                 {itinerary.tradeoffs.map((t, i) => (
                   <div key={i} className="detail-tradeoff-item">
@@ -410,15 +402,15 @@ export default function DetailModal({ itinerary, onClose }: Props) {
           {/* AI Estimated disclaimer */}
           {itinerary.isAIEstimated && (
             <div className="detail-ai-disclaimer">
-              <strong>\u2248 AI-estimated itinerary</strong>
+              <strong>{"≈ AI-estimated itinerary"}</strong>
               <p>
                 {itinerary.destination.name} is not yet in our verified database. All transport costs,
-                accommodation prices, and budget figures are Groq AI estimates based on typical Indian travel
-                prices in 2025. Verify actual fares on{" "}
-                <a href="https://www.irctc.co.in/nget/train-search" target="_blank" rel="noopener noreferrer">IRCTC</a>{" "}
-                and{" "}
-                <a href="https://www.redbus.in" target="_blank" rel="noopener noreferrer">RedBus</a>{" "}
-                before booking.
+                accommodation prices, and budget figures are AI estimates based on typical Indian travel prices
+                (2025). Verify actual fares on{" "}
+                <a href="https://www.irctc.co.in/nget/train-search" target="_blank" rel="noopener noreferrer">IRCTC</a>
+                {" "}and{" "}
+                <a href="https://www.redbus.in" target="_blank" rel="noopener noreferrer">RedBus</a>
+                {" "}before booking.
               </p>
             </div>
           )}
@@ -428,11 +420,9 @@ export default function DetailModal({ itinerary, onClose }: Props) {
             <button
               className="btn btn-primary"
               type="button"
-              onClick={() =>
-                window.open("https://www.irctc.co.in/nget/train-search", "_blank")
-              }
+              onClick={() => window.open("https://www.irctc.co.in/nget/train-search", "_blank")}
             >
-              Book on IRCTC \u2192
+              {"Book on IRCTC \u2192"}
             </button>
             <button className="btn btn-outline" type="button" onClick={onClose}>
               Back to results
@@ -440,9 +430,7 @@ export default function DetailModal({ itinerary, onClose }: Props) {
           </div>
 
         </div>
-        {/* end detail-body */}
       </div>
-      {/* end detail-sheet */}
     </div>
   );
 }

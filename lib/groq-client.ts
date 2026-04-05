@@ -27,6 +27,70 @@ function getGroqClient(): Groq {
   return new Groq({ apiKey: apiKey.trim() });
 }
 
+// ── Destination validation ────────────────────────────────────────────────────
+// Fast pre-check before the 3-call LLM-only path fires.
+// Prevents wasting tokens on places like "barabanki", "my office", typos etc.
+
+export interface DestinationValidation {
+  isValid: boolean;
+  canonicalName: string;      // corrected spelling / proper capitalisation
+  state: string;
+  destinationType: string;    // "hill station", "pilgrimage", "heritage city", etc.
+  reason: string;             // why it is or isn't suitable for a weekend trip
+}
+
+export async function validateDestinationForTravel(
+  destination: string,
+  origin: string
+): Promise<DestinationValidation> {
+  // Silently pass if key is missing — caller decides what to do
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey) {
+    return { isValid: true, canonicalName: destination, state: "India", destinationType: "destination", reason: "" };
+  }
+  const client = new Groq({ apiKey: apiKey.trim() });
+
+  const prompt = `Is "${destination}" a suitable weekend travel destination for someone in India?
+
+Answer with ONLY this JSON (no markdown, no extra text):
+{
+  "isValid": true or false,
+  "canonicalName": "<correctly capitalised name, e.g. Manali not manali>",
+  "state": "<Indian state or UT it belongs to>",
+  "destinationType": "<one of: hill station, beach, pilgrimage, heritage city, wildlife, adventure, city break, waterfall, lake, valley, other>",
+  "reason": "<one sentence: why it IS suitable, or why it is NOT (e.g. district HQ with no tourist infrastructure, misspelling, non-existent place)>"
+}
+
+Rules:
+- isValid = true if it is a named Indian town, city, or region that tourists actually visit (even small offbeat ones like Chopta, Gokarna, Hampi, Lonar, Ziro, Majuli)
+- isValid = false if: it is purely an administrative/industrial district HQ with no tourist draw, it appears to be a typo/nonsense word, it is not in India
+- If isValid=false, canonicalName should still be your best guess at what they meant`;
+
+  try {
+    const res = await client.chat.completions.create({
+      model: "llama-3.1-8b-instant",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.1,
+      max_tokens: 200,
+      response_format: { type: "json_object" },
+    });
+
+    const raw = res.choices[0]?.message?.content ?? "{}";
+    const parsed = JSON.parse(raw) as Record<string, unknown>;
+
+    return {
+      isValid:         typeof parsed.isValid === "boolean" ? parsed.isValid : true,
+      canonicalName:   typeof parsed.canonicalName === "string" ? parsed.canonicalName : destination,
+      state:           typeof parsed.state === "string" ? parsed.state : "India",
+      destinationType: typeof parsed.destinationType === "string" ? parsed.destinationType : "destination",
+      reason:          typeof parsed.reason === "string" ? parsed.reason : "",
+    };
+  } catch {
+    // Validation failure = optimistic pass (don't block on timeout)
+    return { isValid: true, canonicalName: destination, state: "India", destinationType: "destination", reason: "" };
+  }
+}
+
 export interface LLMResponse {
   narrative: string;
   dayPlan: string[];        // compact one-liner per day (card view)
@@ -144,6 +208,8 @@ export interface LLMOnlyContext {
   nights: number;
   travelerType?: TravelerType;
   startDate: string;
+  destinationType?: string;  // from validation: "hill station", "pilgrimage", etc.
+  state?: string;            // from validation: Indian state
 }
 
 // ── Local intelligence formatter ──────────────────────────────────────────────
@@ -357,13 +423,19 @@ export async function generateLLMOnlyItinerary(
       })()
     : "";
 
+  const destContext = ctx.destinationType && ctx.state
+    ? `${ctx.destination} is a ${ctx.destinationType} in ${ctx.state}.`
+    : `${ctx.destination} is a travel destination in India.`;
+
   const userPrompt = `Plan a ${ctx.profile} (${pl.budgetLabel}) trip from ${ctx.origin} to ${ctx.destination} for ${ctx.nights} nights.
+${destContext}
 Total per-person budget: \u20b9${ctx.budget.toLocaleString("en-IN")}.
 Travel dates starting: ${ctx.startDate}.
 Transport preference: ${pl.transportClass}.
 Stay preference: ${pl.accomType}.${travelerNote}
 
-This destination is NOT in our verified database \u2014 estimate all costs from your knowledge of Indian travel (2025 prices).
+IMPORTANT: Use your actual knowledge of ${ctx.destination} to write specific day plans. Name REAL tourist attractions, ACTUAL famous restaurants/dhabas/street food, GENUINE hidden gems that travellers discover. Do NOT write generic placeholder text.
+Estimate all costs from your knowledge of Indian travel prices (2025).
 
 Respond ONLY with this exact JSON (no markdown, no extra keys):
 {
