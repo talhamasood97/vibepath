@@ -146,8 +146,9 @@ export default function SearchForm({ onSubmit, loading, prefill }: Props) {
   function handleDestInputChange(val: string) {
     setDestInput(val);
     if (val.length >= 2) {
+      // Show known destinations as suggestions — but allow ANY free-text destination
       const matches = KNOWN_DESTINATIONS.filter((d) =>
-        d.toLowerCase().startsWith(val.toLowerCase())
+        d.toLowerCase().includes(val.toLowerCase())
       );
       setDestSuggestions(matches.slice(0, 6));
       setShowSuggestions(matches.length > 0);
@@ -387,7 +388,7 @@ export default function SearchForm({ onSubmit, loading, prefill }: Props) {
               <input
                 type="text"
                 className="field-input"
-                placeholder="Type a destination (e.g. Ayodhya, Orchha, Ranthambore...)"
+                placeholder="Any destination \u2014 Ayodhya, Manali, Goa, Hampi, Spiti..."
                 value={destInput}
                 onChange={(e) => handleDestInputChange(e.target.value)}
                 onFocus={() => destInput.length >= 2 && setShowSuggestions(true)}
@@ -431,7 +432,12 @@ export default function SearchForm({ onSubmit, loading, prefill }: Props) {
                 </ul>
               )}
               <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "0.4rem" }}>
-                Musafir will build a deep, personalised plan for your chosen destination.
+                {KNOWN_DESTINATIONS.some((d) => d.toLowerCase() === destInput.trim().toLowerCase())
+                  ? "\u2705 Data-verified destination \u2014 real train routes, curated local intel."
+                  : destInput.trim().length >= 2
+                  ? "\u2728 New destination \u2014 Musafir will research and estimate this plan for you."
+                  : "Type any destination. Verified cities show real train data; others use AI estimates."
+                }
               </p>
             </div>
           )}

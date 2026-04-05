@@ -179,12 +179,27 @@ export interface LiveAlert {
   source?: string;
 }
 
+// Rich per-day structure used in the detail modal
+export interface DetailedDay {
+  day: number;
+  theme: string;       // "Arrival & First Impressions"
+  morning: string;     // activity + timing (50-70 words)
+  afternoon: string;   // main sightseeing + lunch spot (50-70 words)
+  evening: string;     // evening program + dinner (50-70 words)
+  eat: string;         // specific food recs for the day (named places, price, tip)
+  hiddenGem?: string;  // one off-beat spot or insider tip for this day
+  tip?: string;        // logistic / timing tip specific to this day
+}
+
 export interface GeneratedItinerary extends StructuredItinerary {
   narrative: string;
-  dayPlan: string;
+  dayPlan: string;               // compact summary (card view)
+  detailedDays: DetailedDay[];   // rich day-by-day (modal full view)
   tradeoffs: string[];
-  monsoonWarning?: string;  // seasonal safety warning for mountain/coastal destinations
-  liveAlert?: LiveAlert;    // real-time Gemini Search Grounding alert (road closures, weather etc.)
+  monsoonWarning?: string;
+  liveAlert?: LiveAlert;
+  localIntelligence?: LocalIntelligence | null;  // passed through for modal display
+  isAIEstimated?: boolean;       // true for destinations not in the static catalog
 }
 
 // ── API types ─────────────────────────────────────────────────────────────────

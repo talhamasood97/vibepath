@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import type { GeneratedItinerary, TripInput, Vibe, GenerateResponse, GenerateError } from "@/types";
 import SearchForm, { saveShownDestinations } from "@/components/SearchForm";
 import ItineraryCard from "@/components/ItineraryCard";
+import DetailModal from "@/components/DetailModal";
 
 // ── Logo SVG ─────────────────────────────────────────────────────────────────
 function LogoMark({ size = 34 }: { size?: number }) {
@@ -118,13 +119,14 @@ function BudgetEngineCard() {
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function HomePage() {
-  const [loading,     setLoading]     = useState(false);
-  const [error,       setError]       = useState<string | null>(null);
-  const [itineraries, setItineraries] = useState<GeneratedItinerary[]>([]);
-  const [lastVibe,    setLastVibe]    = useState<string>("adventure");
-  const [lastOrigin,  setLastOrigin]  = useState<string | undefined>(undefined);
-  const [prefill,     setPrefill]     = useState<{ vibe?: Vibe; budget?: number } | null>(null);
-  const [showSticky,  setShowSticky]  = useState(false);
+  const [loading,          setLoading]          = useState(false);
+  const [error,            setError]            = useState<string | null>(null);
+  const [itineraries,      setItineraries]      = useState<GeneratedItinerary[]>([]);
+  const [lastVibe,         setLastVibe]         = useState<string>("adventure");
+  const [lastOrigin,       setLastOrigin]       = useState<string | undefined>(undefined);
+  const [prefill,          setPrefill]          = useState<{ vibe?: Vibe; budget?: number } | null>(null);
+  const [showSticky,       setShowSticky]       = useState(false);
+  const [selectedItinerary, setSelectedItinerary] = useState<GeneratedItinerary | null>(null);
 
   const resultsRef = useRef<HTMLElement | null>(null);
   const searchRef  = useRef<HTMLDivElement | null>(null);
@@ -337,7 +339,7 @@ export default function HomePage() {
                 <LoadingSteps origin={lastOrigin} />
               ) : hasResults ? (
                 itineraries.map((it, i) => (
-                  <ItineraryCard key={`${it.destination.name}-${it.profile}`} itinerary={it} index={i} vibe={lastVibe} />
+                  <ItineraryCard key={`${it.destination.name}-${it.profile}`} itinerary={it} index={i} vibe={lastVibe} onViewDetails={setSelectedItinerary} />
                 ))
               ) : (
                 /* Static sample cards */
@@ -593,6 +595,14 @@ export default function HomePage() {
           <a href="#main">Back to top ↑</a>
         </div>
       </footer>
+
+      {/* ── DETAIL MODAL ── */}
+      {selectedItinerary && (
+        <DetailModal
+          itinerary={selectedItinerary}
+          onClose={() => setSelectedItinerary(null)}
+        />
+      )}
     </>
   );
 }

@@ -139,7 +139,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     if (
       message.includes("No routes found") ||
       message.includes("Budget too tight") ||
-      message.includes("not yet in Musafir") ||
       message.includes("No direct transport")
     ) {
       return NextResponse.json<GenerateError>(

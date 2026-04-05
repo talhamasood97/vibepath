@@ -46,9 +46,10 @@ interface Props {
   itinerary: GeneratedItinerary;
   index: number;
   vibe: string;
+  onViewDetails: (itinerary: GeneratedItinerary) => void;
 }
 
-export default function ItineraryCard({ itinerary, index, vibe }: Props) {
+export default function ItineraryCard({ itinerary, index, vibe, onViewDetails }: Props) {
   const cfg = PROFILE_CONFIG[itinerary.profile];
   const gradient =
     itinerary.profile === "balanced"
@@ -106,11 +107,18 @@ export default function ItineraryCard({ itinerary, index, vibe }: Props) {
         {/* Title + spend */}
         <div className="card-header-row">
           <h3 className="card-title">{itinerary.headline}</h3>
-          <div
-            className="budget-number"
-            style={{ color: utilizationPct > 100 ? "var(--accent-warm)" : cfg.budgetColor }}
-          >
-            {`\u20b9${totalSpent.toLocaleString("en-IN")}`}<br />{utilizationPct}%
+          <div style={{ textAlign: "right" }}>
+            <div
+              className="budget-number"
+              style={{ color: utilizationPct > 100 ? "var(--accent-warm)" : cfg.budgetColor }}
+            >
+              {itinerary.isAIEstimated ? "~" : ""}{`\u20b9${totalSpent.toLocaleString("en-IN")}`}<br />{utilizationPct}%
+            </div>
+            {itinerary.isAIEstimated && (
+              <div style={{ fontSize: "0.62rem", color: "var(--text-muted)", marginTop: "0.15rem" }}>
+                AI-estimated
+              </div>
+            )}
           </div>
         </div>
 
@@ -225,7 +233,14 @@ export default function ItineraryCard({ itinerary, index, vibe }: Props) {
 
         {/* Footer */}
         <div className="card-footer">
-          <div style={{ display: "flex", gap: "0.4rem" }}>
+          <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap" }}>
+            <button
+              className="btn btn-primary btn-sm"
+              type="button"
+              onClick={() => onViewDetails(itinerary)}
+            >
+              {"\ud83d\uddfa\ufe0f View Full Plan"}
+            </button>
             <button
               className="btn btn-outline btn-sm"
               type="button"
@@ -237,7 +252,10 @@ export default function ItineraryCard({ itinerary, index, vibe }: Props) {
             </button>
           </div>
           <div className="card-footnote">
-            {"Prices estimated \xb7 verify before booking"}
+            {itinerary.isAIEstimated
+              ? "\u2248 AI-estimated \xb7 verify before booking"
+              : "Prices estimated \xb7 verify before booking"
+            }
           </div>
         </div>
       </div>
