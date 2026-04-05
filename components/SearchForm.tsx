@@ -388,7 +388,7 @@ export default function SearchForm({ onSubmit, loading, prefill }: Props) {
               <input
                 type="text"
                 className="field-input"
-                placeholder="Any destination \u2014 Ayodhya, Manali, Goa, Hampi, Spiti..."
+                placeholder="Any destination — Ayodhya, Manali, Goa, Hampi, Spiti..."
                 value={destInput}
                 onChange={(e) => handleDestInputChange(e.target.value)}
                 onFocus={() => destInput.length >= 2 && setShowSuggestions(true)}
