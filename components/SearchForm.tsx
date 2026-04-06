@@ -170,11 +170,12 @@ export default function SearchForm({ onSubmit, loading, prefill }: Props) {
       budget,
       startDate,
       endDate,
-      vibe: destMode ? "relaxing" : vibe,
+      vibe: vibe,
       travelers: 1,
       travelerType,
       destinationOverride: destMode && destInput.trim() ? destInput.trim() : undefined,
       recentlyShown,
+      // Always send the actual vibe even in dest mode — used for alternative suggestions if dest is uncurated
     });
   }
 
@@ -388,7 +389,7 @@ export default function SearchForm({ onSubmit, loading, prefill }: Props) {
               <input
                 type="text"
                 className="field-input"
-                placeholder="Any destination — Ayodhya, Manali, Goa, Hampi, Spiti..."
+                placeholder="e.g. Rishikesh, Varanasi, Jaipur, Udaipur, Orchha..."
                 value={destInput}
                 onChange={(e) => handleDestInputChange(e.target.value)}
                 onFocus={() => destInput.length >= 2 && setShowSuggestions(true)}
@@ -433,10 +434,10 @@ export default function SearchForm({ onSubmit, loading, prefill }: Props) {
               )}
               <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "0.4rem" }}>
                 {KNOWN_DESTINATIONS.some((d) => d.toLowerCase() === destInput.trim().toLowerCase())
-                  ? "\u2705 Data-verified destination \u2014 real train routes, curated local intel."
+                  ? "\u2705 Verified destination \u2014 real train routes, curated local intel, no estimates."
                   : destInput.trim().length >= 2
-                  ? "\u2728 New destination \u2014 Musafir will research and estimate this plan for you."
-                  : "Type any destination. Verified cities show real train data; others use AI estimates."
+                  ? "\u26a0\ufe0f Not in our verified network yet \u2014 we\u2019ll suggest the closest alternatives."
+                  : "Only verified destinations get a full itinerary. We\u2019ll suggest alternatives if yours isn\u2019t listed."
                 }
               </p>
             </div>

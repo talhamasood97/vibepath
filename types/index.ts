@@ -214,7 +214,19 @@ export interface GenerateResponse {
   mode?: "discovery" | "destination";
 }
 
+// Slim destination shape used in alternative suggestions
+export interface DestinationAlternative {
+  name: string;
+  state: string;
+  tagline: string;
+  primaryVibe: Vibe;
+  discovery: DiscoveryTag;
+}
+
 export interface GenerateError {
   error: string;
-  code: "MISSING_KEY" | "RATE_LIMIT" | "INVALID_INPUT" | "NO_ROUTES" | "LLM_ERROR";
+  code: "MISSING_KEY" | "RATE_LIMIT" | "INVALID_INPUT" | "NO_ROUTES" | "LLM_ERROR" | "DESTINATION_NOT_CURATED";
+  // Populated only when code === "DESTINATION_NOT_CURATED"
+  alternatives?: DestinationAlternative[];
+  requestedDestination?: string;
 }

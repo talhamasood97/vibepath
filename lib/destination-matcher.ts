@@ -963,4 +963,33 @@ export function findDestinationByName(name: string): Destination | null {
   );
 }
 
+// ── Alternative finder (used when a destination is not in the curated catalog) ─
+// Returns top N destinations reachable from origin, no vibe filter.
+// Sorted by: discovery tag (hidden-gem > offbeat > popular > iconic), then seasonal fit.
+
+export function findAlternativesForOrigin(
+  origin: string,
+  startDate: string,
+  count = 3
+): Destination[] {
+  const currentMonth = new Date(startDate).getMonth() + 1;
+  const discoveryScore: Record<string, number> = {
+    "hidden-gem": 4,
+    offbeat: 3,
+    popular: 2,
+    iconic: 1,
+  };
+
+  return DESTINATIONS
+    .filter((d) => hasRoute(origin, d.name))
+    .sort((a, b) => {
+      const seasonal =
+        (b.bestMonths.includes(currentMonth) ? 1 : 0) -
+        (a.bestMonths.includes(currentMonth) ? 1 : 0);
+      if (seasonal !== 0) return seasonal;
+      return (discoveryScore[b.discovery] ?? 0) - (discoveryScore[a.discovery] ?? 0);
+    })
+    .slice(0, count);
+}
+
 export { DESTINATIONS };

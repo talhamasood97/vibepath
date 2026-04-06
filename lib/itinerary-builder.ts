@@ -29,8 +29,9 @@ import type {
   TravelerType,
   BudgetAllocation,
   TrainClass,
+  DestinationAlternative,
 } from "@/types";
-import { matchDestinations, findDestinationByName } from "./destination-matcher";
+import { matchDestinations, findDestinationByName, findAlternativesForOrigin } from "./destination-matcher";
 import { getTransportOptions } from "./transport-data";
 import { allocateAllProfiles } from "./budget-allocator";
 import {
@@ -43,6 +44,31 @@ import {
 } from "./groq-client";
 import { getLocalIntelligence } from "./local-intelligence";
 import { getLiveAlert } from "./gemini-validator";
+
+// ── Quality gate error ────────────────────────────────────────────────────────
+// Thrown when a destination is not in the curated catalogue.
+// Carries alternative suggestions so the API can return them to the client.
+
+export class DestinationNotCuratedError extends Error {
+  alternatives: DestinationAlternative[];
+  requestedDestination: string;
+
+  constructor(requestedDest: string, alternatives: Destination[]) {
+    super(
+      `\u201c${requestedDest}\u201d isn\u2019t in our verified destination network yet. ` +
+      `We only create itineraries for destinations with real, curated data \u2014 no generic plans ever.`
+    );
+    this.name = "DestinationNotCuratedError";
+    this.requestedDestination = requestedDest;
+    this.alternatives = alternatives.map((d): DestinationAlternative => ({
+      name: d.name,
+      state: d.state,
+      tagline: d.tagline,
+      primaryVibe: d.primaryVibe,
+      discovery: d.discovery,
+    }));
+  }
+}
 
 function calcNights(startDate: string, endDate: string): number {
   return Math.max(
@@ -184,9 +210,11 @@ async function buildDestinationItineraries(
   const nights = calcNights(input.startDate, input.endDate);
   const dest = findDestinationByName(destinationName);
 
-  // Unknown destination \u2192 route to LLM-only path
+  // Unknown destination → quality gate: never serve generic/LLM-only itineraries.
+  // Find curated alternatives reachable from origin and surface them to the user instead.
   if (!dest) {
-    return buildLLMOnlyItineraries(input, destinationName);
+    const alternatives = findAlternativesForOrigin(input.origin, input.startDate, 3);
+    throw new DestinationNotCuratedError(destinationName, alternatives);
   }
 
   const transportOptions = getTransportOptions(input.origin, dest.name);

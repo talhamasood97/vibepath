@@ -13,7 +13,7 @@ export const runtime = "edge";
 
 import { NextRequest, NextResponse } from "next/server";
 import type { GenerateRequest, GenerateResponse, GenerateError, Vibe } from "@/types";
-import { buildItineraries } from "@/lib/itinerary-builder";
+import { buildItineraries, DestinationNotCuratedError } from "@/lib/itinerary-builder";
 
 const VALID_VIBES: Vibe[] = [
   "mountains", "beach", "historical", "adventure", "spiritual", "relaxing", "city",
@@ -127,6 +127,19 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     return NextResponse.json(response);
   } catch (err) {
+    // Destination not in curated catalogue — return alternatives, never a generic itinerary
+    if (err instanceof DestinationNotCuratedError) {
+      return NextResponse.json<GenerateError>(
+        {
+          error: err.message,
+          code: "DESTINATION_NOT_CURATED",
+          alternatives: err.alternatives,
+          requestedDestination: err.requestedDestination,
+        },
+        { status: 422 }
+      );
+    }
+
     const message = err instanceof Error ? err.message : "Unknown error";
 
     if (message.includes("GROQ_API_KEY")) {
@@ -139,8 +152,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     if (
       message.includes("No routes found") ||
       message.includes("Budget too tight") ||
-      message.includes("No direct transport") ||
-      message.includes("doesn\u2019t appear to be a travel destination")
+      message.includes("No direct transport")
     ) {
       return NextResponse.json<GenerateError>(
         { error: message, code: "NO_ROUTES" },

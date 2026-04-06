@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import type { GeneratedItinerary, TripInput, Vibe, GenerateResponse, GenerateError } from "@/types";
+import type { GeneratedItinerary, TripInput, Vibe, GenerateResponse, GenerateError, DestinationAlternative } from "@/types";
 import SearchForm, { saveShownDestinations } from "@/components/SearchForm";
 import ItineraryCard from "@/components/ItineraryCard";
 import DetailModal from "@/components/DetailModal";
@@ -127,6 +127,9 @@ export default function HomePage() {
   const [prefill,          setPrefill]          = useState<{ vibe?: Vibe; budget?: number } | null>(null);
   const [showSticky,       setShowSticky]       = useState(false);
   const [selectedItinerary, setSelectedItinerary] = useState<GeneratedItinerary | null>(null);
+  const [alternatives,     setAlternatives]     = useState<DestinationAlternative[]>([]);
+  const [requestedDest,    setRequestedDest]    = useState<string>("");
+  const [lastInput,        setLastInput]        = useState<TripInput | null>(null);
 
   const resultsRef = useRef<HTMLElement | null>(null);
   const searchRef  = useRef<HTMLDivElement | null>(null);
@@ -151,8 +154,11 @@ export default function HomePage() {
   async function handleSearch(input: TripInput) {
     setLoading(true);
     setError(null);
+    setAlternatives([]);
+    setRequestedDest("");
     setLastVibe(input.vibe);
     setLastOrigin(input.origin);
+    setLastInput(input);
 
     try {
       const res = await fetch("/api/generate", {
@@ -163,8 +169,13 @@ export default function HomePage() {
       const data: GenerateResponse | GenerateError = await res.json();
 
       if (!res.ok || "error" in data) {
-        setError("error" in data ? data.error : "Something went wrong. Try again.");
+        const errData = data as GenerateError;
+        setError(errData.error ?? "Something went wrong. Try again.");
         setItineraries([]);
+        if (errData.code === "DESTINATION_NOT_CURATED" && errData.alternatives?.length) {
+          setAlternatives(errData.alternatives);
+          setRequestedDest(errData.requestedDestination ?? input.destinationOverride ?? "");
+        }
       } else {
         const result = (data as GenerateResponse).itineraries;
         setItineraries(result);
@@ -320,16 +331,50 @@ export default function HomePage() {
             {/* Error */}
             {error && (
               <div className="error-box" style={{ marginBottom: "1.5rem" }}>
-                <p style={{ fontWeight: 600, marginBottom: "0.4rem" }}>Couldn't build itineraries</p>
+                <p style={{ fontWeight: 600, marginBottom: "0.4rem" }}>
+                  {alternatives.length > 0 ? `\u201c${requestedDest}\u201d isn\u2019t in our verified network yet` : "Couldn\u2019t build itineraries"}
+                </p>
                 <p style={{ fontSize: "0.88rem", color: "var(--text-muted)" }}>{error}</p>
-                <button
-                  className="btn btn-primary btn-sm"
-                  type="button"
-                  style={{ marginTop: "0.75rem" }}
-                  onClick={scrollToSearch}
-                >
-                  Try again
-                </button>
+
+                {/* Alternative suggestions */}
+                {alternatives.length > 0 && (
+                  <div style={{ marginTop: "1rem" }}>
+                    <p style={{ fontSize: "0.82rem", fontWeight: 600, marginBottom: "0.6rem", color: "var(--text-main)" }}>
+                      Here are verified alternatives we can plan for you:
+                    </p>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
+                      {alternatives.map((alt) => (
+                        <button
+                          key={alt.name}
+                          className="btn btn-outline btn-sm"
+                          type="button"
+                          onClick={() => {
+                            if (lastInput) {
+                              handleSearch({ ...lastInput, destinationOverride: alt.name });
+                            }
+                          }}
+                          style={{ textAlign: "left" }}
+                        >
+                          <strong>{alt.name}</strong>
+                          <span style={{ display: "block", fontSize: "0.72rem", color: "var(--text-muted)", fontWeight: 400 }}>
+                            {alt.state} \xb7 {alt.primaryVibe}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {alternatives.length === 0 && (
+                  <button
+                    className="btn btn-primary btn-sm"
+                    type="button"
+                    style={{ marginTop: "0.75rem" }}
+                    onClick={scrollToSearch}
+                  >
+                    Try again
+                  </button>
+                )}
               </div>
             )}
 
@@ -339,7 +384,7 @@ export default function HomePage() {
                 <LoadingSteps origin={lastOrigin} />
               ) : hasResults ? (
                 itineraries.map((it, i) => (
-                  <ItineraryCard key={`${it.destination.name}-${it.profile}`} itinerary={it} index={i} vibe={lastVibe} onViewDetails={setSelectedItinerary} />
+                  <ItineraryCard key={`${it.destination.name}-${it.profile}`} itinerary={it} index={i} vibe={lastVibe} origin={lastOrigin ?? ""} startDate={lastInput?.startDate ?? ""} onViewDetails={setSelectedItinerary} />
                 ))
               ) : (
                 /* Static sample cards */

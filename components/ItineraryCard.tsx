@@ -1,6 +1,7 @@
 "use client";
 
 import type { GeneratedItinerary } from "@/types";
+import { getRedBusLink, getTrainManLink } from "@/lib/transport-data";
 
 const PROFILE_CONFIG = {
   value: {
@@ -46,10 +47,12 @@ interface Props {
   itinerary: GeneratedItinerary;
   index: number;
   vibe: string;
+  origin: string;
+  startDate: string;
   onViewDetails: (itinerary: GeneratedItinerary) => void;
 }
 
-export default function ItineraryCard({ itinerary, index, vibe, onViewDetails }: Props) {
+export default function ItineraryCard({ itinerary, index, vibe, origin, startDate, onViewDetails }: Props) {
   const cfg = PROFILE_CONFIG[itinerary.profile];
   const gradient =
     itinerary.profile === "balanced"
@@ -70,6 +73,37 @@ export default function ItineraryCard({ itinerary, index, vibe, onViewDetails }:
     .split("\n")
     .map((l) => l.trim())
     .filter(Boolean);
+
+  // ── WhatsApp share ──────────────────────────────────────────────────────────
+  function buildWhatsAppText(): string {
+    const dest    = itinerary.destination.name;
+    const profile = itinerary.profile === "value" ? "Best Value" : itinerary.profile === "comfort" ? "Comfort" : "Balanced";
+    const budget  = `\u20b9${totalSpent.toLocaleString("en-IN")}`;
+    const nights  = `${itinerary.nights}N/${itinerary.nights + 1}D`;
+    const transport = train
+      ? `${train.trainName} | ${train.departure}\u2013${train.arrival}`
+      : bus ? `${bus.operatorType} (~${bus.durationHours}h)` : "Check IRCTC/RedBus";
+    const dayLines = dayPlanLines.slice(0, 3).join("\n");
+    const mustEat  = itinerary.localIntelligence?.mustEat?.[0];
+    const gem      = itinerary.localIntelligence?.hiddenGems?.[0];
+
+    let msg = `*Weekend Trip: ${dest}*\n_${profile} \xb7 ${budget} \xb7 ${nights}_\n\n`;
+    msg += `\ud83d\ude82 *Transport:* ${transport}\n\n`;
+    if (dayLines) msg += `\ud83d\uddd3\ufe0f *Quick Plan:*\n${dayLines}\n\n`;
+    if (mustEat) msg += `\ud83c\udf5c *Must try:* ${mustEat.name} (${mustEat.area}) \u2014 ${mustEat.price}\n`;
+    if (gem)     msg += `\ud83d\udc8e *Don\u2019t miss:* ${gem.name} \u2014 ${gem.what}\n`;
+    msg += `\nPlanned on VibePath \u2192 vibepath.pages.dev`;
+    return msg;
+  }
+
+  function handleWhatsAppShare() {
+    const text = buildWhatsAppText();
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+  }
+
+  // ── Booking links ───────────────────────────────────────────────────────────
+  const trainManUrl = origin ? getTrainManLink(origin, itinerary.destination.name) : null;
+  const redBusUrl   = origin && startDate ? getRedBusLink(origin, itinerary.destination.name, startDate) : null;
 
   const train = itinerary.transport.train;
   const bus   = itinerary.transport.bus;
@@ -241,21 +275,49 @@ export default function ItineraryCard({ itinerary, index, vibe, onViewDetails }:
             >
               {"\ud83d\uddfa\ufe0f View Full Plan"}
             </button>
+
+            {/* Train booking — TrainMan if train exists, generic IRCTC fallback */}
+            {train && trainManUrl ? (
+              <button
+                className="btn btn-outline btn-sm"
+                type="button"
+                onClick={() => window.open(trainManUrl, "_blank")}
+              >
+                {"Book train \u2192"}
+              </button>
+            ) : (
+              <button
+                className="btn btn-outline btn-sm"
+                type="button"
+                onClick={() => window.open("https://www.irctc.co.in/nget/train-search", "_blank")}
+              >
+                {"IRCTC \u2192"}
+              </button>
+            )}
+
+            {/* Bus search — RedBus deep link */}
+            {redBusUrl && (
+              <button
+                className="btn btn-outline btn-sm"
+                type="button"
+                onClick={() => window.open(redBusUrl, "_blank")}
+              >
+                {"Buses on RedBus \u2192"}
+              </button>
+            )}
+
+            {/* WhatsApp share */}
             <button
               className="btn btn-outline btn-sm"
               type="button"
-              onClick={() =>
-                window.open("https://www.irctc.co.in/nget/train-search", "_blank")
-              }
+              onClick={handleWhatsAppShare}
+              title="Share this itinerary on WhatsApp"
             >
-              {"Book on IRCTC \u2192"}
+              {"\ud83d\udcac Share"}
             </button>
           </div>
           <div className="card-footnote">
-            {itinerary.isAIEstimated
-              ? "\u2248 AI-estimated \xb7 verify before booking"
-              : "Prices estimated \xb7 verify before booking"
-            }
+            {"Prices estimated \xb7 verify on IRCTC/RedBus before booking"}
           </div>
         </div>
       </div>

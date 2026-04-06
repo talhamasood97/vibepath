@@ -1292,4 +1292,30 @@ export function getTransportOptions(
   return options;
 }
 
+// ── Deep-link generators ──────────────────────────────────────────────────────
+
+/**
+ * Returns a pre-filled RedBus search URL for the given origin → destination on a date.
+ * Format: DD-MM-YYYY as required by RedBus onward param.
+ */
+export function getRedBusLink(origin: string, destination: string, startDate: string): string {
+  const from = origin.toLowerCase().replace(/\s+/g, "-");
+  const to   = destination.toLowerCase().replace(/\s+/g, "-");
+  const d    = new Date(startDate);
+  const dd   = String(d.getDate()).padStart(2, "0");
+  const mm   = String(d.getMonth() + 1).padStart(2, "0");
+  const yyyy = d.getFullYear();
+  return `https://www.redbus.in/bus-tickets/${from}-to-${to}?onward=${dd}-${mm}-${yyyy}`;
+}
+
+/**
+ * Returns a TrainMan train search URL for the given origin → destination.
+ * TrainMan supports city names in uppercase directly.
+ */
+export function getTrainManLink(origin: string, destination: string): string {
+  const from = origin.toUpperCase().replace(/\s+/g, "-");
+  const to   = destination.toUpperCase().replace(/\s+/g, "-");
+  return `https://www.trainman.in/trains/${from}-to-${to}`;
+}
+
 export { TRAIN_ROUTES, BUS_ROUTES, FIRST_MILE, LAST_MILE, LAST_MILE_DATA };
