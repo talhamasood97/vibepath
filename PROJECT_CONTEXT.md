@@ -1,7 +1,7 @@
 # PROJECT_CONTEXT.md — VibePath
 
 > Single source of truth for the VibePath codebase. Every fact below is derived from actual code inspection.
-> Last updated: 2026-04-05
+> Last updated: 2026-04-07
 
 ---
 
@@ -201,6 +201,18 @@ interface LiveAlert {
   source?: string;   // e.g. "IMD", "NHAI"
 }
 
+interface DestinationAlternative {
+  name: string; state: string; tagline: string;
+  primaryVibe: Vibe; discovery: DiscoveryTag;
+}
+
+interface GenerateError {
+  error: string;
+  code: "MISSING_KEY" | "RATE_LIMIT" | "INVALID_INPUT" | "NO_ROUTES" | "LLM_ERROR" | "DESTINATION_NOT_CURATED";
+  alternatives?: DestinationAlternative[];  // present only on DESTINATION_NOT_CURATED
+  requestedDestination?: string;
+}
+
 interface GeneratedItinerary extends StructuredItinerary {
   narrative: string;
   dayPlan: string;
@@ -246,14 +258,19 @@ vibepath-app/
 │   └── ItineraryCard.tsx       # Gradient header (profile+vibe), stacked budget bar + legend,
 │                               # narrative, last-mile display, monsoon warning,
 │                               # liveAlert block (🔴 Live Check badge — only when present),
-│                               # route pills, day plan, activity pills, tradeoff box, IRCTC CTA
+│                               # route pills, day plan, activity pills, tradeoff box,
+│                               # TrainMan deep link (if train) / IRCTC fallback,
+│                               # RedBus deep link (if bus route), WhatsApp share button
 │
 ├── lib/
 │   ├── destination-matcher.ts  # 33-entry catalogue. Indian national prices.
 │   │                           # matchDestinations() | findDestinationByName()
+│   │                           # findAlternativesForOrigin(origin, startDate, n=3)
 │   ├── destination-scorer.ts   # 5-factor scorer. selectDiverseTop3().
 │   ├── local-intelligence.ts   # Curated data, 13 destinations. Fact-checked.
 │   ├── transport-data.ts       # ~60+ TRAIN/BUS routes. FIRST_MILE/LAST_MILE maps.
+│   │                           # getRedBusLink(origin, dest, startDate) → RedBus deep link
+│   │                           # getTrainManLink(origin, dest) → TrainMan search link
 │   ├── budget-allocator.ts     # allocateAllProfiles() → 3 BudgetAllocation[]
 │   ├── groq-client.ts          # Musafir persona. Discovery + Destination system prompts.
 │   │                           # Rule: "All prices are INDIAN NATIONAL rates."
@@ -262,6 +279,7 @@ vibepath-app/
 │   │                           # google_search tool. 8s timeout. Always fails silently.
 │   └── itinerary-builder.ts    # Orchestrates everything. Promise.all([Groq, Gemini]).
 │                               # Deduplicates dest names for Gemini calls.
+│                               # Throws DestinationNotCuratedError (422) for unknown dests.
 │
 ├── types/index.ts              # All shared types. LiveAlert + liveAlert on GeneratedItinerary.
 ├── wrangler.toml               # name="vibepath". MUST match CF Pages project name.
@@ -287,7 +305,20 @@ vibepath-app/
 
 `liveAlert` is absent (not `null`) when no alert found. Frontend renders `🔴 Live Check` only when field exists.
 
-**Errors:** `MISSING_KEY` (500) · `INVALID_INPUT` (400) · `NO_ROUTES` (422) · `LLM_ERROR` (500)
+**Errors:** `MISSING_KEY` (500) · `INVALID_INPUT` (400) · `NO_ROUTES` (422) · `LLM_ERROR` (500) · `DESTINATION_NOT_CURATED` (422)
+
+**DESTINATION_NOT_CURATED (422)** — returned when `destinationOverride` is not in the curated catalogue:
+```json
+{
+  "error": "\"Bikaner\" isn't in our verified destination network yet...",
+  "code": "DESTINATION_NOT_CURATED",
+  "requestedDestination": "Bikaner",
+  "alternatives": [
+    { "name": "Jaipur", "state": "Rajasthan", "tagline": "...", "primaryVibe": "historical", "discovery": "iconic" },
+    ...
+  ]
+}
+```
 
 Gemini errors are **never** surfaced to the API consumer.
 
@@ -351,11 +382,12 @@ Every `git push origin main` → CF Pages rebuilds and deploys `vibepath.pages.d
 2. **Groq key fails loud** — explicit 500 if `GROQ_API_KEY` missing. Gemini key is optional.
 3. **STRUCTURED GENERATION ONLY** — Groq/Musafir writes narrative only, never prices or logistics
 4. **INDIAN NATIONAL PRICES** — all ASI entry prices are domestic tourist rates
-5. **Gemini scope is narrow** — only real-time safety/closure alerts, not reviews or tips
-6. **Unicode in JSX** — `\uXXXX` must be inside `{}` JS expressions, never bare JSX text (Turbopack renders them literally otherwise)
-7. **Deploy to correct project** — `wrangler.toml` `name = "vibepath"`. Verify with `wrangler pages project list`.
-8. **Specific git add** — never `git add -A`
-9. **Build before push** — `npm run build` must pass clean
+5. **NO GENERIC FALLBACK** — unknown destination → `DestinationNotCuratedError` (422) + curated alternatives. Never serve a templated itinerary with no real data.
+6. **Gemini scope is narrow** — only real-time safety/closure alerts, not reviews or tips
+7. **Unicode in JSX** — `\uXXXX` must be inside `{}` JS expressions, never bare JSX text (Turbopack renders them literally otherwise)
+8. **Deploy to correct project** — `wrangler.toml` `name = "vibepath"`. Verify with `wrangler pages project list`.
+9. **Specific git add** — never `git add -A`
+10. **Build before push** — `npm run build` must pass clean
 
 ## 11. Current State (as of 2026-04-05)
 
@@ -363,6 +395,12 @@ Every `git push origin main` → CF Pages rebuilds and deploys `vibepath.pages.d
 - Full site live at `vibepath.pages.dev`
 - Discovery mode (33 destinations, 5-factor scoring, anti-repetition)
 - Destination mode (override combobox, deep local-expert plan)
+- **Hard quality gate**: unknown destination → 422 + curated alternatives (no generic plans ever)
+- **Alternatives UI**: page shows top-3 reachable curated alternatives as clickable cards
+- **WhatsApp share**: formatted trip card with transport, day plan, must-eat, hidden gem
+- **TrainMan deep links** on each itinerary card (IRCTC fallback if no specific train)
+- **RedBus deep links** with date-encoded URL (DD-MM-YYYY format)
+- Destination mode: verified ✅ / unverified ⚠️ / default hint text
 - Local intelligence injected into Groq (13 destinations, fact-checked)
 - Groq + Gemini parallel ("Fast Brain + Live Eyes")
 - `🔴 Live Check` badge when Gemini finds an alert
@@ -379,7 +417,7 @@ Every `git push origin main` → CF Pages rebuilds and deploys `vibepath.pages.d
 
 ### Pending
 - No real-time train availability
-- No user accounts, saved itineraries, or WhatsApp share
+- No user accounts or saved itineraries
 - Budget Engine sidebar shows static demo data
 - No custom domain
 
@@ -387,6 +425,7 @@ Every `git push origin main` → CF Pages rebuilds and deploys `vibepath.pages.d
 
 | Date | Summary |
 |---|---|
+| 2026-04-07 | Hard quality gate (`DestinationNotCuratedError`), alternatives UI, WhatsApp share, TrainMan + RedBus deep links, vibe fix in dest mode |
 | 2026-04-05 | Gemini "Live Eyes" — `gemini-validator.ts`, parallel `Promise.all`, `LiveAlert` type, `🔴 Live Check` badge |
 | 2026-04-05 | Indian monument prices fixed (Taj ₹50, Agra Fort ₹40, Jantar Mantar ₹50, etc.) |
 | 2026-04-05 | Local intelligence fact-check (Rishikesh bridge, Ranthambore stats, Delhi metro, Agrasen Ki Baoli) |
