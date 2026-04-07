@@ -12,7 +12,7 @@
  */
 
 import type { Destination, Vibe, TripInput, TransportOption } from "@/types";
-import { TRAIN_ROUTES, BUS_ROUTES, getTransportOptions } from "./transport-data";
+import { TRAIN_ROUTES, BUS_ROUTES, getTransportOptions, buildFallbackTransport } from "./transport-data";
 import { scoreDestination, selectDiverseTop3, type ScoredDestination } from "./destination-scorer";
 
 // ── Destination catalogue ─────────────────────────────────────────────────────
@@ -1707,9 +1707,12 @@ function estimateMinCost(
       ? Math.min(...trains.map((t) => t.price.sleeper || t.price.ac3).filter((p) => p > 0))
       : 999999;
   const cheapestBus = BUS_ROUTES[key]?.price.min ?? 999999;
-  const transportOneWay = Math.min(cheapestTrain, cheapestBus);
+  let transportOneWay = Math.min(cheapestTrain, cheapestBus);
 
-  if (transportOneWay === 999999) return 999999;
+  // No curated route — fall back to distance-based bus estimate (~₹1.2/km)
+  if (transportOneWay === 999999) {
+    transportOneWay = Math.max(150, Math.round(dest.distanceKm * 1.2));
+  }
 
   const transport = transportOneWay * 2;
   const stay = dest.accommodation.hostel.min * nights;
@@ -1735,10 +1738,11 @@ export function matchDestinations(input: TripInput): Destination[] {
 
   const currentMonth = new Date(startDate).getMonth() + 1; // 1-12
 
-  // Step 1: Hard filter — vibe match, route exists, budget feasible
+  // Step 1: Hard filter — vibe match, budget feasible
+  // Route existence is NOT a hard gate: uncurated routes use distance-based bus fallback.
+  // RouteQuality in the scorer (train=0.8–1.0, bus=0.5) naturally penalises fallback options.
   const candidates = DESTINATIONS.filter((dest) => {
     if (!dest.vibes.includes(vibe)) return false;
-    if (!hasRoute(origin, dest.name)) return false;
     const minCost = estimateMinCost(origin, dest, nights);
     if (minCost > budget * 0.90) return false;
     return true;
@@ -1746,11 +1750,13 @@ export function matchDestinations(input: TripInput): Destination[] {
 
   if (candidates.length === 0) return [];
 
-  // Step 2: Score each candidate
+  // Step 2: Score each candidate — use fallback bus when no curated route exists
   const scoredList: ScoredDestination[] = candidates.map((dest) => {
     const transportOptions = getTransportOptions(origin, dest.name);
-    const bestTransport: TransportOption | null =
-      transportOptions.length > 0 ? transportOptions[0] : null;
+    const bestTransport: TransportOption =
+      transportOptions.length > 0
+        ? transportOptions[0]
+        : buildFallbackTransport(origin, dest.name, dest.distanceKm);
 
     return scoreDestination(dest, vibe, bestTransport, nights, recentlyShown, currentMonth);
   });

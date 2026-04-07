@@ -2119,6 +2119,46 @@ export function getTransportOptions(
   return options;
 }
 
+// ── Fallback transport for uncurated routes ───────────────────────────────────
+// Used when no TRAIN_ROUTES or BUS_ROUTES entry exists for an origin→destination pair.
+// Generates a distance-based estimate so the itinerary engine always has something
+// to work with. The bus note tells users to verify on RedBus — no fake specifics.
+
+export function buildFallbackTransport(
+  origin: string,
+  destination: string,
+  distanceKm: number
+): TransportOption {
+  const durationHours = Math.max(2, Math.round(distanceKm / 48));
+  const budgetPrice   = Math.max(150, Math.round(distanceKm * 1.2));   // ~₹1.2/km non-AC bus
+  const comfortPrice  = Math.max(400, Math.round(distanceKm * 2.8));   // ~₹2.8/km Volvo
+
+  const bus: BusRoute = {
+    operatorType: "State / Private Volvo",
+    price: { min: budgetPrice, max: comfortPrice },
+    durationHours,
+    frequency: "Daily services available — check RedBus for schedules",
+    note: `Estimated fare (₹${budgetPrice.toLocaleString("en-IN")}–₹${comfortPrice.toLocaleString("en-IN")}) based on distance. No fixed schedule in our database — verify on RedBus before booking.`,
+  };
+
+  const firstMile   = FIRST_MILE[origin]      ?? `Auto/Ola to ${origin} bus stand (~₹80–130)`;
+  const lastMile    = LAST_MILE[destination]   ?? `Auto/Cab from ${destination} (~₹100–200)`;
+  const lastMileData = LAST_MILE_DATA[destination];
+
+  return {
+    mode: "bus",
+    bus,
+    firstMile,
+    lastMile,
+    lastMileData,
+    totalCostPerPerson: {
+      budget:   budgetPrice,
+      midrange: Math.round((budgetPrice + comfortPrice) / 2),
+      comfort:  comfortPrice,
+    },
+  };
+}
+
 // ── Deep-link generators ──────────────────────────────────────────────────────
 
 /**

@@ -32,7 +32,7 @@ import type {
   DestinationAlternative,
 } from "@/types";
 import { matchDestinations, findDestinationByName, findAlternativesForOrigin } from "./destination-matcher";
-import { getTransportOptions } from "./transport-data";
+import { getTransportOptions, buildFallbackTransport } from "./transport-data";
 import { allocateAllProfiles } from "./budget-allocator";
 import {
   generateAllNarratives,
@@ -173,8 +173,10 @@ async function buildDiscoveryItineraries(input: TripInput): Promise<GeneratedIti
   }
 
   for (const { dest, profile } of pairs) {
-    const transportOptions = getTransportOptions(input.origin, dest.name);
-    if (transportOptions.length === 0) continue;
+    const raw = getTransportOptions(input.origin, dest.name);
+    const transportOptions = raw.length > 0
+      ? raw
+      : [buildFallbackTransport(input.origin, dest.name, dest.distanceKm)];
     const transport = pickBestTransport(transportOptions, profile, input.startDate);
     if (!transport) continue;
 
@@ -217,13 +219,10 @@ async function buildDestinationItineraries(
     throw new DestinationNotCuratedError(destinationName, alternatives);
   }
 
-  const transportOptions = getTransportOptions(input.origin, dest.name);
-  if (transportOptions.length === 0) {
-    throw new Error(
-      `No direct transport found from ${input.origin} to ${dest.name}. ` +
-        `Try a different origin city or use vibe-based search.`
-    );
-  }
+  const raw = getTransportOptions(input.origin, dest.name);
+  const transportOptions = raw.length > 0
+    ? raw
+    : [buildFallbackTransport(input.origin, dest.name, dest.distanceKm)];
 
   const profiles = ["value", "balanced", "comfort"] as const;
   const structured: StructuredItinerary[] = [];
