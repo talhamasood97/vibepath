@@ -179,6 +179,15 @@ export interface LiveAlert {
   source?: string;
 }
 
+// Extended Gemini response — superset of LiveAlert
+// weatherNow + currentEvent injected into Groq context for richer narratives
+export interface GeminiBriefing {
+  alert?: string;      // safety alert sentence (maps to LiveAlert.text)
+  source?: string;
+  weatherNow?: string; // e.g. "Partly cloudy, 28–34°C" — injected into Groq prompt
+  currentEvent?: string; // e.g. "Holi festival" or null
+}
+
 // Rich per-day structure used in the detail modal
 export interface DetailedDay {
   day: number;

@@ -132,7 +132,10 @@ CRITICAL RULES:
 7. Keep narrative under 90 words. Each day plan compact line under 20 words.
 8. Use English naturally with occasional desi phrases (dost, scene hai, bilkul, bhai, yaar) where they fit.
 9. The tradeoffs should be honest \u2014 tell them what this profile GIVES UP vs other options too.
-10. For detailedDays: each section (morning/afternoon/evening) should be 50-70 words with specific place names, timings, food spots, and insider tips from the LOCAL INTELLIGENCE provided.`;
+10. TIMING RULE: Never write "morning" or "evening" \u2014 always write the EXACT time (e.g. "6:30 AM", "5:45 PM").
+    For each activity: state (a) exact arrival time, (b) WHY that time is optimal, (c) one specific insider tip.
+11. For detailedDays: each section (morning/afternoon/evening) must be 55\u201370 words with specific place names,
+    exact timings from SEASONAL CONTEXT, food spots, and insider tips from LOCAL INTELLIGENCE.`;
 
 // ── Destination mode system prompt ───────────────────────────────────────────
 
@@ -149,7 +152,11 @@ CRITICAL RULES:
 7. Keep narrative under 100 words. Each day plan compact line under 20 words.
 8. Mix English with natural desi phrases. Sound warm, not formal.
 9. The tradeoffs should compare what each profile experience FEELS like, not just the budget difference.
-10. For detailedDays: each section (morning/afternoon/evening) must name specific spots, timings, and food from the LOCAL INTELLIGENCE. Minimum 60 words per section. Include hidden gems and timing warnings.`;
+10. TIMING RULE: Never write "morning" or "evening" \u2014 always write the EXACT time (e.g. "6:30 AM", "5:45 PM").
+    For each activity: state (a) exact arrival time, (b) WHY that time is optimal (sunrise light, crowd gap, heat avoidance),
+    (c) one specific insider tip that most tourists miss.
+11. For detailedDays: each section (morning/afternoon/evening) must name specific spots, EXACT timings from SEASONAL CONTEXT,
+    and food from LOCAL INTELLIGENCE. Minimum 60 words per section. Include hidden gems and timing warnings.`;
 
 // ── LLM-only mode system prompt ───────────────────────────────────────────────
 
@@ -198,6 +205,10 @@ export interface ItineraryContext {
   isDestinationMode?: boolean;
   travelerType?: TravelerType;
   monsoonWarning?: string;
+  // Personalisation & real-time context
+  seasonalContext?: string;   // from seasonal-context.ts — exact timings, heat/cold warnings
+  weatherNow?: string;        // from Gemini — current weather sentence
+  currentEvent?: string;      // from Gemini — active festival/mela
 }
 
 export interface LLMOnlyContext {
@@ -321,24 +332,84 @@ export async function generateItineraryNarrative(
     ? `\nThe user specifically chose ${ctx.destination} \u2014 they know they want to go here. Be their local expert.`
     : "";
 
+  // ── Traveler-type context (detailed, actionable per type) ──────────────────
   const travelerNote = ctx.travelerType
     ? (() => {
         const notes: Record<TravelerType, string> = {
-          "solo-female": "TRAVELER: Solo female. Prioritise well-lit central stays, female-friendly hostels, safe evening timings. Mention specific safety tips.",
-          "solo-male":   "TRAVELER: Solo male. Emphasis on budget-stretching, meeting travellers, street food trails, independent exploration.",
-          "couple":      "TRAVELER: Couple. Highlight romantic stays, scenic spots, quiet cafes, experiences better shared.",
-          "friends":     "TRAVELER: Friends group. Emphasise shared hostel experience, group activities, nightlife or late-night street food.",
-          "family":      "TRAVELER: Family with kids/elders. Prioritise comfort, early check-ins, child/elder-friendly activities. Avoid long treks.",
+          "solo-female": `SOLO FEMALE TRAVELLER CONTEXT:
+- Stay: recommend Zostel/branded hostels or well-reviewed guesthouses in central areas — NOT unmarked guesthouses on quiet lanes
+- Timing: wrap all outdoor activity by 7:30 PM; use Ola/Uber (not street autos) after dark
+- Mention 1 female-specific safety tip per day (women-only security lanes, female porter options, safe café zones)
+- Evening: replace "night market" or "late dinner" with early dinner at a well-lit restaurant (7 PM)
+- Add: one WhatsApp-shareable safety detail ("tell someone your ghat plan" type tips)`,
+          "solo-male": `SOLO MALE TRAVELLER CONTEXT:
+- Emphasise budget-maximising: street food over restaurants, shared transport, free viewpoints over paid
+- Include 1 "wander zone" per day — a specific neighbourhood or bazaar that rewards aimless exploration
+- Suggest 1 "meet fellow travellers" opportunity (hostel common room, popular chai stall, hostel trek sign-ups)
+- Be specific on dhabas: name them, give the dish to order, price range
+- Include 1 optional adventure add-on per trip (sunrise hike, river walk, cycle rental)`,
+          "couple": `COUPLE TRAVELLER CONTEXT:
+- Include 1 "golden hour moment" per day — the single best spot for the light, named specifically with exact time
+- Day 2 evening: romantic dinner recommendation (named restaurant, cuisine, price range, why it works for a couple)
+- Skip "hostel dorm" framing — suggest private rooms even in budget profile
+- Highlight experiences better shared: boat ride, rooftop view, heritage walk at dusk
+- One quiet, crowd-minimal experience per day (garden, viewpoint, café) — not just the main tourist cluster`,
+          "friends": `FRIENDS GROUP CONTEXT:
+- Include 1 "group hangout" spot per day — rooftop café, chai stall with a view, street food crawl zone
+- Budget math: call out where sharing saves money (split cab vs individual autos, group safari booking)
+- Include 1 optional adventure add-on the group can do together (rafting, paragliding, sunrise trek)
+- Evening: suggest a fun group activity (card games at a rooftop, night bazaar, late street food trail)
+- Tone: high-energy, "ye sab karke aao" — this is the trip they'll talk about for years`,
+          "family": `FAMILY TRAVELLER CONTEXT (with kids/elders):
+- MANDATORY afternoon rest block 1:30 PM–3:30 PM — schedule this explicitly every day
+- Flag any site with "kid-fatigue risk" (long walks, steep climbs) and give a shorter alternative
+- Mention clean restroom availability at each major site (critical for families)
+- Snack stops every 2–3 hours: name a specific place and what to order (kid-friendly options)
+- Prioritise ground-floor or lift-accessible accommodation — no guesthouses with steep stairs for elders
+- Prefer AC transport; mention if sites have shaded seating for elders to rest`,
         };
-        return `\n${notes[ctx.travelerType]}`;
+        return `\n\n${notes[ctx.travelerType]}`;
       })()
     : "";
 
+  // ── Budget-profile tone (differentiates the experience, not just the price) ──
+  const profileTone = {
+    value: `BUDGET PROFILE TONE: This traveller is maximising every rupee.
+- Food: street food and local dhabas > restaurants. Name specific stalls/dhabas.
+- Transport: shared autos, cycle-rickshaws, tempos over private cabs. Mention exact shared fares.
+- Viewpoints: free viewpoints over paid entry where possible. Call out what's free.
+- Stay: hostel common room culture — mention it positively. Early check-in may not be available.
+- Day plan: include 1 "zero-cost highlight" per day — something genuinely memorable that costs nothing.`,
+    balanced: `BALANCED PROFILE TONE: This traveller wants comfort without splurging.
+- Food: 1 proper sit-down meal per day at a named mid-range restaurant; rest street food.
+- Transport: Ola/Uber for key routes (airport, long distances), shared auto elsewhere.
+- Stay: private room in a budget hotel — mention cleanliness and central location as selling points.
+- Day plan: mix of free and paid experiences. Don't suggest the cheapest option if it significantly compromises quality.`,
+    comfort: `COMFORT PROFILE TONE: This traveller values quality and time.
+- Food: named restaurants with reputation — not tourist traps, but the local favourite mid-range+ spot.
+- Transport: cab booked for the day or pre-arranged hotel transfer. No shared transport needed.
+- Stay: AC midrange hotel — mention specific amenities (rooftop, pool, heritage building if applicable).
+- Day plan: fewer sites, higher quality. Depth over breadth. Skip the crowded secondary sites.
+- Include 1 "upgrade moment" per day — what the extra budget unlocks that value/balanced profiles miss.`,
+  }[ctx.profile] ?? "";
+
+  // ── Real-time context from Gemini ─────────────────────────────────────────
+  const geminiContext = [
+    ctx.weatherNow    ? `CURRENT WEATHER: ${ctx.weatherNow}` : "",
+    ctx.currentEvent  ? `ACTIVE EVENT THIS WEEK: ${ctx.currentEvent} — acknowledge this naturally in narrative and day plan if relevant` : "",
+  ].filter(Boolean).join("\n");
+
   const monsoonNote = ctx.monsoonWarning
-    ? `\nSEASONAL NOTE: ${ctx.monsoonWarning} Acknowledge naturally in narrative \u2014 honest but not alarmist.`
+    ? `\nSEASONAL ALERT: ${ctx.monsoonWarning} Acknowledge naturally in narrative \u2014 honest but not alarmist.`
     : "";
 
-  const userPrompt = `Here is the structured data for a ${ctx.profile} trip to ${ctx.destination}, ${ctx.state}:${destinationModeNote}${travelerNote}${monsoonNote}
+  const userPrompt = `Here is the structured data for a ${ctx.profile} trip to ${ctx.destination}, ${ctx.state}:${destinationModeNote}
+${travelerNote}
+
+${profileTone}
+${ctx.seasonalContext ? `\n${ctx.seasonalContext}` : ""}
+${geminiContext ? `\nLIVE INTELLIGENCE:\n${geminiContext}` : ""}
+${monsoonNote}
 
 DESTINATION: ${ctx.destination} \u2014 "${ctx.tagline}"
 TRANSPORT: ${ctx.transportMode}${ctx.trainName ? ` (${ctx.trainName})` : ""}

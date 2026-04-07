@@ -33,6 +33,7 @@ import type {
 } from "@/types";
 import { matchDestinations, findDestinationByName, findAlternativesForOrigin } from "./destination-matcher";
 import { getTransportOptions, buildFallbackTransport } from "./transport-data";
+import { getSeasonalContext } from "./seasonal-context";
 import { allocateAllProfiles } from "./budget-allocator";
 import {
   generateAllNarratives,
@@ -43,7 +44,7 @@ import {
   type LLMOnlyBudgetEstimate,
 } from "./groq-client";
 import { getLocalIntelligence } from "./local-intelligence";
-import { getLiveAlert } from "./gemini-validator";
+import { getLiveAlert, toLiveAlert } from "./gemini-validator";
 
 // ── Quality gate error ────────────────────────────────────────────────────────
 // Thrown when a destination is not in the curated catalogue.
@@ -288,10 +289,11 @@ async function buildLLMOnlyItineraries(
   }));
 
   // Groq (3 profiles) + Gemini live alert check run in parallel
-  const [llmResults, liveAlert] = await Promise.all([
+  const [llmResults, geminiBriefing] = await Promise.all([
     generateAllLLMOnly(contexts),
     getLiveAlert(canonicalName, validation.state, input.startDate),
   ]);
+  const liveAlert = toLiveAlert(geminiBriefing);
 
   return profiles.map((profile, i): GeneratedItinerary => {
     const llm = llmResults[i];
@@ -385,12 +387,28 @@ async function buildAndGenerateNarratives(
   input: TripInput,
   isDestinationMode: boolean
 ): Promise<GeneratedItinerary[]> {
+  const uniqueDestNames = [...new Set(structured.map((s) => s.destination.name))];
+
+  // ── Fetch Gemini briefings per unique destination (parallel with Groq) ──────
+  // briefingMap: destName → GeminiBriefing | null
+  const briefingMap = new Map<string, import("@/types").GeminiBriefing | null>();
+  const briefingFetch = Promise.all(
+    uniqueDestNames.map(async (destName) => {
+      const s = structured.find((x) => x.destination.name === destName)!;
+      const briefing = await getLiveAlert(destName, s.destination.state, input.startDate);
+      briefingMap.set(destName, briefing);
+    })
+  );
+
+  // ── Build Groq contexts with seasonal + Gemini intelligence ─────────────────
   const contexts: ItineraryContext[] = structured.map((s) => {
     const totalSpent =
       s.allocation.transport + s.allocation.accommodation + s.allocation.food + s.allocation.activities;
     const localIntelligence = getLocalIntelligence(s.destination.name);
     const monsoonWarning = getMonsoonWarning(s.destination, input.startDate);
-
+    const seasonalContext = getSeasonalContext(s.destination.name, s.destination.state, input.startDate);
+    // Gemini briefing may not be ready yet — it arrives in parallel
+    // We pass a placeholder; actual values filled after briefingFetch resolves
     return {
       profile:              s.profile,
       destination:          s.destination.name,
@@ -419,29 +437,30 @@ async function buildAndGenerateNarratives(
       isDestinationMode,
       travelerType:         input.travelerType as TravelerType | undefined,
       monsoonWarning,
+      seasonalContext,
+      // weatherNow + currentEvent added after briefings resolve (see below)
     };
   });
 
-  const uniqueDestNames = [...new Set(structured.map((s) => s.destination.name))];
+  // ── Wait for both Gemini briefings + Groq narratives in parallel ─────────────
+  // Patch contexts with Gemini data once briefings arrive, THEN call Groq.
+  await briefingFetch;
 
-  const [narratives, alertMap] = await Promise.all([
-    generateAllNarratives(contexts),
-    (async () => {
-      const map = new Map<string, import("@/types").LiveAlert | null>();
-      await Promise.all(
-        uniqueDestNames.map(async (destName) => {
-          const s = structured.find((x) => x.destination.name === destName)!;
-          const alert = await getLiveAlert(destName, s.destination.state, input.startDate);
-          map.set(destName, alert);
-        })
-      );
-      return map;
-    })(),
-  ]);
+  // Enrich contexts with live Gemini intelligence
+  for (const ctx of contexts) {
+    const briefing = briefingMap.get(ctx.destination);
+    if (briefing) {
+      ctx.weatherNow   = briefing.weatherNow;
+      ctx.currentEvent = briefing.currentEvent;
+    }
+  }
+
+  const narratives = await generateAllNarratives(contexts);
 
   return structured.map((s, i): GeneratedItinerary => {
-    const monsoonWarning = getMonsoonWarning(s.destination, input.startDate);
-    const liveAlert      = alertMap.get(s.destination.name) ?? undefined;
+    const monsoonWarning    = getMonsoonWarning(s.destination, input.startDate);
+    const briefing          = briefingMap.get(s.destination.name) ?? null;
+    const liveAlert         = toLiveAlert(briefing);
     const localIntelligence = getLocalIntelligence(s.destination.name);
 
     return {
@@ -451,7 +470,7 @@ async function buildAndGenerateNarratives(
       detailedDays:   narratives[i]?.detailedDays ?? [],
       tradeoffs:      narratives[i]?.tradeoffs ?? [],
       monsoonWarning,
-      liveAlert:      liveAlert ?? undefined,
+      liveAlert,
       localIntelligence,
       isAIEstimated:  false,
     };
