@@ -1,7 +1,7 @@
 # PROJECT_CONTEXT.md — VibePath
 
 > Single source of truth for the VibePath codebase. Every fact below is derived from actual code inspection.
-> Last updated: 2026-04-07 (North India expansion v2)
+> Last updated: 2026-04-07 (transport fallback fix)
 
 ---
 
@@ -271,6 +271,8 @@ vibepath-app/
 │   ├── destination-scorer.ts   # 5-factor scorer. selectDiverseTop3().
 │   ├── local-intelligence.ts   # Curated data, 44 destinations. Fact-checked.
 │   ├── transport-data.ts       # 105 train routes + 31 bus routes. FIRST_MILE/LAST_MILE maps.
+│   │                           # buildFallbackTransport(origin, dest, distanceKm) exported —
+│   │                           # distance-based bus estimate when no curated route exists.
 │   │                           # getRedBusLink(origin, dest, startDate) → RedBus deep link
 │   │                           # getTrainManLink(origin, dest) → TrainMan search link
 │   ├── budget-allocator.ts     # allocateAllProfiles() → 3 BudgetAllocation[]
@@ -406,6 +408,7 @@ Every `git push origin main` → CF Pages rebuilds and deploys `vibepath.pages.d
 - Destination mode: verified ✅ / unverified ⚠️ / default hint text
 - Local intelligence injected into Groq (44 destinations, fact-checked)
 - 105 curated train routes + 31 bus routes with FIRST_MILE/LAST_MILE/LAST_MILE_DATA
+- **Transport fallback**: uncurated routes use `buildFallbackTransport()` (distance-based bus estimate + RedBus note) — itinerary always generated when destination is in catalogue
 - Groq + Gemini parallel ("Fast Brain + Live Eyes")
 - `🔴 Live Check` badge when Gemini finds an alert
 - Monsoon warnings (Jun–Sep, mountain/beach destinations)
@@ -428,6 +431,7 @@ Every `git push origin main` → CF Pages rebuilds and deploys `vibepath.pages.d
 
 | Date | Summary |
 |---|---|
+| 2026-04-07 | **Transport fallback**: `buildFallbackTransport()` — distance-based bus estimate for any uncurated origin→destination pair. Removed hard `hasRoute` gate. Itinerary always generated when destination exists in catalogue (e.g. Delhi→Shimla now works). |
 | 2026-04-07 | **North India expansion**: 30 new destinations (HP, Uttarakhand, Rajasthan, UP, Bihar, J&K, Haryana, Jharkhand), 5 new source cities (Delhi, Chandigarh, Meerut, Dehradun, Jodhpur), 44 local intel entries, 105 train routes, 31 bus routes |
 | 2026-04-07 | Hard quality gate (`DestinationNotCuratedError`), alternatives UI, WhatsApp share, TrainMan + RedBus deep links, vibe fix in dest mode |
 | 2026-04-05 | Gemini "Live Eyes" — `gemini-validator.ts`, parallel `Promise.all`, `LiveAlert` type, `🔴 Live Check` badge |
@@ -446,7 +450,8 @@ Every `git push origin main` → CF Pages rebuilds and deploys `vibepath.pages.d
 3. **Definition of Done:** edit → `npm run build` passes → `git add <files>` → commit → push → CF Pages auto-deploys.
 4. **Deploy verification:** compare chunk names between live site and local build (see §9).
 5. **Always deploy to `vibepath`.** Confirm project: `wrangler pages project list`.
-6. **Adding origin city:** `SUPPORTED_ORIGINS` in `route.ts` + `ORIGINS` in `SearchForm.tsx` + `FIRST_MILE` in `transport-data.ts` + route entries for new source→destination pairs.
+6. **Adding origin city:** `SUPPORTED_ORIGINS` in `route.ts` + `ORIGINS` in `SearchForm.tsx` + `FIRST_MILE` in `transport-data.ts` + route entries for new source→destination pairs. Note: missing routes now auto-fall back to bus estimate — no hard blocker.
+7a. **Transport fallback rule:** `buildFallbackTransport()` activates when `getTransportOptions()` returns `[]`. Do NOT throw or skip in this case. Discovery mode: scorer uses fallback (RouteQuality=0.5). Destination mode: all 3 profiles use fallback.
 7. **Adding destination:** `DESTINATIONS` in `destination-matcher.ts` (full interface) + transport routes + optional local intelligence.
 8. **Adding vibe:** `Vibe` union in `types/index.ts` + `VALID_VIBES` in `route.ts` + pill in `SearchForm` + gradient in `globals.css` + `VIBE_GRADIENTS` in `ItineraryCard` + active color in `globals.css`.
 9. **Unicode in JSX:** `{"\u20b9"}` or `` {`\u20b9${expr}`} `` — never bare in JSX text.
