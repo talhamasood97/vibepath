@@ -28,7 +28,7 @@
   --radius-lg: 22px;
 }
 
-html { scroll-behavior: smooth; text-size-adjust: none; overflow-x: clip; }
+html { scroll-behavior: smooth; text-size-adjust: none; }
 
 
 body {
