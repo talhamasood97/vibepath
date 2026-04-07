@@ -96,9 +96,27 @@ export default function ItineraryCard({ itinerary, index, vibe, origin, startDat
     return msg;
   }
 
-  function handleWhatsAppShare() {
+  async function handleShare() {
     const text = buildWhatsAppText();
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+    // Use native share sheet on iOS/Android (shows contacts + all apps).
+    // window.open() is blocked by iOS Safari popup blocker for external URLs.
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({
+          title: `Weekend Trip: ${itinerary.destination.name}`,
+          text,
+        });
+      } catch (err) {
+        // AbortError = user dismissed sheet — do nothing.
+        // Any other error → fall back to wa.me.
+        if ((err as Error).name !== "AbortError") {
+          window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+        }
+      }
+    } else {
+      // Desktop / browsers without Web Share API → WhatsApp Web
+      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+    }
   }
 
   // ── Booking links ───────────────────────────────────────────────────────────
@@ -306,12 +324,12 @@ export default function ItineraryCard({ itinerary, index, vibe, origin, startDat
               </button>
             )}
 
-            {/* WhatsApp share */}
+            {/* Share — native sheet on iOS/Android, wa.me fallback on desktop */}
             <button
               className="btn btn-outline btn-sm"
               type="button"
-              onClick={handleWhatsAppShare}
-              title="Share this itinerary on WhatsApp"
+              onClick={handleShare}
+              title="Share this itinerary"
             >
               {"\ud83d\udcac Share"}
             </button>
