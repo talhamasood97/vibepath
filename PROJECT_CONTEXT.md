@@ -1,7 +1,7 @@
 # PROJECT_CONTEXT.md — VibePath
 
 > Single source of truth for the VibePath codebase. Every fact below is derived from actual code inspection.
-> Last updated: 2026-04-07 (transport fallback fix)
+> Last updated: 2026-04-07 (personalisation engine)
 
 ---
 
@@ -107,13 +107,19 @@ POST /api/generate → GenerateResponse { itineraries[3], mode: "destination" }
 
 **Deduplication:** In discovery mode, 3 different destinations → up to 3 Gemini calls. In destination mode, 1 destination × 3 profiles → exactly 1 Gemini call. Uses `new Set(destNames)`.
 
-### Gemini Live Alert Details (`lib/gemini-validator.ts`)
+### Gemini Live Briefing Details (`lib/gemini-validator.ts`)
 
 - **API:** Direct `fetch` to `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=...` — no npm package (avoids Edge Runtime compatibility issues)
 - **Tool:** `{ google_search: {} }` — enables real-time web grounding
 - **Timeout:** 8-second `AbortSignal.timeout`
-- **Scope (narrow by design):** IMD weather red/orange alerts, landslides, road closures, floods, bandhs/strikes, official monument/park closures in the last 7 days. NOT cafe hours, hotel reviews, or general travel tips.
-- **Silent failure:** Any error (timeout, parse failure, missing key, API down) → returns `null` → Groq results returned as-is
+- **Returns `GeminiBriefing`** (4 fields, same single call):
+  - `alert` — IMD red/orange alerts, landslides, road closures, bandhs, monument closures (last 7 days)
+  - `source` — e.g. "IMD", "NHAI"
+  - `weatherNow` — current conditions sentence ("Partly cloudy, 28–34°C") → injected into Groq prompt
+  - `currentEvent` — active festival/mela this week → injected into Groq prompt
+  - Deliberately excludes `crowdLevel` (redundant with scorer) and `trendingNow` (hallucination risk)
+- **`toLiveAlert(briefing)`** — adapter that extracts just `alert + source` for backward-compatible UI badge
+- **Silent failure:** Any error → returns `null` → product works fine without it
 - **Free tier:** 5,000 grounded prompts/month — at ~2 searches/user → covers 2,500 users at $0
 
 ### 5-Factor Scoring Engine (`lib/destination-scorer.ts`)
@@ -270,6 +276,10 @@ vibepath-app/
 │   │                           # findAlternativesForOrigin(origin, startDate, n=3)
 │   ├── destination-scorer.ts   # 5-factor scorer. selectDiverseTop3().
 │   ├── local-intelligence.ts   # Curated data, 44 destinations. Fact-checked.
+│   ├── seasonal-context.ts     # getSeasonalContext(dest, state, date) → string injected into Groq.
+│   │                           # 100% static. Sunrise/sunset by month+state, heat blocks (Apr–Jun plains),
+│   │                           # cold/snow advisories (Nov–Feb mountains), monsoon rules, river timings,
+│   │                           # Rajasthan crowd/booking warnings. Forces Groq to use exact times.
 │   ├── transport-data.ts       # 105 train routes + 31 bus routes. FIRST_MILE/LAST_MILE maps.
 │   │                           # buildFallbackTransport(origin, dest, distanceKm) exported —
 │   │                           # distance-based bus estimate when no curated route exists.
@@ -280,9 +290,13 @@ vibepath-app/
 │   │                           # Rule: "All prices are INDIAN NATIONAL rates."
 │   │                           # generateAllNarratives() → parallel Promise.allSettled
 │   ├── gemini-validator.ts     # "Live Eyes" layer. fetch() to Gemini 2.0 Flash REST API.
+│   │                           # Returns GeminiBriefing: alert + source + weatherNow + currentEvent.
+│   │                           # toLiveAlert() adapter for backward-compatible UI (alert badge only).
 │   │                           # google_search tool. 8s timeout. Always fails silently.
-│   └── itinerary-builder.ts    # Orchestrates everything. Promise.all([Groq, Gemini]).
-│                               # Deduplicates dest names for Gemini calls.
+│   └── itinerary-builder.ts    # Orchestrates everything.
+│                               # Fetches Gemini briefings per unique dest, enriches Groq
+│                               # contexts with weatherNow + currentEvent before LLM call.
+│                               # Injects getSeasonalContext() into every ItineraryContext.
 │                               # Throws DestinationNotCuratedError (422) for unknown dests.
 │
 ├── types/index.ts              # All shared types. LiveAlert + liveAlert on GeneratedItinerary.
@@ -409,6 +423,7 @@ Every `git push origin main` → CF Pages rebuilds and deploys `vibepath.pages.d
 - Local intelligence injected into Groq (44 destinations, fact-checked)
 - 105 curated train routes + 31 bus routes with FIRST_MILE/LAST_MILE/LAST_MILE_DATA
 - **Transport fallback**: uncurated routes use `buildFallbackTransport()` (distance-based bus estimate + RedBus note) — itinerary always generated when destination is in catalogue
+- **Personalisation engine**: seasonal context (exact sunrise/sunset, heat blocks, cold/monsoon advisories), detailed traveler-type branching, budget-profile tone differentiation, Gemini live briefing (weatherNow + currentEvent)
 - Groq + Gemini parallel ("Fast Brain + Live Eyes")
 - `🔴 Live Check` badge when Gemini finds an alert
 - Monsoon warnings (Jun–Sep, mountain/beach destinations)
@@ -431,6 +446,7 @@ Every `git push origin main` → CF Pages rebuilds and deploys `vibepath.pages.d
 
 | Date | Summary |
 |---|---|
+| 2026-04-07 | **Personalisation engine**: `seasonal-context.ts` (exact sunrise/sunset, heat blocks, monsoon/cold advisories), expanded traveler-type branching (5 types, detailed), budget-profile tone differentiation, Gemini briefing expanded to `GeminiBriefing` (weatherNow + currentEvent alongside alert) |
 | 2026-04-07 | **Transport fallback**: `buildFallbackTransport()` — distance-based bus estimate for any uncurated origin→destination pair. Removed hard `hasRoute` gate. Itinerary always generated when destination exists in catalogue (e.g. Delhi→Shimla now works). |
 | 2026-04-07 | **North India expansion**: 30 new destinations (HP, Uttarakhand, Rajasthan, UP, Bihar, J&K, Haryana, Jharkhand), 5 new source cities (Delhi, Chandigarh, Meerut, Dehradun, Jodhpur), 44 local intel entries, 105 train routes, 31 bus routes |
 | 2026-04-07 | Hard quality gate (`DestinationNotCuratedError`), alternatives UI, WhatsApp share, TrainMan + RedBus deep links, vibe fix in dest mode |
@@ -452,6 +468,8 @@ Every `git push origin main` → CF Pages rebuilds and deploys `vibepath.pages.d
 5. **Always deploy to `vibepath`.** Confirm project: `wrangler pages project list`.
 6. **Adding origin city:** `SUPPORTED_ORIGINS` in `route.ts` + `ORIGINS` in `SearchForm.tsx` + `FIRST_MILE` in `transport-data.ts` + route entries for new source→destination pairs. Note: missing routes now auto-fall back to bus estimate — no hard blocker.
 7a. **Transport fallback rule:** `buildFallbackTransport()` activates when `getTransportOptions()` returns `[]`. Do NOT throw or skip in this case. Discovery mode: scorer uses fallback (RouteQuality=0.5). Destination mode: all 3 profiles use fallback.
+7b. **Personalisation pipeline:** `getSeasonalContext(dest, state, date)` → injected into every `ItineraryContext.seasonalContext`. `getLiveAlert()` now returns `GeminiBriefing` — use `toLiveAlert()` to convert for UI. `weatherNow` + `currentEvent` from briefing → `ItineraryContext` → Groq prompt.
+7c. **Groq timing rule:** System prompts now mandate exact times (never "morning"/"evening"). When adding/editing Groq prompts, maintain this — always reference SEASONAL CONTEXT times in day plans.
 7. **Adding destination:** `DESTINATIONS` in `destination-matcher.ts` (full interface) + transport routes + optional local intelligence.
 8. **Adding vibe:** `Vibe` union in `types/index.ts` + `VALID_VIBES` in `route.ts` + pill in `SearchForm` + gradient in `globals.css` + `VIBE_GRADIENTS` in `ItineraryCard` + active color in `globals.css`.
 9. **Unicode in JSX:** `{"\u20b9"}` or `` {`\u20b9${expr}`} `` — never bare in JSX text.
