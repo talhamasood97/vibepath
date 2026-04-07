@@ -1,7 +1,7 @@
 # PROJECT_CONTEXT.md — VibePath
 
 > Single source of truth for the VibePath codebase. Every fact below is derived from actual code inspection.
-> Last updated: 2026-04-07 (personalisation engine)
+> Last updated: 2026-04-07 (mobile compatibility fix)
 
 ---
 
@@ -342,6 +342,8 @@ Gemini errors are **never** surfaced to the API consumer.
 
 ## 8. UI Design System
 
+**Mobile viewport:** Zero horizontal overflow at 375px (iOS) and 360px (Android). Root fix: `grid-template-columns: minmax(0, 1fr)` (not bare `1fr`) in 960px breakpoint prevents content-minimum-size blowout. `html { overflow-x: clip }` for iOS Safari. Logo tagline hidden ≤480px via explicit `display: block` base + media query override (Tailwind v4 optimizer drops `display: none` unless the base rule also sets `display`).
+
 **Color tokens:** `--primary: #5b3fd9` · `--accent-warm: #ff6a3c` · `--accent-teal: #00c9a7` · `--accent-gold: #FFB547` · `--bg: #f6f5ff`
 
 **Vibe pill glow (active state):**
@@ -435,6 +437,7 @@ Every `git push origin main` → CF Pages rebuilds and deploys `vibepath.pages.d
 - Route pill CSS tooltips on sample cards
 - Sample card hover hint
 - Social proof institution badges
+- **Mobile compatibility**: zero horizontal overflow on iOS (375px) and Android (360px). Hero CTA buttons stack vertically ≤560px. Stats bar 2×2 grid ≤720px. Compact nav ≤480px.
 
 ### Pending
 - No real-time train availability
@@ -446,6 +449,7 @@ Every `git push origin main` → CF Pages rebuilds and deploys `vibepath.pages.d
 
 | Date | Summary |
 |---|---|
+| 2026-04-07 | **Mobile compatibility fix**: resolved 206px horizontal overflow on 375px/360px viewports. Root cause: `1fr` grid column (without `minmax(0)`) allowed content-min-size blowout in `hero-layout`. Added `html { overflow-x: clip }`, stacked CTA buttons ≤560px, stats bar 2×2 ≤720px, compact nav ≤480px. Tailwind v4 optimizer quirk: `display: none` in media query requires explicit `display: block` in base rule to avoid being stripped. |
 | 2026-04-07 | **Personalisation engine**: `seasonal-context.ts` (exact sunrise/sunset, heat blocks, monsoon/cold advisories), expanded traveler-type branching (5 types, detailed), budget-profile tone differentiation, Gemini briefing expanded to `GeminiBriefing` (weatherNow + currentEvent alongside alert) |
 | 2026-04-07 | **Transport fallback**: `buildFallbackTransport()` — distance-based bus estimate for any uncurated origin→destination pair. Removed hard `hasRoute` gate. Itinerary always generated when destination exists in catalogue (e.g. Delhi→Shimla now works). |
 | 2026-04-07 | **North India expansion**: 30 new destinations (HP, Uttarakhand, Rajasthan, UP, Bihar, J&K, Haryana, Jharkhand), 5 new source cities (Delhi, Chandigarh, Meerut, Dehradun, Jodhpur), 44 local intel entries, 105 train routes, 31 bus routes |
