@@ -1,7 +1,7 @@
 # PROJECT_CONTEXT.md — VibePath
 
 > Single source of truth for the VibePath codebase. Every fact below is derived from actual code inspection.
-> Last updated: 2026-04-07
+> Last updated: 2026-04-07 (North India expansion v2)
 
 ---
 
@@ -23,7 +23,7 @@
 
 VibePath is a constraint-based weekend trip planner for Tier 2/3 India. It operates in two modes:
 
-- **DISCOVERY mode:** User provides origin city, budget (₹2k–25k), travel dates, and one vibe → system scores 33 destinations via 5-factor algorithm → returns exactly 3 opinionated itineraries (Value / Balanced / Comfort)
+- **DISCOVERY mode:** User provides origin city, budget (₹2k–25k), travel dates, and one vibe → system scores 62 destinations via 5-factor algorithm → returns exactly 3 opinionated itineraries (Value / Balanced / Comfort)
 - **DESTINATION mode:** User already knows where they want to go → enters destination directly → system returns 3 budget profiles (Value / Balanced / Comfort) for that same destination with a deep, local-expert itinerary
 
 **Core PM principle:** Budget is a trade-off space, not a filter. The engine treats ₹8,000 as a slider across transport class, stay type, and activities — not a hard cutoff.
@@ -134,11 +134,11 @@ Score = VibeDepth×0.30 + TripFit×0.25 + Freshness×0.20 + RouteQuality×0.15 +
 
 ## 5. Data & Schemas
 
-### Supported Origins (10)
+### Supported Origins (15)
 
-`Kanpur`, `Lucknow`, `Varanasi`, `Jaipur`, `Indore`, `Nagpur`, `Bhopal`, `Patna`, `Agra`, `Prayagraj`
+`Kanpur`, `Lucknow`, `Varanasi`, `Jaipur`, `Indore`, `Nagpur`, `Bhopal`, `Patna`, `Agra`, `Prayagraj`, `Delhi`, `Chandigarh`, `Meerut`, `Dehradun`, `Jodhpur`
 
-### Destination Catalogue (33, in `lib/destination-matcher.ts`)
+### Destination Catalogue (62, in `lib/destination-matcher.ts`)
 
 **CRITICAL: All monument/entry prices are INDIAN NATIONAL (domestic) rates.** ASI has two-tier pricing; domestic tourists pay far less. Key corrections applied:
 
@@ -152,9 +152,11 @@ Score = VibeDepth×0.30 + TripFit×0.25 + Freshness×0.20 + RouteQuality×0.15 +
 
 ### Local Intelligence Coverage (`lib/local-intelligence.ts`)
 
-13 destinations with curated hyper-local data injected into Groq prompts:
+44 destinations with curated hyper-local data injected into Groq prompts:
 
-**Ayodhya, Varanasi, Rishikesh, Agra, Jaipur, Mathura, Orchha, Ujjain, Pushkar, Bodh Gaya, Rajgir, Pachmarchi, Ranthambore, Delhi**
+**Original (14):** Ayodhya, Varanasi, Rishikesh, Agra, Jaipur, Mathura, Orchha, Ujjain, Pushkar, Bodh Gaya, Rajgir, Pachmarchi, Ranthambore, Delhi
+
+**North India expansion (30):** Amritsar, McLeod Ganj, Manali, Kasol, Bir Billing, Dalhousie, Chail, Corbett, Chopta, Auli, Dehradun, Jaisalmer, Bikaner, Ajmer, Chittorgarh, Alwar, Bharatpur, Mount Abu, Mandawa, Ranakpur, Vrindavan, Prayagraj, Fatehpur Sikri, Lucknow, Dudhwa, Nalanda, Vaishno Devi, Kurukshetra, Chandigarh, Deoghar
 
 Each entry: `mustEat[]`, `streetFood[]`, `shopping[]`, `hiddenGems[]`, `avoid[]`, `timingTips[]`, `localTransport`, `knowBeforeYouGo[]`, `stayAreas[]`
 
@@ -251,9 +253,9 @@ vibepath-app/
 │   └── api/generate/route.ts   # POST /api/generate. runtime="edge". Validates all inputs.
 │
 ├── components/
-│   ├── SearchForm.tsx          # Origin (10 cities), budget slider (₹2k–25k, default ₹8k),
+│   ├── SearchForm.tsx          # Origin (15 cities), budget slider (₹2k–25k, default ₹8k),
 │   │                           # date pickers with night count, 7 vibe pills (beach=SOON),
-│   │                           # traveler type pills, destination override combobox (29 dests),
+│   │                           # traveler type pills, destination override combobox (57 dests),
 │   │                           # saveShownDestinations() exported for freshness
 │   └── ItineraryCard.tsx       # Gradient header (profile+vibe), stacked budget bar + legend,
 │                               # narrative, last-mile display, monsoon warning,
@@ -263,12 +265,12 @@ vibepath-app/
 │                               # RedBus deep link (if bus route), WhatsApp share button
 │
 ├── lib/
-│   ├── destination-matcher.ts  # 33-entry catalogue. Indian national prices.
+│   ├── destination-matcher.ts  # 62-entry catalogue. Indian national prices.
 │   │                           # matchDestinations() | findDestinationByName()
 │   │                           # findAlternativesForOrigin(origin, startDate, n=3)
 │   ├── destination-scorer.ts   # 5-factor scorer. selectDiverseTop3().
-│   ├── local-intelligence.ts   # Curated data, 13 destinations. Fact-checked.
-│   ├── transport-data.ts       # ~60+ TRAIN/BUS routes. FIRST_MILE/LAST_MILE maps.
+│   ├── local-intelligence.ts   # Curated data, 44 destinations. Fact-checked.
+│   ├── transport-data.ts       # 105 train routes + 31 bus routes. FIRST_MILE/LAST_MILE maps.
 │   │                           # getRedBusLink(origin, dest, startDate) → RedBus deep link
 │   │                           # getTrainManLink(origin, dest) → TrainMan search link
 │   ├── budget-allocator.ts     # allocateAllProfiles() → 3 BudgetAllocation[]
@@ -389,19 +391,21 @@ Every `git push origin main` → CF Pages rebuilds and deploys `vibepath.pages.d
 9. **Specific git add** — never `git add -A`
 10. **Build before push** — `npm run build` must pass clean
 
-## 11. Current State (as of 2026-04-05)
+## 11. Current State (as of 2026-04-07)
 
 ### Working
 - Full site live at `vibepath.pages.dev`
-- Discovery mode (33 destinations, 5-factor scoring, anti-repetition)
-- Destination mode (override combobox, deep local-expert plan)
+- Discovery mode (62 destinations, 5-factor scoring, anti-repetition)
+- Destination mode (override combobox, deep local-expert plan, 57 known destinations)
+- **15 source cities**: Kanpur, Lucknow, Varanasi, Jaipur, Indore, Nagpur, Bhopal, Patna, Agra, Prayagraj, Delhi, Chandigarh, Meerut, Dehradun, Jodhpur
 - **Hard quality gate**: unknown destination → 422 + curated alternatives (no generic plans ever)
 - **Alternatives UI**: page shows top-3 reachable curated alternatives as clickable cards
 - **WhatsApp share**: formatted trip card with transport, day plan, must-eat, hidden gem
 - **TrainMan deep links** on each itinerary card (IRCTC fallback if no specific train)
 - **RedBus deep links** with date-encoded URL (DD-MM-YYYY format)
 - Destination mode: verified ✅ / unverified ⚠️ / default hint text
-- Local intelligence injected into Groq (13 destinations, fact-checked)
+- Local intelligence injected into Groq (44 destinations, fact-checked)
+- 105 curated train routes + 31 bus routes with FIRST_MILE/LAST_MILE/LAST_MILE_DATA
 - Groq + Gemini parallel ("Fast Brain + Live Eyes")
 - `🔴 Live Check` badge when Gemini finds an alert
 - Monsoon warnings (Jun–Sep, mountain/beach destinations)
@@ -413,7 +417,6 @@ Every `git push origin main` → CF Pages rebuilds and deploys `vibepath.pages.d
 - Route pill CSS tooltips on sample cards
 - Sample card hover hint
 - Social proof institution badges
-- ~60+ transport routes
 
 ### Pending
 - No real-time train availability
@@ -425,6 +428,7 @@ Every `git push origin main` → CF Pages rebuilds and deploys `vibepath.pages.d
 
 | Date | Summary |
 |---|---|
+| 2026-04-07 | **North India expansion**: 30 new destinations (HP, Uttarakhand, Rajasthan, UP, Bihar, J&K, Haryana, Jharkhand), 5 new source cities (Delhi, Chandigarh, Meerut, Dehradun, Jodhpur), 44 local intel entries, 105 train routes, 31 bus routes |
 | 2026-04-07 | Hard quality gate (`DestinationNotCuratedError`), alternatives UI, WhatsApp share, TrainMan + RedBus deep links, vibe fix in dest mode |
 | 2026-04-05 | Gemini "Live Eyes" — `gemini-validator.ts`, parallel `Promise.all`, `LiveAlert` type, `🔴 Live Check` badge |
 | 2026-04-05 | Indian monument prices fixed (Taj ₹50, Agra Fort ₹40, Jantar Mantar ₹50, etc.) |
@@ -442,7 +446,7 @@ Every `git push origin main` → CF Pages rebuilds and deploys `vibepath.pages.d
 3. **Definition of Done:** edit → `npm run build` passes → `git add <files>` → commit → push → CF Pages auto-deploys.
 4. **Deploy verification:** compare chunk names between live site and local build (see §9).
 5. **Always deploy to `vibepath`.** Confirm project: `wrangler pages project list`.
-6. **Adding origin city:** `SUPPORTED_ORIGINS` in `route.ts` + `FIRST_MILE`/`LAST_MILE` + route entries.
+6. **Adding origin city:** `SUPPORTED_ORIGINS` in `route.ts` + `ORIGINS` in `SearchForm.tsx` + `FIRST_MILE` in `transport-data.ts` + route entries for new source→destination pairs.
 7. **Adding destination:** `DESTINATIONS` in `destination-matcher.ts` (full interface) + transport routes + optional local intelligence.
 8. **Adding vibe:** `Vibe` union in `types/index.ts` + `VALID_VIBES` in `route.ts` + pill in `SearchForm` + gradient in `globals.css` + `VIBE_GRADIENTS` in `ItineraryCard` + active color in `globals.css`.
 9. **Unicode in JSX:** `{"\u20b9"}` or `` {`\u20b9${expr}`} `` — never bare in JSX text.
