@@ -6,16 +6,25 @@ import type { TripInput, Vibe, TravelerType } from "@/types";
 const ORIGINS = [
   "Kanpur", "Lucknow", "Varanasi", "Jaipur", "Indore",
   "Nagpur", "Bhopal", "Patna", "Agra", "Prayagraj",
+  "Delhi", "Chandigarh", "Meerut", "Dehradun", "Jodhpur",
 ];
 
 // Destinations available for the "I know where I'm going" mode
 const KNOWN_DESTINATIONS = [
+  // Original destinations
   "Ayodhya", "Mathura", "Rishikesh", "Haridwar", "Varanasi",
   "Agra", "Jaipur", "Orchha", "Khajuraho", "Gwalior",
   "Sanchi", "Bundi", "Udaipur", "Jodhpur", "Mandu",
   "Mussoorie", "Nainital", "Shimla", "Lansdowne", "Pachmarchi",
   "Ranthambore", "Pench", "Jabalpur", "Delhi",
   "Ujjain", "Pushkar", "Bodh Gaya", "Rajgir", "Chitrakoot",
+  // North India expansion
+  "Amritsar", "McLeod Ganj", "Manali", "Kasol", "Bir Billing",
+  "Dalhousie", "Chail", "Corbett", "Chopta", "Auli", "Dehradun",
+  "Jaisalmer", "Bikaner", "Ajmer", "Chittorgarh", "Alwar",
+  "Bharatpur", "Mount Abu", "Mandawa", "Ranakpur",
+  "Vrindavan", "Fatehpur Sikri", "Dudhwa", "Chandigarh",
+  "Nalanda", "Vaishno Devi", "Kurukshetra", "Deoghar",
 ];
 
 // Rec 6: localStorage key for recently shown destinations

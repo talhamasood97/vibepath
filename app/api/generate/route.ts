@@ -22,6 +22,7 @@ const VALID_VIBES: Vibe[] = [
 const SUPPORTED_ORIGINS = [
   "Kanpur", "Lucknow", "Varanasi", "Jaipur", "Indore",
   "Nagpur", "Bhopal", "Patna", "Agra", "Prayagraj",
+  "Delhi", "Chandigarh", "Meerut", "Dehradun", "Jodhpur",
 ];
 
 function validateInput(body: unknown): GenerateRequest | GenerateError {

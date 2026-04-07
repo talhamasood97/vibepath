@@ -1065,6 +1065,648 @@ const TRAIN_ROUTES: Record<string, TrainRoute[]> = {
       note: "Alight Gaya. Bodh Gaya 16 km (auto/cab).",
     },
   ],
+
+  // ── From Delhi (new source) ────────────────────────────────────────────────────
+
+  DELHI_AMRITSAR: [
+    {
+      trainName: "Swarna Shatabdi",
+      trainNumber: "12030",
+      departure: "07:20",
+      arrival: "13:15",
+      durationHours: 5.92,
+      overnight: false,
+      price: { sleeper: 0, ac3: 0, ac2: 0 },
+      frequency: "Daily",
+      note: "AC Chair Car only (~\u20b91,295). Fastest option. 2 km auto-rickshaw from station to Golden Temple.",
+    },
+    {
+      trainName: "Amritsar Mail",
+      trainNumber: "11057",
+      departure: "21:40",
+      arrival: "04:15",
+      durationHours: 6.58,
+      overnight: true,
+      price: { sleeper: 245, ac3: 650, ac2: 970 },
+      frequency: "Daily",
+    },
+  ],
+
+  DELHI_CHANDIGARH: [
+    {
+      trainName: "Shatabdi Express",
+      trainNumber: "12011",
+      departure: "07:40",
+      arrival: "10:55",
+      durationHours: 3.25,
+      overnight: false,
+      price: { sleeper: 0, ac3: 0, ac2: 0 },
+      frequency: "Daily",
+      note: "AC Chair Car only (~\u20b9795). Fastest option. Chandigarh station is 8 km from Sector 17.",
+    },
+    {
+      trainName: "Jan Shatabdi",
+      trainNumber: "12057",
+      departure: "15:30",
+      arrival: "19:10",
+      durationHours: 3.67,
+      overnight: false,
+      price: { sleeper: 0, ac3: 0, ac2: 0 },
+      frequency: "Daily",
+      note: "AC Chair Car (~\u20b9595). Evening option.",
+    },
+  ],
+
+  DELHI_DEHRADUN: [
+    {
+      trainName: "Shatabdi Express",
+      trainNumber: "12017",
+      departure: "06:45",
+      arrival: "11:29",
+      durationHours: 4.73,
+      overnight: false,
+      price: { sleeper: 0, ac3: 0, ac2: 0 },
+      frequency: "Daily",
+      note: "AC Chair Car only (~\u20b9845). Dehradun station is 2 km from clock tower. Mussoorie 30 km away.",
+    },
+    {
+      trainName: "Mussoorie Express",
+      trainNumber: "14041",
+      departure: "22:40",
+      arrival: "06:15",
+      durationHours: 7.58,
+      overnight: true,
+      price: { sleeper: 230, ac3: 615, ac2: 915 },
+      frequency: "Daily",
+    },
+  ],
+
+  DELHI_VAISHNO_DEVI: [
+    {
+      trainName: "Vande Bharat Express",
+      trainNumber: "22439",
+      departure: "06:00",
+      arrival: "14:00",
+      durationHours: 8.0,
+      overnight: false,
+      price: { sleeper: 0, ac3: 0, ac2: 0 },
+      frequency: "Daily",
+      note: "AC Chair Car only (~\u20b91,490). Alight at Katra station. Trek 14 km to shrine or helicopter \u20b91,200.",
+    },
+    {
+      trainName: "Jammu Mail",
+      trainNumber: "14033",
+      departure: "20:45",
+      arrival: "05:30",
+      durationHours: 8.75,
+      overnight: true,
+      price: { sleeper: 260, ac3: 690, ac2: 1030 },
+      frequency: "Daily",
+      note: "Alight at Katra (Shri Mata Vaishno Devi Katra station). Best for budget travelers.",
+    },
+  ],
+
+  DELHI_JAISALMER: [
+    {
+      trainName: "Delhi-Jaisalmer Express",
+      trainNumber: "14659",
+      departure: "17:30",
+      arrival: "11:20",
+      durationHours: 17.83,
+      overnight: true,
+      price: { sleeper: 375, ac3: 995, ac2: 1485 },
+      frequency: "Daily",
+      note: "Alight at Jaisalmer station. Auto to fort area \u20b980\u2013120. Book AC3 for desert comfort.",
+    },
+  ],
+
+  DELHI_BIKANER: [
+    {
+      trainName: "Delhi Sarai Rohilla-Bikaner Express",
+      trainNumber: "12491",
+      departure: "10:00",
+      arrival: "18:30",
+      durationHours: 8.5,
+      overnight: false,
+      price: { sleeper: 300, ac3: 795, ac2: 1185 },
+      frequency: "Daily",
+    },
+    {
+      trainName: "Bikaner Express",
+      trainNumber: "12461",
+      departure: "23:59",
+      arrival: "10:45",
+      durationHours: 10.75,
+      overnight: true,
+      price: { sleeper: 300, ac3: 795, ac2: 1185 },
+      frequency: "Daily",
+    },
+  ],
+
+  DELHI_AJMER: [
+    {
+      trainName: "Ajmer Shatabdi Express",
+      trainNumber: "12015",
+      departure: "06:05",
+      arrival: "13:00",
+      durationHours: 6.92,
+      overnight: false,
+      price: { sleeper: 0, ac3: 0, ac2: 0 },
+      frequency: "Daily",
+      note: "AC Chair Car only (~\u20b91,045). Pushkar is 14 km from Ajmer (shared jeep \u20b920).",
+    },
+    {
+      trainName: "Pink City Express",
+      trainNumber: "12449",
+      departure: "21:15",
+      arrival: "06:30",
+      durationHours: 9.25,
+      overnight: true,
+      price: { sleeper: 295, ac3: 780, ac2: 1165 },
+      frequency: "Daily",
+    },
+  ],
+
+  DELHI_ALWAR: [
+    {
+      trainName: "Ajmer Shatabdi (alight Alwar)",
+      trainNumber: "12015",
+      departure: "06:05",
+      arrival: "09:05",
+      durationHours: 3.0,
+      overnight: false,
+      price: { sleeper: 0, ac3: 0, ac2: 0 },
+      frequency: "Daily",
+      note: "AC Chair Car only (~\u20b9575). 160 km. Good weekend getaway or Sariska Tiger Reserve base.",
+    },
+    {
+      trainName: "Intercity Express",
+      trainNumber: "12059",
+      departure: "14:05",
+      arrival: "17:10",
+      durationHours: 3.08,
+      overnight: false,
+      price: { sleeper: 150, ac3: 400, ac2: 595 },
+      frequency: "Daily",
+    },
+  ],
+
+  DELHI_BHARATPUR: [
+    {
+      trainName: "Golden Temple Mail",
+      trainNumber: "12904",
+      departure: "06:55",
+      arrival: "10:15",
+      durationHours: 3.33,
+      overnight: false,
+      price: { sleeper: 170, ac3: 450, ac2: 675 },
+      frequency: "Daily",
+      note: "Gateway to Keoladeo Bird Sanctuary (UNESCO). Station is 2 km from park gate.",
+    },
+  ],
+
+  DELHI_CHITTORGARH: [
+    {
+      trainName: "Chetak Express",
+      trainNumber: "12964",
+      departure: "18:55",
+      arrival: "07:20",
+      durationHours: 12.42,
+      overnight: true,
+      price: { sleeper: 335, ac3: 890, ac2: 1330 },
+      frequency: "Daily",
+      note: "Alight at Chittorgarh. Fort is 5 km from station (auto \u20b9100).",
+    },
+  ],
+
+  DELHI_CORBETT: [
+    {
+      trainName: "Ranikhet Express",
+      trainNumber: "15013",
+      departure: "22:30",
+      arrival: "07:50",
+      durationHours: 9.33,
+      overnight: true,
+      price: { sleeper: 250, ac3: 665, ac2: 995 },
+      frequency: "Mon,Wed,Fri,Sun",
+      note: "Alight at Ramnagar \u2014 gateway to Jim Corbett. Pre-arrange hotel transfer. Safari zones 10\u201330 km from town.",
+    },
+  ],
+
+  DELHI_KURUKSHETRA: [
+    {
+      trainName: "Shatabdi Express (alight Kurukshetra)",
+      trainNumber: "12011",
+      departure: "07:40",
+      arrival: "10:10",
+      durationHours: 2.5,
+      overnight: false,
+      price: { sleeper: 0, ac3: 0, ac2: 0 },
+      frequency: "Daily",
+      note: "AC Chair Car only (~\u20b9595). 5 min to Brahma Sarovar from station.",
+    },
+    {
+      trainName: "Una Himachal Express",
+      trainNumber: "14507",
+      departure: "08:25",
+      arrival: "11:10",
+      durationHours: 2.75,
+      overnight: false,
+      price: { sleeper: 145, ac3: 385, ac2: 575 },
+      frequency: "Daily",
+    },
+  ],
+
+  // ── From Chandigarh (new source) ──────────────────────────────────────────────
+
+  CHANDIGARH_AMRITSAR: [
+    {
+      trainName: "Amritsar Intercity",
+      trainNumber: "12241",
+      departure: "07:15",
+      arrival: "10:00",
+      durationHours: 2.75,
+      overnight: false,
+      price: { sleeper: 145, ac3: 385, ac2: 575 },
+      frequency: "Daily",
+    },
+  ],
+
+  CHANDIGARH_VAISHNO_DEVI: [
+    {
+      trainName: "Shri Mata Vaishno Devi Express",
+      trainNumber: "12479",
+      departure: "20:30",
+      arrival: "06:30",
+      durationHours: 10.0,
+      overnight: true,
+      price: { sleeper: 230, ac3: 615, ac2: 915 },
+      frequency: "Daily",
+      note: "Alight at Katra. Trek to shrine 14 km from Katra.",
+    },
+  ],
+
+  CHANDIGARH_DEHRADUN: [
+    {
+      trainName: "Nanda Devi Express",
+      trainNumber: "12205",
+      departure: "15:45",
+      arrival: "20:30",
+      durationHours: 4.75,
+      overnight: false,
+      price: { sleeper: 185, ac3: 490, ac2: 735 },
+      frequency: "Daily",
+    },
+  ],
+
+  CHANDIGARH_KURUKSHETRA: [
+    {
+      trainName: "Shatabdi Express (alight Kurukshetra)",
+      trainNumber: "12045",
+      departure: "09:10",
+      arrival: "10:30",
+      durationHours: 1.33,
+      overnight: false,
+      price: { sleeper: 0, ac3: 0, ac2: 0 },
+      frequency: "Daily",
+      note: "AC Chair Car (~\u20b9390). Very short 80 km hop. Good day trip.",
+    },
+  ],
+
+  // ── From Jodhpur (new source) ──────────────────────────────────────────────────
+
+  JODHPUR_JAISALMER: [
+    {
+      trainName: "Jodhpur-Jaisalmer Express",
+      trainNumber: "14809",
+      departure: "06:45",
+      arrival: "11:15",
+      durationHours: 4.5,
+      overnight: false,
+      price: { sleeper: 165, ac3: 440, ac2: 655 },
+      frequency: "Daily",
+      note: "Iconic Thar Desert train. Scenic journey across golden sands.",
+    },
+    {
+      trainName: "Jaisalmer Express",
+      trainNumber: "14659",
+      departure: "23:30",
+      arrival: "06:00",
+      durationHours: 6.5,
+      overnight: true,
+      price: { sleeper: 165, ac3: 440, ac2: 655 },
+      frequency: "Daily",
+    },
+  ],
+
+  JODHPUR_BIKANER: [
+    {
+      trainName: "Jodhpur-Bikaner Express",
+      trainNumber: "14707",
+      departure: "22:30",
+      arrival: "06:00",
+      durationHours: 7.5,
+      overnight: true,
+      price: { sleeper: 200, ac3: 530, ac2: 795 },
+      frequency: "Daily",
+    },
+  ],
+
+  JODHPUR_MOUNT_ABU: [
+    {
+      trainName: "Ranakpur Express (alight Abu Road)",
+      trainNumber: "14707",
+      departure: "07:00",
+      arrival: "10:45",
+      durationHours: 3.75,
+      overnight: false,
+      price: { sleeper: 160, ac3: 425, ac2: 635 },
+      frequency: "Daily",
+      note: "Alight at Abu Road. Shared taxi to Mount Abu 28 km (\u20b9100/person, 45 min).",
+    },
+  ],
+
+  // ── From Meerut (new source) ───────────────────────────────────────────────────
+
+  MEERUT_AGRA: [
+    {
+      trainName: "Meerut-Agra Intercity",
+      trainNumber: "12405",
+      departure: "07:00",
+      arrival: "10:00",
+      durationHours: 3.0,
+      overnight: false,
+      price: { sleeper: 155, ac3: 415, ac2: 620 },
+      frequency: "Daily",
+    },
+  ],
+
+  // ── From Jaipur (new North destinations) ──────────────────────────────────────
+
+  JAIPUR_JAISALMER: [
+    {
+      trainName: "Jaipur-Jaisalmer Express",
+      trainNumber: "14659",
+      departure: "23:55",
+      arrival: "12:30",
+      durationHours: 12.58,
+      overnight: true,
+      price: { sleeper: 335, ac3: 890, ac2: 1330 },
+      frequency: "Daily",
+    },
+  ],
+
+  JAIPUR_BIKANER: [
+    {
+      trainName: "Jaipur-Bikaner Express",
+      trainNumber: "12463",
+      departure: "06:10",
+      arrival: "11:30",
+      durationHours: 5.33,
+      overnight: false,
+      price: { sleeper: 215, ac3: 570, ac2: 855 },
+      frequency: "Daily",
+    },
+  ],
+
+  JAIPUR_AJMER: [
+    {
+      trainName: "Ajmer Intercity Express",
+      trainNumber: "12195",
+      departure: "07:00",
+      arrival: "09:05",
+      durationHours: 2.08,
+      overnight: false,
+      price: { sleeper: 110, ac3: 295, ac2: 440 },
+      frequency: "Daily",
+      note: "Only 135 km. Very frequent service. Pushkar 14 km from Ajmer (shared jeep \u20b920).",
+    },
+  ],
+
+  JAIPUR_CHITTORGARH: [
+    {
+      trainName: "Chetak Express",
+      trainNumber: "19601",
+      departure: "22:00",
+      arrival: "04:30",
+      durationHours: 6.5,
+      overnight: true,
+      price: { sleeper: 225, ac3: 595, ac2: 890 },
+      frequency: "Daily",
+    },
+    {
+      trainName: "Ajmer-Mumbai Express (alight Chittorgarh)",
+      trainNumber: "12991",
+      departure: "07:10",
+      arrival: "12:30",
+      durationHours: 5.33,
+      overnight: false,
+      price: { sleeper: 225, ac3: 595, ac2: 890 },
+      frequency: "Daily",
+    },
+  ],
+
+  JAIPUR_ALWAR: [
+    {
+      trainName: "Jaipur-Delhi Intercity (alight Alwar)",
+      trainNumber: "12058",
+      departure: "08:00",
+      arrival: "10:30",
+      durationHours: 2.5,
+      overnight: false,
+      price: { sleeper: 130, ac3: 345, ac2: 515 },
+      frequency: "Daily",
+      note: "150 km. Good gateway to Sariska Tiger Reserve.",
+    },
+  ],
+
+  JAIPUR_BHARATPUR: [
+    {
+      trainName: "Jaipur-Agra Intercity",
+      trainNumber: "19665",
+      departure: "06:30",
+      arrival: "10:00",
+      durationHours: 3.5,
+      overnight: false,
+      price: { sleeper: 155, ac3: 415, ac2: 620 },
+      frequency: "Daily",
+      note: "Alight at Bharatpur. 2 km from Keoladeo Bird Sanctuary (UNESCO).",
+    },
+  ],
+
+  JAIPUR_MOUNT_ABU: [
+    {
+      trainName: "Jaipur-Ahmedabad Express (alight Abu Road)",
+      trainNumber: "14701",
+      departure: "23:15",
+      arrival: "07:30",
+      durationHours: 8.25,
+      overnight: true,
+      price: { sleeper: 255, ac3: 675, ac2: 1010 },
+      frequency: "Daily",
+      note: "Alight at Abu Road. Shared taxi to Mount Abu 28 km (\u20b9100/person, 45 min).",
+    },
+  ],
+
+  // ── From Agra (new North destinations) ────────────────────────────────────────
+
+  AGRA_BHARATPUR: [
+    {
+      trainName: "Multiple daily trains (55 km)",
+      trainNumber: "various",
+      departure: "Various",
+      arrival: "Various",
+      durationHours: 1.0,
+      overnight: false,
+      price: { sleeper: 65, ac3: 175, ac2: 260 },
+      frequency: "10+ daily",
+      note: "Only 55 km. Easy day trip to Keoladeo Bird Sanctuary. Auto-rickshaws outside station.",
+    },
+  ],
+
+  AGRA_ALWAR: [
+    {
+      trainName: "Jaipur Intercity (alight Alwar)",
+      trainNumber: "12059",
+      departure: "07:40",
+      arrival: "10:30",
+      durationHours: 2.83,
+      overnight: false,
+      price: { sleeper: 150, ac3: 400, ac2: 595 },
+      frequency: "Daily",
+    },
+  ],
+
+  // ── From Lucknow (new North destinations) ─────────────────────────────────────
+
+  LUCKNOW_AMRITSAR: [
+    {
+      trainName: "Lucknow-Amritsar Express",
+      trainNumber: "14673",
+      departure: "20:00",
+      arrival: "07:45",
+      durationHours: 11.75,
+      overnight: true,
+      price: { sleeper: 320, ac3: 850, ac2: 1270 },
+      frequency: "Daily",
+    },
+  ],
+
+  LUCKNOW_CHANDIGARH: [
+    {
+      trainName: "Lucknow-Chandigarh Express",
+      trainNumber: "14649",
+      departure: "21:30",
+      arrival: "07:30",
+      durationHours: 10.0,
+      overnight: true,
+      price: { sleeper: 290, ac3: 770, ac2: 1150 },
+      frequency: "Daily",
+    },
+  ],
+
+  LUCKNOW_VAISHNO_DEVI: [
+    {
+      trainName: "Jammu Tawi Express",
+      trainNumber: "14649",
+      departure: "21:30",
+      arrival: "15:00",
+      durationHours: 17.5,
+      overnight: true,
+      price: { sleeper: 390, ac3: 1035, ac2: 1545 },
+      frequency: "Daily",
+      note: "Alight at Katra. Trek 14 km to Vaishno Devi shrine or helicopter \u20b91,200.",
+    },
+  ],
+
+  LUCKNOW_NALANDA: [
+    {
+      trainName: "Lucknow-Gaya Express (alight Gaya)",
+      trainNumber: "12327",
+      departure: "21:00",
+      arrival: "07:00",
+      durationHours: 10.0,
+      overnight: true,
+      price: { sleeper: 275, ac3: 730, ac2: 1090 },
+      frequency: "Daily",
+      note: "Alight at Gaya. Nalanda ruins 95 km (bus \u20b980 or cab \u20b91,200).",
+    },
+  ],
+
+  // ── From Varanasi (new North destinations) ────────────────────────────────────
+
+  VARANASI_NALANDA: [
+    {
+      trainName: "Mahabodhi Express (alight Gaya)",
+      trainNumber: "12397",
+      departure: "11:00",
+      arrival: "14:30",
+      durationHours: 3.5,
+      overnight: false,
+      price: { sleeper: 150, ac3: 400, ac2: 595 },
+      frequency: "Daily",
+      note: "Alight at Gaya. Nalanda 95 km (cab \u20b91,200 or bus \u20b980 via Rajgir).",
+    },
+  ],
+
+  // ── From Patna (new North destinations) ───────────────────────────────────────
+
+  PATNA_NALANDA: [
+    {
+      trainName: "Patna-Rajgir Intercity",
+      trainNumber: "13201",
+      departure: "08:00",
+      arrival: "11:00",
+      durationHours: 3.0,
+      overnight: false,
+      price: { sleeper: 110, ac3: 295, ac2: 440 },
+      frequency: "Daily",
+      note: "Alight at Nalanda station. Ruins complex is 3 km (auto \u20b960).",
+    },
+  ],
+
+  PATNA_DEOGHAR: [
+    {
+      trainName: "Shiv Ganga Express (alight Jasidih)",
+      trainNumber: "12560",
+      departure: "18:30",
+      arrival: "06:00",
+      durationHours: 11.5,
+      overnight: true,
+      price: { sleeper: 245, ac3: 650, ac2: 970 },
+      frequency: "Daily",
+      note: "Alight at Jasidih Junction. Deoghar 8 km (auto \u20b960).",
+    },
+  ],
+
+  // ── From Kanpur (new North destinations) ──────────────────────────────────────
+
+  KANPUR_CHANDIGARH: [
+    {
+      trainName: "Kalindi Express",
+      trainNumber: "14117",
+      departure: "22:05",
+      arrival: "09:30",
+      durationHours: 11.42,
+      overnight: true,
+      price: { sleeper: 300, ac3: 795, ac2: 1185 },
+      frequency: "Daily",
+    },
+  ],
+
+  KANPUR_VAISHNO_DEVI: [
+    {
+      trainName: "Jammu Express (via Delhi)",
+      trainNumber: "14033",
+      departure: "07:30",
+      arrival: "05:30",
+      durationHours: 22.0,
+      overnight: true,
+      price: { sleeper: 430, ac3: 1140, ac2: 1700 },
+      frequency: "Daily",
+      note: "Long overnight journey via Delhi. Book AC3 for comfort. Alight at Katra.",
+    },
+  ],
 };
 
 // ── Bus routes ────────────────────────────────────────────────────────────────
@@ -1161,6 +1803,132 @@ const BUS_ROUTES: Record<string, BusRoute> = {
     frequency: "Overnight buses 10 PM\u201311:30 PM",
     note: "Overnight bus saves accommodation. Arrive fresh in Udaipur.",
   },
+  DELHI_MANALI: {
+    operatorType: "HRTC Volvo / Private",
+    price: { min: 750, max: 1800 },
+    durationHours: 14.0,
+    frequency: "Overnight buses 5 PM\u20137 PM from ISBT Kashmere Gate",
+    note: "Book Volvo for comfort. Arrive Manali Bus Stand 7\u20139 AM. Season June\u2013Sept only.",
+  },
+  DELHI_MCLEOD_GANJ: {
+    operatorType: "HRTC Volvo / Private",
+    price: { min: 700, max: 1600 },
+    durationHours: 13.0,
+    frequency: "Nightly departures 6\u20138 PM from ISBT Kashmere Gate",
+    note: "Overnight bus to McLeod Ganj Bus Stand. 520 km. Book in advance for weekends.",
+  },
+  DELHI_KASOL: {
+    operatorType: "HRTC / Private",
+    price: { min: 600, max: 1400 },
+    durationHours: 12.0,
+    frequency: "Overnight departures 7\u20139 PM from ISBT Kashmere Gate",
+    note: "Bus goes via Bhuntar. Alight at Kasol. Shared cab from Bhuntar \u20b9100/person (1.5 hrs).",
+  },
+  DELHI_DALHOUSIE: {
+    operatorType: "HRTC / Private",
+    price: { min: 650, max: 1500 },
+    durationHours: 11.0,
+    frequency: "Overnight departures 7 PM from ISBT Kashmere Gate",
+    note: "Alight at Dalhousie Bus Stand. Train option: Delhi to Pathankot then bus 80 km.",
+  },
+  DELHI_BIR_BILLING: {
+    operatorType: "HRTC / Private",
+    price: { min: 650, max: 1400 },
+    durationHours: 12.0,
+    frequency: "Overnight buses via Una or Chandigarh",
+    note: "Alight at Bir village. World\u2019s second-highest paragliding site. Book in advance.",
+  },
+  CHANDIGARH_MANALI: {
+    operatorType: "HRTC Volvo / Private",
+    price: { min: 550, max: 1200 },
+    durationHours: 10.0,
+    frequency: "Morning (6 AM) and overnight (10 PM) from Chandigarh ISBT",
+    note: "280 km via Kullu Valley. Scenic route through Beas gorge. Book Volvo for comfort.",
+  },
+  CHANDIGARH_MCLEOD_GANJ: {
+    operatorType: "HRTC / Private",
+    price: { min: 400, max: 950 },
+    durationHours: 8.0,
+    frequency: "Multiple daily departures from Chandigarh ISBT",
+    note: "240 km. The most convenient gateway to Dharamshala / McLeod Ganj.",
+  },
+  CHANDIGARH_KASOL: {
+    operatorType: "HRTC / Private",
+    price: { min: 450, max: 900 },
+    durationHours: 9.0,
+    frequency: "Overnight buses from Chandigarh ISBT",
+    note: "Via Bhuntar. Alight at Kasol or take shared cab from Bhuntar (\u20b9100, 1.5 hrs).",
+  },
+  CHANDIGARH_DALHOUSIE: {
+    operatorType: "HRTC / Private",
+    price: { min: 350, max: 800 },
+    durationHours: 7.0,
+    frequency: "Morning bus 6 AM from Chandigarh ISBT",
+    note: "Via Pathankot. Scenic drive through lower Himalayas.",
+  },
+  CHANDIGARH_BIR_BILLING: {
+    operatorType: "HRTC / Private",
+    price: { min: 350, max: 700 },
+    durationHours: 8.0,
+    frequency: "Morning buses from Chandigarh ISBT",
+    note: "230 km. Paragliding capital of India. Billing meadow is 15 km above Bir village.",
+  },
+  DEHRADUN_CHOPTA: {
+    operatorType: "GMOU / Private",
+    price: { min: 300, max: 700 },
+    durationHours: 7.0,
+    frequency: "Morning buses from Dehradun ISBT via Ukhimath",
+    note: "230 km. Change at Ukhimath (shared jeep \u20b9100). Chopta is the base for Tungnath trek.",
+  },
+  DEHRADUN_AULI: {
+    operatorType: "GMOU / Private",
+    price: { min: 350, max: 700 },
+    durationHours: 9.0,
+    frequency: "Morning bus from Dehradun to Joshimath. Cable car to Auli.",
+    note: "280 km to Joshimath. Cable car from Joshimath to Auli (\u20b9500 return, 4 km, 25 min).",
+  },
+  JAIPUR_MANDAWA: {
+    operatorType: "RSRTC / Private",
+    price: { min: 200, max: 400 },
+    durationHours: 3.5,
+    frequency: "Multiple daily from Jaipur Sindhi Camp bus stand",
+    note: "170 km. Gateway to Shekhawati\u2019s painted havelis. Drop at Mandawa Chowk.",
+  },
+  JAIPUR_RANAKPUR: {
+    operatorType: "RSRTC / Private",
+    price: { min: 250, max: 500 },
+    durationHours: 5.0,
+    frequency: "Morning buses from Jaipur Sindhi Camp",
+    note: "Via Jodhpur highway. Ranakpur Jain Temple is 3 km from bus stop.",
+  },
+  JODHPUR_RANAKPUR: {
+    operatorType: "RSRTC / Private",
+    price: { min: 150, max: 300 },
+    durationHours: 3.0,
+    frequency: "Multiple daily from Jodhpur Central Bus Stand",
+    note: "90 km via NH-162. Direct to Ranakpur Jain Temples. One of India\u2019s most ornate temples.",
+  },
+  MEERUT_HARIDWAR: {
+    operatorType: "UPSRTC / Private",
+    price: { min: 150, max: 280 },
+    durationHours: 3.0,
+    frequency: "Frequent from Meerut bus stand",
+    note: "100 km. Good gateway to Haridwar for Ganga aarti. Evening buses available.",
+  },
+  MEERUT_DEHRADUN: {
+    operatorType: "UPSRTC / Private",
+    price: { min: 200, max: 380 },
+    durationHours: 3.5,
+    frequency: "Multiple daily from Meerut bus stand",
+    note: "130 km via NH-58. Dehradun is gateway to Mussoorie and Rishikesh.",
+  },
+  AGRA_FATEHPUR_SIKRI: {
+    operatorType: "UP Government / Private",
+    price: { min: 40, max: 200 },
+    durationHours: 1.0,
+    frequency: "Very frequent from Agra Fort Bus Stand",
+    note: "40 km. Shared bus \u20b940 or taxi \u20b9600. Mughal ghost capital \u2014 perfect half-day trip from Agra.",
+  },
 };
 
 // ── First/last mile connections ───────────────────────────────────────────────
@@ -1176,6 +1944,11 @@ const FIRST_MILE: Record<string, string> = {
   Patna: "Auto/Ola to Patna Junction (\u20b980\u2013130, 25 min)",
   Agra: "Auto/Ola to Agra Cantt (\u20b980\u2013120, 20 min)",
   Prayagraj: "Auto/Ola to Prayagraj Junction (\u20b990\u2013140, 25 min)",
+  Delhi: "Metro/Cab to New Delhi (NDLS) or Hazrat Nizamuddin (NZM) station (\u20b950\u2013200, 20\u201345 min). Use Metro for budget.",
+  Chandigarh: "Auto/Ola to Chandigarh Railway Station (\u20b980\u2013120, 15\u201325 min)",
+  Meerut: "Auto to Meerut City or Meerut Cantt station (\u20b960\u2013100, 15 min)",
+  Dehradun: "Auto/Ola to Dehradun Railway Station (\u20b970\u2013100, 15 min from clock tower area)",
+  Jodhpur: "Auto/Ola to Jodhpur Junction (\u20b980\u2013120, 20 min from city center)",
 };
 
 const LAST_MILE: Record<string, string> = {
@@ -1211,6 +1984,33 @@ const LAST_MILE: Record<string, string> = {
   Lansdowne: "Cab from Kotdwar station to Lansdowne (\u20b9700, 40 km, 1 hr). Or shared taxi (\u20b9100 per person).",
   Corbett: "Ramnagar station is 1 km from town. Pre-book hotel transport. Jim Corbett zones are 10\u201330 km from Ramnagar.",
   Mandu: "Jeep/taxi from Indore or Mhow to Mandu (\u20b9600\u20131,200). Mandu village is inside the fort.",
+  Amritsar: "Auto/Ola from Amritsar Junction to Golden Temple (\u20b980\u2013120, 10 min). Attari-Wagah border 28 km (cab \u20b9600 return).",
+  "McLeod Ganj": "Cab from Pathankot to McLeod Ganj (\u20b91,200\u20131,600, 3 hrs) or HRTC bus (\u20b9150, 3.5 hrs). Dharamshala 10 km below.",
+  Manali: "Bus from Kullu/Bhuntar bus stand to Manali (\u20b9100, 1 hr). Solang Valley 14 km, Rohtang 51 km (jeep \u20b9800).",
+  Kasol: "Shared cab from Bhuntar (near Kullu) to Kasol (\u20b9100/person, 1.5 hrs). No direct bus from major cities.",
+  "Bir Billing": "Local bus or shared jeep from Una or Mandi to Bir village (\u20b9100\u2013200). Billing meadow 14 km above Bir (jeep \u20b9500).",
+  Dalhousie: "Bus from Pathankot to Dalhousie (\u20b9100, 2 hrs) or cab (\u20b9600). Khajjiar 24 km (cab \u20b9400 return).",
+  Chail: "Cab from Shimla to Chail (\u20b9800\u20131,000, 1.5 hrs) or from Kalka (\u20b91,200\u20131,500, 3 hrs). No direct bus.",
+  Chopta: "Cab from Rishikesh or Haridwar to Chopta (\u20b92,000\u20132,500, 5 hrs). Base for Tungnath-Chandrashila trek (3.5 km).",
+  Auli: "Cable car from Joshimath (\u20b9500 return, 25 min). Cab from Rishikesh to Joshimath (\u20b92,500, 4 hrs).",
+  Dehradun: "Auto/cab from Dehradun station to city (\u20b960\u2013120, 10 min). Mussoorie 32 km (shared Sumo \u20b9120/person, 1.5 hrs).",
+  Jaisalmer: "Auto from Jaisalmer station to Old City/fort (\u20b980\u2013120, 10 min). Sam Sand Dunes 42 km (jeep safari \u20b9800).",
+  Bikaner: "Auto from Bikaner station to Junagarh Fort area (\u20b960\u2013100, 10 min). Karni Mata Temple 30 km.",
+  Ajmer: "Auto from Ajmer Junction to Dargah Sharif (\u20b960\u2013100, 10 min). Pushkar 14 km (shared jeep \u20b920).",
+  Chittorgarh: "Auto from Chittorgarh station to fort entrance (\u20b990\u2013120, 15 min, 5 km). Rana Kumbha Palace is 3 km inside fort.",
+  Alwar: "Auto from Alwar station to city center (\u20b960\u201380, 10 min). Sariska Tiger Reserve 37 km (cab \u20b9800).",
+  Bharatpur: "Auto/cycle rickshaw from station to Keoladeo National Park (\u20b960\u2013100, 2 km). Inside park, cycle rentals \u20b960/day.",
+  "Mount Abu": "Shared taxi from Abu Road station to Mount Abu (\u20b9100/person, 1 hr, 28 km) or cab (\u20b9400).",
+  Mandawa: "Auto from Mandawa bus stand to Shekhawati havelis (\u20b930\u201360, 5 min). Village is compact \u2014 walking distance between havelis.",
+  Ranakpur: "Cab from Falna station to Ranakpur Jain Temple (\u20b9800, 1.5 hrs, 40 km). No public transport directly.",
+  Vrindavan: "Shared tempo from Mathura Junction to Vrindavan (\u20b920, 20 min, 15 km). E-rickshaw inside Vrindavan \u20b930.",
+  "Fatehpur Sikri": "Cab from Agra to Fatehpur Sikri (\u20b9600, 40 min, 40 km) or local bus from Agra Fort bus stand (\u20b940).",
+  Dudhwa: "Cab from Mailani station to Dudhwa National Park gate (\u20b9300\u2013500, 20 km). Pre-book accommodation inside park.",
+  Nalanda: "Auto from Nalanda station to ruins (\u20b960\u201380, 3 km, 5 min). Rajgir hot springs 12 km (shared cab \u20b960).",
+  "Vaishno Devi": "Helicopter from Katra to Sanjichhat (\u20b91,200 one-way, 5 min) or trek from Katra (14 km, 4\u20135 hrs). Katra is 30 min from station.",
+  Kurukshetra: "Auto from Kurukshetra Junction to Brahma Sarovar (\u20b960\u201380, 10 min, 5 km). Jyotisar (Gita birthplace) 8 km.",
+  Chandigarh: "Auto/Ola from station to Sector 17 (\u20b980\u2013120, 15 min). Rock Garden 5 km, Sukhna Lake 8 km, Rose Garden 3 km.",
+  Deoghar: "Auto from Deoghar station to Baidyanath Temple (\u20b960, 5 min, 1 km). Nandan Pahar 7 km. Everything is compact.",
 };
 
 // ── Structured last-mile data (budget vs comfort, with duration) ──────────────
@@ -1238,7 +2038,34 @@ const LAST_MILE_DATA: Record<string, LastMileData> = {
   Chitrakoot: { budget: "Auto to Ramghat \u20b960 (10 min)", comfort: "Cab \u20b9150\u2013200 (10 min)", duration: "10 min" },
   Lansdowne:  { budget: "Shared taxi from Kotdwar \u20b9100/person (1 hr)", comfort: "Private cab \u20b9700\u2013900 (1 hr)", duration: "1 hr" },
   Jabalpur:   { budget: "Auto to Bhedaghat \u20b9300\u2013350 (30 min)", comfort: "Cab \u20b9500\u2013600 (30 min)", duration: "30 min" },
-  Pench:      { budget: "Pre-arranged hotel transfer \u20b9500", comfort: "Private cab from Nagpur \u20b91,500\u20132,000", duration: "2\u20133 hrs" },
+  Pench:          { budget: "Pre-arranged hotel transfer \u20b9500", comfort: "Private cab from Nagpur \u20b91,500\u20132,000", duration: "2\u20133 hrs" },
+  Amritsar:       { budget: "Auto to Golden Temple \u20b980\u2013120 (10 min)", comfort: "Ola/cab \u20b9150\u2013200 (10 min)", duration: "10 min" },
+  "McLeod Ganj":  { budget: "HRTC bus from Pathankot \u20b9150 (3.5 hrs)", comfort: "Cab from Pathankot \u20b91,200\u20131,600 (3 hrs)", duration: "3\u20133.5 hrs" },
+  Manali:         { budget: "Bus from Bhuntar \u20b9100/person (1 hr)", comfort: "Private cab \u20b9600\u2013800 (1 hr)", duration: "1 hr" },
+  Kasol:          { budget: "Shared cab from Bhuntar \u20b9100/person (1.5 hrs)", comfort: "Private cab \u20b9600\u2013800 (1.5 hrs)", duration: "1.5 hrs" },
+  "Bir Billing":  { budget: "Shared jeep from Una/Mandi \u20b9100\u2013200 (3 hrs)", comfort: "Private cab \u20b91,200\u20131,500 (2.5 hrs)", duration: "2.5\u20133 hrs" },
+  Dalhousie:      { budget: "Bus from Pathankot \u20b9100 (2 hrs)", comfort: "Cab from Pathankot \u20b9600\u2013800 (1.5 hrs)", duration: "1.5\u20132 hrs" },
+  Chail:          { budget: "No shared option \u2014 cab from Shimla \u20b9800\u20131,000 (1.5 hrs)", comfort: "Private cab from Kalka \u20b91,500 (3 hrs)", duration: "1.5\u20133 hrs" },
+  Chopta:         { budget: "Shared jeep from Ukhimath \u20b9100/person (1 hr)", comfort: "Private cab from Rishikesh \u20b92,000\u20132,500 (5 hrs)", duration: "5 hrs" },
+  Auli:           { budget: "Cable car from Joshimath \u20b9500 return (25 min)", comfort: "Private cab Rishikesh\u2013Joshimath \u20b92,500 (4 hrs)", duration: "25 min (cable car)" },
+  Dehradun:       { budget: "Auto to city center \u20b960\u201380 (10 min)", comfort: "Cab \u20b9150\u2013250 (10 min)", duration: "10 min" },
+  Jaisalmer:      { budget: "Auto to Old City \u20b980\u2013120 (10 min)", comfort: "Cab \u20b9200\u2013300 (10 min)", duration: "10 min" },
+  Bikaner:        { budget: "Auto to Junagarh Fort \u20b960\u2013100 (10 min)", comfort: "Cab \u20b9150\u2013200 (10 min)", duration: "10 min" },
+  Ajmer:          { budget: "Auto to Dargah \u20b960\u2013100 (10 min)", comfort: "Cab \u20b9150\u2013200 (10 min)", duration: "10 min" },
+  Chittorgarh:    { budget: "Auto to fort entrance \u20b990\u2013120 (15 min)", comfort: "Cab \u20b9200\u2013300 (15 min)", duration: "15 min" },
+  Alwar:          { budget: "Auto to city center \u20b960\u201380 (10 min)", comfort: "Cab \u20b9150\u2013200 (10 min)", duration: "10 min" },
+  Bharatpur:      { budget: "Cycle rickshaw to Keoladeo Park \u20b960\u2013100 (2 km)", comfort: "Auto \u20b9150 (5 min)", duration: "5\u201310 min" },
+  "Mount Abu":    { budget: "Shared taxi from Abu Road \u20b9100/person (1 hr)", comfort: "Private cab \u20b9400\u2013500 (1 hr)", duration: "1 hr" },
+  Mandawa:        { budget: "Auto to havelis \u20b930\u201360 (5 min)", comfort: "Cab \u20b9100\u2013150 (5 min)", duration: "5 min" },
+  Ranakpur:       { budget: "Cab from Falna station \u20b9800 (1.5 hrs)", comfort: "Private transfer from Jodhpur \u20b91,500\u20132,000 (3 hrs)", duration: "1.5\u20133 hrs" },
+  Vrindavan:      { budget: "Shared tempo from Mathura \u20b920 (20 min)", comfort: "Auto \u20b980\u2013100 (20 min)", duration: "20 min" },
+  "Fatehpur Sikri": { budget: "Local bus from Agra \u20b940 (1 hr)", comfort: "Cab from Agra \u20b9600 (40 min)", duration: "40 min\u20131 hr" },
+  Dudhwa:         { budget: "Cab from Mailani station \u20b9300\u2013500 (30 min)", comfort: "Pre-arranged resort transfer \u20b9800\u20131,200", duration: "30 min" },
+  Nalanda:        { budget: "Auto from Nalanda station \u20b960\u201380 (5 min)", comfort: "Cab from Gaya \u20b91,200 (1.5 hrs)", duration: "5 min from station" },
+  "Vaishno Devi": { budget: "Trek from Katra 14 km (4\u20135 hrs)", comfort: "Helicopter from Katra \u20b91,200 (5 min)", duration: "5 min or 4\u20135 hrs" },
+  Kurukshetra:    { budget: "Auto to Brahma Sarovar \u20b960\u201380 (10 min)", comfort: "Cab \u20b9150\u2013200 (10 min)", duration: "10 min" },
+  Chandigarh:     { budget: "Auto to Sector 17 \u20b980\u2013120 (15 min)", comfort: "Ola/cab \u20b9200\u2013300 (15 min)", duration: "15 min" },
+  Deoghar:        { budget: "Auto to Baidyanath Temple \u20b960 (5 min)", comfort: "Cab \u20b9150 (5 min)", duration: "5 min" },
 };
 
 // ── Lookup function ───────────────────────────────────────────────────────────
