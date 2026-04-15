@@ -436,6 +436,8 @@ async function buildAndGenerateNarratives(
       localIntelligence,
       isDestinationMode,
       travelerType:         input.travelerType as TravelerType | undefined,
+      travelers:            input.travelers ?? 1,
+      pois:                 s.destination.pois,
       monsoonWarning,
       seasonalContext,
       // weatherNow + currentEvent added after briefings resolve (see below)

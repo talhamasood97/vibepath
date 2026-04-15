@@ -14,7 +14,7 @@
  */
 
 import Groq from "groq-sdk";
-import type { LocalIntelligence, TravelerType, DetailedDay } from "@/types";
+import type { LocalIntelligence, TravelerType, DetailedDay, PoiItem } from "@/types";
 
 function getGroqClient(): Groq {
   const apiKey = process.env.GROQ_API_KEY;
@@ -204,7 +204,9 @@ export interface ItineraryContext {
   localIntelligence?: LocalIntelligence | null;
   isDestinationMode?: boolean;
   travelerType?: TravelerType;
+  travelers?: number;          // group size — used for per-person vs total cost framing
   monsoonWarning?: string;
+  pois?: PoiItem[];            // curated POI seed list — if present, LLM uses ONLY these
   // Personalisation & real-time context
   seasonalContext?: string;   // from seasonal-context.ts — exact timings, heat/cold warnings
   weatherNow?: string;        // from Gemini — current weather sentence
@@ -403,10 +405,45 @@ export async function generateItineraryNarrative(
     ? `\nSEASONAL ALERT: ${ctx.monsoonWarning} Acknowledge naturally in narrative \u2014 honest but not alarmist.`
     : "";
 
+  // ── Traveler count framing ─────────────────────────────────────────────────
+  const travelers = ctx.travelers ?? 1;
+  const groupSize = travelers === 1
+    ? "solo traveller"
+    : travelers === 2
+    ? "2 people (couple / friends)"
+    : `${travelers} people`;
+  const totalGroupBudget = ctx.totalBudget * travelers;
+  const travelerCountNote = travelers > 1
+    ? `GROUP: ${groupSize}. Total group budget = \u20b9${totalGroupBudget.toLocaleString("en-IN")} (all costs below are per-person).`
+    : `TRAVELLER: Solo. Per-person budget = \u20b9${ctx.totalBudget.toLocaleString("en-IN")}.`;
+
+  // ── POI seed list (anti-hallucination layer) ────────────────────────────────
+  // When curated POIs exist, Musafir MUST use only these named places in sequence.
+  const poiSection = ctx.pois && ctx.pois.length > 0
+    ? `\nCURATED POI SEQUENCE (use EXACTLY these named places in this order — do NOT add, remove, or rename any):
+${ctx.pois.map((p, i) =>
+  `${i + 1}. ${p.name} — ${p.type}, best at ${p.bestTime}, ~${p.durationHours}h${p.entryFee !== undefined ? `, entry \u20b9${p.entryFee === 0 ? "free" : p.entryFee}` : ""}${p.note ? `. TIP: ${p.note}` : ""}`
+).join("\n")}
+RULE: Narrative and day plan must reference ONLY the above named POIs. Do not invent additional attractions.`
+    : "";
+
+  // ── Hard budget constraint ─────────────────────────────────────────────────
+  // Prevents Musafir from recommending activities/food that blow the allocation
+  const perDayFoodBudget = Math.round(ctx.foodBudget / (ctx.nights + 1));
+  const perDayActivityBudget = Math.round(ctx.activitiesBudget / (ctx.nights + 1));
+  const budgetConstraint = `
+HARD BUDGET RULES (do NOT violate):
+- Food per day: \u20b9${perDayFoodBudget.toLocaleString("en-IN")} per person. Do NOT recommend restaurants above this.
+- Activities per day: \u20b9${perDayActivityBudget.toLocaleString("en-IN")} per person. Skip any paid attraction above this limit.
+- Transport is already accounted for (\u20b9${ctx.transportCostRoundtrip.toLocaleString("en-IN")} round-trip). Do NOT suggest additional private cabs or paid transfers unless within remaining budget.
+- Total spent = \u20b9${ctx.totalSpent.toLocaleString("en-IN")} of \u20b9${ctx.totalBudget.toLocaleString("en-IN")} budget. ${ctx.utilizationPct > 90 ? "Budget is tight \u2014 emphasise free/cheap alternatives every day." : "Some flexibility exists \u2014 one upgrade per day is acceptable."}`;
+
   const userPrompt = `Here is the structured data for a ${ctx.profile} trip to ${ctx.destination}, ${ctx.state}:${destinationModeNote}
 ${travelerNote}
 
+${travelerCountNote}
 ${profileTone}
+${budgetConstraint}
 ${ctx.seasonalContext ? `\n${ctx.seasonalContext}` : ""}
 ${geminiContext ? `\nLIVE INTELLIGENCE:\n${geminiContext}` : ""}
 ${monsoonNote}
@@ -419,10 +456,10 @@ TRANSPORT: ${ctx.transportMode}${ctx.trainName ? ` (${ctx.trainName})` : ""}
   Round-trip cost: \u20b9${ctx.transportCostRoundtrip.toLocaleString("en-IN")}${ctx.trainClass ? ` (${ctx.trainClass})` : ""}
 
 STAY: ${ctx.nights} night(s) in ${ctx.accommodationType} \u2014 \u20b9${ctx.accommodationCost.toLocaleString("en-IN")} total
-FOOD: \u20b9${ctx.foodBudget.toLocaleString("en-IN")} for the trip
-ACTIVITIES: \u20b9${ctx.activitiesBudget.toLocaleString("en-IN")} budget
+FOOD: \u20b9${ctx.foodBudget.toLocaleString("en-IN")} for the trip (\u20b9${perDayFoodBudget.toLocaleString("en-IN")}/day per person)
+ACTIVITIES: \u20b9${ctx.activitiesBudget.toLocaleString("en-IN")} total (\u20b9${perDayActivityBudget.toLocaleString("en-IN")}/day per person)
 TOTAL: \u20b9${ctx.totalSpent.toLocaleString("en-IN")} of \u20b9${ctx.totalBudget.toLocaleString("en-IN")} (${ctx.utilizationPct}% used)
-
+${poiSection}
 TOP THINGS TO DO:
 ${ctx.mustDo.map((a, i) => `${i + 1}. ${a}`).join("\n")}
 ${localIntelSection}

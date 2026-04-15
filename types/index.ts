@@ -118,6 +118,33 @@ export interface LocalIntelligence {
   stayAreas: { area: string; why: string; bestFor: string }[];
 }
 
+// ── POI seed list (anti-hallucination layer) ──────────────────────────────────
+// Passed to Musafir as the definitive list of places — it may only narrate
+// around named POIs in this list, never invent new ones.
+
+export type PoiType =
+  | "temple"
+  | "monument"
+  | "nature"
+  | "market"
+  | "food"
+  | "viewpoint"
+  | "museum"
+  | "activity"
+  | "neighbourhood"
+  | "lake"
+  | "ghat"
+  | "fort";
+
+export interface PoiItem {
+  name: string;              // exact place name used in the narrative
+  type: PoiType;
+  bestTime: string;          // e.g. "6:00 AM", "5:30 PM", "anytime"
+  durationHours: number;     // typical visit length
+  entryFee?: number;         // INR for Indian nationals (0 = free)
+  note?: string;             // one insider tip
+}
+
 // ── Destination types ─────────────────────────────────────────────────────────
 
 export interface Destination {
@@ -142,6 +169,9 @@ export interface Destination {
   };
   mustDo: string[];
   avgActivityCost: number;
+  pois?: PoiItem[];            // curated POI seed list — if present, LLM uses ONLY these
+  lat?: number;                // coordinates for haversine distance calculation
+  lng?: number;
 }
 
 // ── Budget types ──────────────────────────────────────────────────────────────

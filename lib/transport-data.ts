@@ -2185,4 +2185,72 @@ export function getTrainManLink(origin: string, destination: string): string {
   return `https://www.trainman.in/trains/${from}-to-${to}`;
 }
 
+// ── Destination-first transport lookup ───────────────────────────────────────
+// The destination-first model (v4.0): given a destination, find ALL origin
+// cities that have curated train routes to it. Any city within 500km and
+// <8 hrs direct journey auto-qualifies as a source city.
+//
+// This enables the origin dropdown to expand as destinations are curated —
+// no separate "which origins to support" planning needed.
+
+export interface DestinationTrainSource {
+  origin: string;          // e.g. "Lucknow"
+  trains: TrainRoute[];    // all curated trains from this origin to the destination
+  fastestHours: number;    // fastest train duration
+  cheapestSleeper: number; // cheapest sleeper one-way fare (₹)
+}
+
+/**
+ * Given a destination name, returns every origin city in TRAIN_ROUTES
+ * that has a curated route to it, sorted by journey time ascending.
+ *
+ * This is the destination-first lookup that enables auto-expanding
+ * source city coverage as the destination catalogue grows.
+ */
+export function getTrainsToDestination(destination: string): DestinationTrainSource[] {
+  const destKey = destination.toUpperCase().replace(/\s+/g, "_");
+  const suffix  = `_${destKey}`;
+
+  const results: DestinationTrainSource[] = [];
+
+  for (const routeKey of Object.keys(TRAIN_ROUTES)) {
+    if (!routeKey.endsWith(suffix)) continue;
+
+    // Extract origin from key: "LUCKNOW_AYODHYA" → "Lucknow"
+    const originRaw = routeKey.slice(0, routeKey.length - suffix.length);
+    const origin = originRaw
+      .split("_")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+      .join(" ");
+
+    const trains = TRAIN_ROUTES[routeKey];
+    if (!trains || trains.length === 0) continue;
+
+    const fastestHours = Math.min(...trains.map((t) => t.durationHours));
+    const sleeperFares = trains.map((t) => t.price.sleeper).filter((p) => p > 0);
+    const cheapestSleeper = sleeperFares.length > 0 ? Math.min(...sleeperFares) : 0;
+
+    results.push({ origin, trains, fastestHours, cheapestSleeper });
+  }
+
+  // Sort by fastest journey time — closest cities first
+  return results.sort((a, b) => a.fastestHours - b.fastestHours);
+}
+
+/**
+ * Returns all origin cities reachable to a destination within:
+ *   - maxDistanceHours: maximum direct train journey duration (default 8h)
+ *
+ * This is the 500km / <8hr filter described in VibePath v4.0 architecture.
+ * Used to populate the origin dropdown for a given destination.
+ */
+export function getQualifyingSourceCities(
+  destination: string,
+  maxJourneyHours = 8
+): DestinationTrainSource[] {
+  return getTrainsToDestination(destination).filter(
+    (s) => s.fastestHours <= maxJourneyHours
+  );
+}
+
 export { TRAIN_ROUTES, BUS_ROUTES, FIRST_MILE, LAST_MILE, LAST_MILE_DATA };

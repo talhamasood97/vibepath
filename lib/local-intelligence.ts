@@ -2694,6 +2694,1304 @@ const LOCAL_INTEL: Record<string, LocalIntelligence> = {
     ],
   },
 
+  // ── Batch 1: Missing destinations ─────────────────────────────────────────
+
+  Haridwar: {
+    destination: "Haridwar",
+    mustEat: [
+      {
+        name: "Mohan's Kachori Shop",
+        area: "Upper Road, near Har Ki Pauri",
+        knownFor: "Bedmi puri with aloo sabzi \u2014 the classic Haridwar breakfast since 1947.",
+        price: "\u20b940\u201370",
+        tip: "Go between 7\u20139 AM. By 10 AM the puri gets oily. Sit inside, not on the street.",
+      },
+      {
+        name: "Hoshiyar Puri",
+        area: "Near Railway Station, Haridwar",
+        knownFor: "Rabdi and jalebi. A Haridwar institution for over 60 years.",
+        price: "\u20b960\u2013120",
+        tip: "Order the rabdi-jalebi combo. The rabdi is thicker than UP-style \u2014 more cream, less water.",
+      },
+      {
+        name: "Chotu Dhaba",
+        area: "Laltarao Bridge area",
+        knownFor: "Dal makhani and roti \u2014 genuinely home-cooked, no tourist markup.",
+        price: "\u20b980\u2013150",
+        tip: "Ask for the thali \u2014 dal, two sabzis, roti, rice, salad. Better value than ordering \u00e0 la carte.",
+      },
+    ],
+    streetFood: [
+      { name: "Aloo Puri", area: "Any stall near Har Ki Pauri", price: "\u20b930\u201350", tip: "Only eat at stalls with a visible gas flame, not pre-cooked." },
+      { name: "Kulhad chai with lemon", area: "Ghats area", price: "\u20b910\u201315" },
+      { name: "Petha (Haridwar variety, softer than Agra)", area: "Near railway station market", price: "\u20b960\u2013200/250g" },
+    ],
+    shopping: [
+      {
+        what: "Rudraksh and tulsi mala",
+        where: "Moti Bazaar (the long lane behind Har Ki Pauri)",
+        priceRange: "\u20b950\u2013800",
+        tip: "Buy from fixed-price Ayurvedic shops, not pavement touts. Ask for certification on expensive rudraksh.",
+      },
+      {
+        what: "Patanjali Ayurvedic products",
+        where: "Patanjali Mega Store near railway station",
+        priceRange: "\u20b950\u2013500",
+        tip: "MRP is fixed. Cheapest place for Patanjali products in India \u2014 directly at source.",
+      },
+    ],
+    hiddenGems: [
+      {
+        name: "Rajaji National Park half-day safari",
+        what: "Jeep safari inside Rajaji \u2014 elephants, leopards, and spotted deer just 10 km from the city",
+        why: "Most visitors miss this entirely. Sunrise jeep safari (\u20b91,200\u20131,800) gets you back by noon. Better wildlife density than many major parks.",
+        bestTime: "6:00\u20139:00 AM (Oct\u2013June only)",
+      },
+      {
+        name: "Neel Dhara Pakshi Vihar",
+        what: "Canal-side bird sanctuary 3 km from Haridwar where migratory birds winter on the Ganga",
+        why: "November\u2013February brings bar-headed geese, brahminy ducks, and river terns. Free entry, almost zero visitors.",
+        bestTime: "Sunrise, November\u2013February",
+      },
+    ],
+    avoid: [
+      "Boat rides near Har Ki Pauri \u2014 fixed extortionate prices (\u20b9500+ for 10 min). The ghat walk is free and better.",
+      "Pandas (priests) who grab your arm and start a puja without consent \u2014 walk away firmly.",
+      "Eating non-veg near the ghats \u2014 culturally disrespectful and most places don\u2019t serve it anyway.",
+      "Buying \u2018Gangajal\u2019 from random vendors \u2014 fill your own bottle at Har Ki Pauri tap (free, genuine).",
+    ],
+    timingTips: [
+      {
+        activity: "Ganga Aarti at Har Ki Pauri",
+        bestTime: "6:15 PM (March\u2013October) / 5:45 PM (November\u2013February)",
+        avoidTime: "Weekends and festival nights",
+        tip: "Arrive 45 minutes early. Sit on the upper ghat steps, left side facing the river. Completely free. The brass lamps on the water are genuinely moving.",
+      },
+      {
+        activity: "Chandi Devi Temple via ropeway",
+        bestTime: "7:30\u20138:30 AM",
+        avoidTime: "12\u20132 PM (heat and long queues)",
+        tip: "Ropeway \u20b9169 return. The 45-min trek up is actually pleasant in the morning. Combine with Mansa Devi on the same day.",
+      },
+    ],
+    localTransport: "Haridwar Railway Station is 2 km from Har Ki Pauri. Auto \u20b930\u201350. Shared tempos run from station to ghat (\u20b910). Everything in the ghat area is walkable. For Rajaji safari, pre-book a jeep from hotel or Rajaji Range Office.",
+    knowBeforeYouGo: [
+      "Haridwar is strictly vegetarian and alcohol-free in the ghat area.",
+      "Carry flip-flops \u2014 you will remove shoes at multiple points.",
+      "Kumbh Mela (every 3 years in the 12-year cycle) brings 30\u201350 million people. Check dates before booking.",
+      "Best months: February\u2013April and September\u2013November. Avoid summer peak heat.",
+    ],
+    stayAreas: [
+      { area: "Near Har Ki Pauri (Railway Road area)", why: "Walking distance to the main ghat. Noisy but most convenient.", bestFor: "value, balanced" },
+      { area: "Rishikul / Jwalapur area", why: "Quieter side of the city. Better air. 2 km auto to Har Ki Pauri.", bestFor: "comfort" },
+    ],
+  },
+
+  "Bodh Gaya": {
+    destination: "Bodh Gaya",
+    mustEat: [
+      {
+        name: "Mohammed's Restaurant",
+        area: "Bodhgaya main road, near Mahabodhi Temple",
+        knownFor: "Traveller institution: Tibetan thukpa, Israeli shakshuka, Indian thali. Backpackers and monks since the 1990s.",
+        price: "\u20b9100\u2013250",
+        tip: "The thukpa is the best value and genuinely warming. Order before 7 PM \u2014 they run out of stock.",
+      },
+      {
+        name: "Be Happy Cafe",
+        area: "Opposite Mahabodhi Temple gate",
+        knownFor: "Fresh juice, banana pancakes, and coffee. Frequented by international monks and Buddhist scholars.",
+        price: "\u20b9100\u2013200",
+        tip: "Best place to meet Tibetan or Japanese monks in conversation over breakfast.",
+      },
+      {
+        name: "Fujiya Green Hotel Restaurant",
+        area: "Near Japanese Monastery",
+        knownFor: "Japanese-run: genuine miso soup, Japanese curry, and Indian food. Clean and calm.",
+        price: "\u20b9150\u2013350",
+      },
+    ],
+    streetFood: [
+      { name: "Litti Chokha (Bihar roadside style)", area: "Evening stalls near bus stand", price: "\u20b960\u2013100", tip: "Smoked litti with baingan bharta. Eat with mustard oil and raw onion." },
+      { name: "Chana Ghugni", area: "Near Mahabodhi Temple gate", price: "\u20b920\u201340" },
+    ],
+    shopping: [
+      { what: "Tibetan prayer flags and singing bowls", where: "Market lane near Tibetan Monastery", priceRange: "\u20b9100\u20132,000", tip: "Test bowls by striking \u2014 rich sustained tone means quality. Nepal-made bowls are better." },
+      { what: "Bodhi tree leaf bookmarks (pressed real leaves)", where: "Shops near Mahabodhi gate", priceRange: "\u20b920\u201360" },
+    ],
+    hiddenGems: [
+      {
+        name: "Sujata Kuti village",
+        what: "Village 2 km from Bodh Gaya where Sujata offered milk rice to the fasting Buddha, ending his extreme asceticism",
+        why: "A stupa marks the spot. Almost no tourists. Cross the Niranjana river by boat (\u20b930) for the authentic approach. Deeply quiet.",
+        bestTime: "Sunrise, 5:30\u20136:30 AM",
+      },
+      {
+        name: "14-country Monastery Circuit walk",
+        what: "Thai, Japanese, Tibetan, Chinese, Vietnamese, Bhutanese monasteries within 1 km of each other",
+        why: "Each reflects its national Buddhist tradition. Free, respectful visits welcome. The Thai and Japanese ones are architecturally exceptional.",
+        bestTime: "7\u20139 AM (morning prayers ongoing in most)",
+      },
+    ],
+    avoid: [
+      "Auto-rickshaws near the temple gate \u2014 they quote 5x the rate for tourists. Walk or negotiate hard.",
+      "Visiting Mahabodhi Temple between 12\u20132 PM \u2014 scorching sun and school group rush.",
+      "Buying rudraksh from touts near the Bodhi Tree \u2014 often fake.",
+    ],
+    timingTips: [
+      {
+        activity: "Mahabodhi Temple darshan",
+        bestTime: "5:00\u20136:30 AM (sunrise, monks chanting, almost empty)",
+        avoidTime: "10 AM\u20132 PM (peak heat and tour groups)",
+        tip: "The Bodhi Tree is at the rear of the temple. Sit quietly for at least 20 minutes. The atmosphere at dawn is genuinely transcendent.",
+      },
+      {
+        activity: "Community chanting under the Bodhi Tree",
+        bestTime: "5:00 PM",
+        tip: "Open to all. Tibetan monks lead, joined by Japanese and Sri Lankan delegations. Sit respectfully.",
+      },
+    ],
+    localTransport: "Bodh Gaya is 13 km from Gaya Junction (main railway station). Auto from Gaya to Bodh Gaya \u20b9150\u2013200 (shared auto \u20b940). Within Bodh Gaya, everything is walkable. Cycle rentals near the main temple (\u20b960\u2013100/day).",
+    knowBeforeYouGo: [
+      "Remove shoes before entering Mahabodhi Temple complex. Carry socks for the hot stone floor in summer.",
+      "Dress conservatively \u2014 shoulders and knees covered inside the temple area.",
+      "Most good restaurants close by 9 PM. Plan early dinners.",
+      "Best months: October\u2013February. March onwards is very hot.",
+    ],
+    stayAreas: [
+      { area: "Near Mahabodhi Temple (main road)", why: "Walking distance to everything. All budgets.", bestFor: "value, balanced" },
+      { area: "Near Thai or Japanese Monastery", why: "Quieter. Some monasteries offer clean guestrooms to visitors.", bestFor: "balanced, comfort" },
+    ],
+  },
+
+  Chitrakoot: {
+    destination: "Chitrakoot",
+    mustEat: [
+      {
+        name: "Ram Rasoi (temple trust kitchen)",
+        area: "Near Ramghat, Chitrakoot",
+        knownFor: "Free prasad meal \u2014 puri, sabzi, khichdi. Run by temple trust.",
+        price: "Free (donation welcome)",
+        tip: "Go between 11 AM\u20131 PM. Eat on the ghat steps facing the Mandakini. One of the most peaceful meals you\u2019ll have anywhere.",
+      },
+      {
+        name: "Shri Ram Dhaba",
+        area: "Bus stand area, Chitrakoot",
+        knownFor: "Satvik thali \u2014 no onion or garlic. Dal, rice, roti, sabzi. Clean and filling.",
+        price: "\u20b960\u2013120",
+      },
+    ],
+    streetFood: [
+      { name: "Malpua and rabdi", area: "Ramghat stalls", price: "\u20b940\u201380" },
+      { name: "Chaat and aloo tikki", area: "Near Kamadgiri entrance", price: "\u20b920\u201340" },
+    ],
+    shopping: [
+      { what: "Rudraksh, sandalwood items", where: "Near Kamadgiri circumambulation path", priceRange: "\u20b950\u2013500" },
+      { what: "Hand-painted Ram Darbar miniatures", where: "Artist stalls near Sphatik Shila", priceRange: "\u20b9150\u2013800" },
+    ],
+    hiddenGems: [
+      {
+        name: "Gupt Godavari caves",
+        what: "Natural caves where two underground streams emerge. One can wade through with a torch. Ram held his court here according to legend.",
+        why: "Genuinely eerie and beautiful. The inner cave has thigh-deep water. Almost no one ventures past the first chamber.",
+        bestTime: "10:00 AM\u201312:00 PM",
+      },
+      {
+        name: "Sphatik Shila",
+        what: "A flat river rock on the Mandakini bank where Ram is said to have etched Sita\u2019s name",
+        why: "Almost never crowded. Sunrise over the river from this rock is exceptional. The surrounding forest is untouched.",
+        bestTime: "Sunrise, 5:30\u20136:30 AM",
+      },
+    ],
+    avoid: [
+      "Hiring a guide for Kamadgiri parikrama \u2014 the 5 km path is clearly marked. Free to walk.",
+      "Hanuman Dhara waterfall during monsoon without checking water levels \u2014 can be dangerous.",
+    ],
+    timingTips: [
+      {
+        activity: "Ramghat aarti",
+        bestTime: "6:00\u20136:45 PM",
+        tip: "Take a short boat ride (\u20b950\u2013100) to the middle of the Mandakini to watch the aarti from the water. Completely different from the bank.",
+      },
+      {
+        activity: "Kamadgiri parikrama (5 km sacred walk)",
+        bestTime: "6:00\u20138:30 AM",
+        avoidTime: "11 AM\u20133 PM in summer (no shade, very hot)",
+        tip: "Barefoot is customary. The hill itself is considered the embodiment of Ram \u2014 devotees touch the soil as they walk.",
+      },
+    ],
+    localTransport: "Chitrakoot Dham Karwi station is 11 km from Ramghat. Auto from station \u20b960\u2013100. Within Chitrakoot: auto and e-rickshaw \u20b920\u201340 per trip. Mandakini boat rides \u20b950\u2013150.",
+    knowBeforeYouGo: [
+      "Chitrakoot straddles UP and MP. Ramghat and Kamadgiri are in MP; Hanuman Dhara is in UP.",
+      "Strictly vegetarian town. No meat available anywhere near the ghats.",
+      "Best months: October\u2013March. Monsoon is lush but some sites flood.",
+      "Carry a torch for Gupt Godavari caves \u2014 the inner passage is dark.",
+    ],
+    stayAreas: [
+      { area: "Near Ramghat", why: "Heart of the pilgrimage area. Noisy but spiritually alive.", bestFor: "value, balanced" },
+      { area: "Near Kamadgiri entrance", why: "Quieter. 2 km from Ramghat by auto.", bestFor: "comfort" },
+    ],
+  },
+
+  Khajuraho: {
+    destination: "Khajuraho",
+    mustEat: [
+      {
+        name: "Raja's Cafe",
+        area: "Main road opposite Western Temple Group",
+        knownFor: "Traveller institution: banana lassi, Israeli salad, good dal. Rooftop with temple spire views.",
+        price: "\u20b9150\u2013300",
+        tip: "The rooftop is the real draw \u2014 you can see the Kandariya Mahadeva spire while eating breakfast.",
+      },
+      {
+        name: "Mediterranean Restaurant",
+        area: "Near Western Temple Group entrance",
+        knownFor: "Best thali in Khajuraho. Fixed-price unlimited meal. Popular with Indian families.",
+        price: "\u20b9150\u2013200",
+      },
+    ],
+    streetFood: [
+      { name: "Bhutte ka kees (grated corn with milk and spices)", area: "Evening stalls near main market", price: "\u20b930\u201360", tip: "MP specialty. Authentic here." },
+      { name: "Poha and jalebi", area: "Morning stalls near bus stand", price: "\u20b920\u201340" },
+    ],
+    shopping: [
+      { what: "Replica temple carvings (stone or resin)", where: "Shops near Western Temple Group", priceRange: "\u20b9200\u20133,000", tip: "Resin looks identical and weighs less. Stone replicas are genuine but heavy to carry." },
+    ],
+    hiddenGems: [
+      {
+        name: "Eastern Temple Group (Parsvanath Jain Temple)",
+        what: "Largest Jain temple in Khajuraho \u2014 carvings as fine as the Western Group but almost no visitors",
+        why: "90% of tourists see only the Western Group and leave. The Eastern Group is free to enter and equally stunning.",
+        bestTime: "8:00\u201310:00 AM",
+      },
+      {
+        name: "Chaturbhuja Temple (Southern Group)",
+        what: "1.5 km south of main town \u2014 a monolithic Vishnu figure that is one of the masterpieces of Chandela sculpture",
+        why: "Almost always empty. You will be the only visitor.",
+        bestTime: "Anytime",
+      },
+    ],
+    avoid: [
+      "Hiring unofficial guides \u2014 many give inaccurate history. ASI-approved guides (\u20b9150\u2013200) are worth it for Western Group.",
+      "Visiting Khajuraho only for the \u2018erotic\u2019 sculptures \u2014 these are a small fraction of 900+ carvings which mostly show music, dance, and celestial life.",
+      "Expensive restaurants right at the temple gate \u2014 walk 5 minutes for half the price.",
+    ],
+    timingTips: [
+      {
+        activity: "Western Temple Group (Kandariya Mahadeva)",
+        bestTime: "6:30\u20138:30 AM (sunrise light on sandstone, empty)",
+        avoidTime: "10 AM\u20132 PM (tour bus peak)",
+        tip: "At 7 AM you can frame the Kandariya spire against a clean sky with no people. Best photography window in Khajuraho.",
+      },
+      {
+        activity: "Sound & Light Show",
+        bestTime: "7:30 PM Hindi / 8:45 PM English",
+        tip: "Worth attending once. The illuminated temples at night are spectacular. Buy at gate (\u20b9250).",
+      },
+    ],
+    localTransport: "Khajuraho airport (limited flights). Train station 6 km from temples, auto \u20b960\u2013100. Cycle rental within town (\u20b980\u2013120/day) \u2014 ideal since the three temple groups are spread 3 km apart.",
+    knowBeforeYouGo: [
+      "Best months: October\u2013February. March\u2013May hits 45\u00b0C+.",
+      "Western Group entry \u20b940 Indians. All other groups are free.",
+      "Khajuraho Dance Festival (Feb/March around Maha Shivratri) \u2014 classical dance performances at the temples. Plan around it if possible.",
+    ],
+    stayAreas: [
+      { area: "Near Western Temple Group", why: "Walking distance to main temples, restaurants, and ATMs.", bestFor: "value, balanced, comfort" },
+    ],
+  },
+
+  Gwalior: {
+    destination: "Gwalior",
+    mustEat: [
+      {
+        name: "Kachori Wala at Phoolbagh",
+        area: "Phoolbagh market, Gwalior",
+        knownFor: "Bedmi kachori with aloo sabzi \u2014 a Gwalior breakfast institution. Queue out the door by 8 AM.",
+        price: "\u20b930\u201360",
+        tip: "Order 3\u20134 kachoris minimum \u2014 they\u2019re small. Add imli chutney. Cash only.",
+      },
+      {
+        name: "Paliwal Restaurant",
+        area: "MLN Road, near Jai Vilas Palace",
+        knownFor: "Gwalior thali: dal, rice, roti, two sabzis, papad. Local businessmen\u2019s lunch spot.",
+        price: "\u20b9120\u2013180",
+      },
+    ],
+    streetFood: [
+      { name: "Gajak (sesame-jaggery brittle, Nov\u2013Feb only)", area: "Old city shops near fort base", price: "\u20b980\u2013200/250g", tip: "Buy from shops that make it fresh \u2014 slightly soft inside, crispy outside is the correct texture." },
+      { name: "Poha (Gwalior style with fennel seeds)", area: "Morning stalls near Phoolbagh", price: "\u20b920\u201330" },
+    ],
+    shopping: [
+      { what: "Gajak (GI-tagged Gwalior sesame sweet, seasonal)", where: "Phoolbagh market", priceRange: "\u20b9150\u2013600/kg" },
+      { what: "Chanderi and Maheshwari silk fabric", where: "Sarafa Bazaar, old Gwalior", priceRange: "\u20b9800\u201310,000" },
+    ],
+    hiddenGems: [
+      {
+        name: "Gopachal Parvat Jain rock sculptures",
+        what: "Hundreds of giant Jain tirthankar figures carved into the fort\u2019s cliff face on the approach road",
+        why: "Most visitors drive straight up and miss these entirely. Figures 1\u201358 feet tall, dating 7th\u201315th century. Spectacular and completely free.",
+        bestTime: "7:00\u20139:00 AM (soft light on the carvings)",
+      },
+      {
+        name: "Tansen's Tomb and the 500-year-old Tamarind Tree",
+        what: "Tomb of Tansen, greatest musician in Akbar\u2019s court. Locals believe chewing leaves from the specific tamarind tree here improves one\u2019s singing voice.",
+        why: "Musicians from across India pilgrimage here. Quiet, touching, unique.",
+        bestTime: "Anytime",
+      },
+    ],
+    avoid: [
+      "Taking a cab directly to fort gate \u2014 you miss the Jain cliff sculptures. Walk the approach road or go slowly.",
+      "Jai Vilas Palace museum (\u20b9150): excellent but skip the mandatory guided tour pace \u2014 ask to go independently.",
+    ],
+    timingTips: [
+      {
+        activity: "Gwalior Fort (Man Singh Palace)",
+        bestTime: "8:00\u201310:00 AM",
+        avoidTime: "12\u20132 PM (no shade, brutal sun on hilltop)",
+        tip: "Entry \u20b975 Indians. Visit Gujari Mahal museum at the base (\u20b915) before going up \u2014 it gives essential context.",
+      },
+    ],
+    localTransport: "Gwalior Junction is well connected: Delhi 3.5 hrs Shatabdi, Agra 1.5 hrs, Bhopal 3 hrs. Fort is 3 km from station \u2014 auto \u20b960\u2013100. City autos run \u20b920\u201350.",
+    knowBeforeYouGo: [
+      "Gwalior is compact \u2014 fort, Jai Vilas Palace, and Tansen\u2019s tomb are all within 4 km.",
+      "Fort closes at sunset. Light show begins after. Plan the sequence.",
+      "October\u2013March is best. Summer is very hot but fort is manageable early morning.",
+    ],
+    stayAreas: [
+      { area: "Lashkar area (MLN Road / Jayendra Ganj)", why: "Central, walking to restaurants and bazaars.", bestFor: "value, balanced" },
+      { area: "Near Jai Vilas Palace", why: "Quieter, cleaner. Heritage hotel options.", bestFor: "comfort" },
+    ],
+  },
+
+  Sanchi: {
+    destination: "Sanchi",
+    mustEat: [
+      {
+        name: "Sanchi Tourist Cafeteria (MP Tourism)",
+        area: "Near stupa entrance",
+        knownFor: "Clean, fixed-price thali. Only decent sit-down option near the stupas.",
+        price: "\u20b9120\u2013180",
+        tip: "Eat lunch here, save dinner for Bhopal (46 km) which has far better options.",
+      },
+      {
+        name: "Dhabas on Sanchi main road",
+        area: "The single main road through Sanchi village",
+        knownFor: "Dal, roti, rice. Simple and cheap. Eaten by ASI workers and local guides.",
+        price: "\u20b960\u2013100",
+      },
+    ],
+    streetFood: [
+      { name: "Poha (MP style with sev, coriander, lemon)", area: "Morning stalls near bus stand", price: "\u20b915\u201330" },
+    ],
+    shopping: [
+      { what: "Sanchi stupa replica (stone or resin)", where: "Shops near stupa entrance", priceRange: "\u20b9100\u2013800" },
+    ],
+    hiddenGems: [
+      {
+        name: "Heliodorus Pillar at Vidisha (6 km from Sanchi)",
+        what: "2nd century BC Greek ambassador\u2019s devotional column to Vishnu \u2014 first known foreigner to convert to Vaishnavism",
+        why: "Proves Greek admiration for Indian philosophy 2,200 years ago. Almost no visitors. Fascinating inscription.",
+        bestTime: "Anytime",
+      },
+      {
+        name: "Udaygiri Caves Cave 5 (13 km from Sanchi)",
+        what: "The finest Varaha (boar avatar) carving in India \u2014 Vishnu lifting Earth from the cosmic ocean. Gupta period, 5th century AD.",
+        why: "One of the masterpieces of Indian sculpture. Rarely on tourist circuits.",
+        bestTime: "8:00\u201311:00 AM",
+      },
+    ],
+    avoid: [
+      "Treating Sanchi as a 2-hour stop \u2014 the torana carvings need at least half a day.",
+      "Skipping the museum at the base (\u20b915) \u2014 it has original relics that make the stupas far more meaningful.",
+    ],
+    timingTips: [
+      {
+        activity: "Great Stupa and Toranas",
+        bestTime: "7:00\u20139:00 AM (soft light on sandstone, empty)",
+        avoidTime: "10:30 AM\u201312:30 PM (Bhopal school group rush)",
+        tip: "Walk all four torana gates systematically (N/S/E/W) \u2014 each has different narrative carvings. An ASI guide (\u20b9150) adds real depth.",
+      },
+    ],
+    localTransport: "Sanchi is 46 km from Bhopal (train or bus, 1 hour). Regular trains from Bhopal (\u20b930\u201350). Stupa hill is 1 km from Sanchi station \u2014 auto \u20b930.",
+    knowBeforeYouGo: [
+      "Sanchi entry \u20b940 Indians. Museum is \u20b915 separate.",
+      "Sanchi is a small village \u2014 stay in Bhopal for better food and hotels.",
+      "Best months: October\u2013February. Sandstone looks warm gold in winter light.",
+    ],
+    stayAreas: [
+      { area: "Bhopal (base city, 46 km)", why: "Far better food, hotels, and connectivity. Sanchi is best as a day trip.", bestFor: "value, balanced, comfort" },
+    ],
+  },
+
+  // ── Batch 2 ───────────────────────────────────────────────────────────────
+
+  Bundi: {
+    destination: "Bundi",
+    mustEat: [
+      {
+        name: "Bundi Vilas (rooftop restaurant)",
+        area: "Old city, near Taragarh Fort base",
+        knownFor: "Dal baati churma and Rajasthani thali with fort views. Frequented by visiting writers and photographers.",
+        price: "\u20b9200\u2013350",
+        tip: "Rooftop is best at sunset when the fort turns gold. Reserve a table by 5:30 PM.",
+      },
+      {
+        name: "Shree Ji Lassi",
+        area: "Nawal Sagar lake road",
+        knownFor: "Thick curd lassi in clay cups. The best lassi in Bundi by local consensus.",
+        price: "\u20b920\u201340",
+        tip: "Ask for the salted version \u2014 unusual but excellent in heat.",
+      },
+    ],
+    streetFood: [
+      { name: "Kachori with chutney", area: "Chogan Gate market", price: "\u20b920\u201340" },
+      { name: "Churma laddoo", area: "Sweets shops near Nawal Sagar", price: "\u20b940\u201380" },
+    ],
+    shopping: [
+      { what: "Bundi miniature paintings (folk art with horses, elephants)", where: "Artist workshops in old city lanes", priceRange: "\u20b9300\u20135,000", tip: "Watch artists work before buying. Genuine miniaturists in old Bundi still use natural pigments." },
+    ],
+    hiddenGems: [
+      {
+        name: "Nawal Sagar lake at dawn",
+        what: "The lake reflects the Bundi Palace and Taragarh Fort in perfect symmetry",
+        why: "The half-submerged Varuna temple in the lake appears when water levels drop. At sunrise there\u2019s almost no one here. Photographic gold.",
+        bestTime: "6:00\u20137:00 AM",
+      },
+      {
+        name: "Blue city walk (unnamed lanes)",
+        what: "Bundi\u2019s old city is painted indigo like Jodhpur \u2014 but with one-tenth the tourists",
+        why: "Get lost in the lanes between Nawal Sagar and Taragarh. You\u2019ll find centuries-old havelis, women drawing water from stepwells, and barely another tourist.",
+        bestTime: "8:00\u201310:00 AM",
+      },
+    ],
+    avoid: [
+      "Taragarh Fort \u2014 entry is free but the path is loose and there are no barriers. Don\u2019t go alone at dusk.",
+      "Guides who offer to show 'secret' havelis for cash \u2014 the old city is navigable alone.",
+    ],
+    timingTips: [
+      {
+        activity: "Raniji Ki Baori (queen's stepwell)",
+        bestTime: "7:00\u20138:30 AM (best light into the well shaft)",
+        tip: "One of India\u2019s most beautiful stepwells. Three storeys deep with carved figures lining the descent. Free entry.",
+      },
+      {
+        activity: "Bundi Palace murals",
+        bestTime: "8:00\u201310:00 AM",
+        tip: "Entry \u20b950. The Chitrashala (painted gallery) has 18th century Bundi School murals of exceptional quality. Torch useful for the darker chambers.",
+      },
+    ],
+    localTransport: "Bundi is 36 km from Kota (nearest major railway station). Shared taxis/buses from Kota (\u20b960\u2013100). Within Bundi: tuk-tuks and autos \u20b920\u201360. Bundi town is small \u2014 old city is walkable.",
+    knowBeforeYouGo: [
+      "Bundi is the most underrated town in Rajasthan. Come before it gets popular.",
+      "October\u2013February is ideal. March\u2013June is very hot.",
+      "Limited ATMs \u2014 carry cash from Kota.",
+    ],
+    stayAreas: [
+      { area: "Old city near Nawal Sagar", why: "Walking distance to stepwell, palace, and old city lanes.", bestFor: "value, balanced" },
+      { area: "Heritage havelis converted to guesthouses", why: "Several families have opened their ancestral homes. Atmosphere is unmatched.", bestFor: "comfort" },
+    ],
+  },
+
+  Udaipur: {
+    destination: "Udaipur",
+    mustEat: [
+      {
+        name: "Millets of Mewar",
+        area: "Near Jagdish Temple, old city",
+        knownFor: "Heritage restaurant serving traditional Mewar cuisine: bajra roti, ker sangri, laal maas. One of the best local dining experiences in Rajasthan.",
+        price: "\u20b9300\u2013600",
+        tip: "Book a table for dinner to watch the illuminated City Palace from the rooftop terrace.",
+      },
+      {
+        name: "Natraj Dining Hall",
+        area: "Near Ghanta Ghar (Clock Tower), City Palace Road",
+        knownFor: "No-frills dal baati churma thali served since 1958. Where Udaipur locals eat.",
+        price: "\u20b9100\u2013180",
+        tip: "Lunch only. Arrive by 12:30 PM or the dal baati sells out.",
+      },
+      {
+        name: "Cafe Edelweiss (Savage Garden)",
+        area: "Chandpole area, near Jagdish Temple",
+        knownFor: "Continental breakfast spot popular with long-stay travellers. Good filter coffee.",
+        price: "\u20b9150\u2013300",
+      },
+    ],
+    streetFood: [
+      { name: "Dal Baati Churma at ghat dhabas", area: "Gangaur Ghat stalls", price: "\u20b980\u2013150" },
+      { name: "Makhan bada (deep-fried soft sweet)", area: "Near Jagdish Temple", price: "\u20b910\u201320 per piece" },
+      { name: "Kachori with green chutney (Udaipur morning)", area: "Nai Sarak stalls, 6\u20139 AM", price: "\u20b920\u201340" },
+    ],
+    shopping: [
+      { what: "Miniature paintings (Mewar School style)", where: "Workshops in Moti Chohatta lane", priceRange: "\u20b9500\u201330,000", tip: "Watch the artist work. Genuine Mewar miniaturists use squirrel-hair brushes. Ask to see the process." },
+      { what: "Silver jewellery (tribal and Rajput styles)", where: "Hathi Pol bazaar", priceRange: "\u20b9200\u20135,000" },
+    ],
+    hiddenGems: [
+      {
+        name: "Ambrai Ghat (free)",
+        what: "The ghat on the opposite bank from City Palace \u2014 gives the best reflection view of the palace and Lake Pichola",
+        why: "Tourist boats charge ₹400 for a similar view. Ambrai Ghat is free, quieter, and the reflection shot at sunrise is cleaner without backlight.",
+        bestTime: "Sunrise, 6:00\u20137:00 AM",
+      },
+      {
+        name: "Badi Lake (11 km from city)",
+        what: "An ancient reservoir built by Maharana Raj Singh \u2014 completely tourist-free with Aravalli hills backdrop",
+        why: "Udaipur locals come here for evening walks. No vendors, no selfie crowds. The lake is striking at golden hour.",
+        bestTime: "5:00\u20136:30 PM",
+      },
+    ],
+    avoid: [
+      "Lake Pichola boat ride pricing \u2014 negotiate hard. Published rate is \u20b9400 RTDC (official), private boats quote up to \u20b9800. Take the RTDC boat.",
+      "Restaurants on Lal Ghat near Gangaur Ghat \u2014 overpriced tourist traps with mediocre food.",
+      "The floating restaurant on the lake \u2014 food quality doesn\u2019t match the price.",
+    ],
+    timingTips: [
+      {
+        activity: "City Palace",
+        bestTime: "9:30 AM (opens) \u2014 arrive by 9:15 for first entry",
+        avoidTime: "11 AM\u20132 PM (peak crowd from overnight buses)",
+        tip: "Entry \u20b9300 Indians. The museum inside is genuinely world-class. Allow 2.5\u20133 hours. Sunset view from the Mor Chowk terrace is not to be missed.",
+      },
+      {
+        activity: "Lake Pichola boat ride",
+        bestTime: "5:30 PM (sunset, golden light on Jag Mandir and City Palace)",
+        tip: "Take the RTDC government boat (\u20b9400 return, official). Goes to Jag Mandir island included.",
+      },
+    ],
+    localTransport: "Udaipur City Railway Station is 3 km from the lake. Auto \u20b960\u2013100. Within old city: walking is best (it\u2019s small). E-bikes and scooter rentals available (\u20b9300\u2013500/day) for Badi Lake and farther sites.",
+    knowBeforeYouGo: [
+      "Best months: October\u2013February. Monsoon (July\u2013September) turns the hills green but Lake Pichola can overflow its ghats.",
+      "City Palace is closed on certain festival days \u2014 check before going.",
+      "Udaipur is a heritage city \u2014 many lanes in the old city are too narrow for vehicles. Plan walks.",
+    ],
+    stayAreas: [
+      { area: "Lal Ghat / Gangaur Ghat (old city lakeside)", why: "Walking distance to lake, City Palace, Jagdish Temple. Most hostels and guesthouses here.", bestFor: "value, balanced" },
+      { area: "Fateh Sagar Lake area", why: "Quieter. Away from tourist crowds. Good midrange hotels.", bestFor: "comfort" },
+    ],
+  },
+
+  Jodhpur: {
+    destination: "Jodhpur",
+    mustEat: [
+      {
+        name: "Shree Mishrilal Hotel",
+        area: "Near Clock Tower (Sardar Market), Jodhpur",
+        knownFor: "Makhaniya lassi \u2014 saffron-flavoured thick curd lassi served since 1956. The original. Non-negotiable.",
+        price: "\u20b960\u2013120",
+        tip: "Large size is better value. Drink slowly \u2014 it\u2019s rich. Don\u2019t eat anything before this; it fills you.",
+      },
+      {
+        name: "Gypsy Restaurant",
+        area: "Opposite Mehrangarh Fort lower gate, old city",
+        knownFor: "Rajasthani thali: dal baati churma, gatte ki sabzi, ker sangri, bajra roti. Locals\u2019 recommendation for authentic Marwari food.",
+        price: "\u20b9200\u2013350",
+      },
+      {
+        name: "Janta Sweet House",
+        area: "Clock Tower area",
+        knownFor: "Mirchi vada (potato-stuffed chilli fritter) and pyaaz kachori. The definitive Jodhpur street breakfast.",
+        price: "\u20b920\u201360",
+        tip: "Order mirchi vada first \u2014 it sells out by 9 AM on busy days.",
+      },
+    ],
+    streetFood: [
+      { name: "Mirchi Vada (Jodhpur specialty)", area: "Clock Tower market stalls", price: "\u20b910\u201320 per piece" },
+      { name: "Pyaaz Kachori", area: "Near Sardar Market", price: "\u20b915\u201330" },
+      { name: "Mawa Kachori (sweet, filled with mawa and dry fruits)", area: "Old city sweet shops", price: "\u20b930\u201350" },
+    ],
+    shopping: [
+      { what: "Bandhani tie-dye fabric and dupattas", where: "Sardar Market stalls around Clock Tower", priceRange: "\u20b9150\u20133,000", tip: "Negotiate \u2014 first price is 2\u20133x fair value. Handmade bandhani has tiny irregular dots; machine-made is uniform." },
+      { what: "Mojari (Rajasthani leather shoes)", where: "Clock Tower market lane", priceRange: "\u20b9300\u20131,500" },
+    ],
+    hiddenGems: [
+      {
+        name: "Toorji Ka Jhalra (stepwell)",
+        what: "Restored 18th-century stepwell in the heart of old Jodhpur with intricate carved niches",
+        why: "Far less visited than stepwells in Bundi or Abhaneri. Inside the old city, 10-minute walk from Clock Tower. Clean, atmospheric, free.",
+        bestTime: "7:00\u20138:30 AM or 4:30\u20136:00 PM",
+      },
+      {
+        name: "Blue city walk at 7 AM",
+        what: "The indigo-painted houses of old Jodhpur seen from Mehrangarh\u2019s ramparts at sunrise",
+        why: "The blue haze over the old city at dawn, with Mehrangarh lit by the rising sun behind you, is one of India\u2019s great visual moments.",
+        bestTime: "6:30\u20137:30 AM from upper ramparts",
+      },
+    ],
+    avoid: [
+      "Camel safari touts near Clock Tower and Mehrangarh \u2014 aggressive and overpriced. Book via your hotel if you want one.",
+      "Overpriced rooftop restaurants within 100m of Mehrangarh gate \u2014 terrible food, captive audience pricing.",
+      "Auto from railway station to old city \u2014 \u20b9200+ tourist rate. Ola/Uber is \u20b960\u201380.",
+    ],
+    timingTips: [
+      {
+        activity: "Mehrangarh Fort",
+        bestTime: "9:00\u201311:00 AM (opens at 9, before Delhi/Jaipur buses arrive)",
+        tip: "Entry \u20b9100 Indians. The museum inside is one of India\u2019s best fort collections \u2014 miniature paintings, palanquins, howdahs. Allow 2.5 hours minimum.",
+      },
+      {
+        activity: "Jaswant Thada",
+        bestTime: "4:30\u20136:00 PM (golden light, Mehrangarh backdrop)",
+        tip: "Entry \u20b930. White marble cenotaph of Maharaja Jaswant Singh II. Almost no crowd. The fort towers above it \u2014 one of Jodhpur\u2019s best photographs.",
+      },
+    ],
+    localTransport: "Jodhpur Junction is well connected. From station to fort: auto \u20b960\u2013100 or Ola \u20b960\u201380. Within old city: walking is best. Scooter rental \u20b9300\u2013400/day for Umaid Bhawan and farther sites.",
+    knowBeforeYouGo: [
+      "Best months: October\u2013February. March\u2013May is very hot but Mehrangarh is manageable early morning.",
+      "Mehrangarh has an excellent audio guide included in the entry fee. Use it.",
+      "The old city is hilly \u2014 plan for walking and stairs.",
+    ],
+    stayAreas: [
+      { area: "Old city near Clock Tower", why: "Walking distance to Mehrangarh, stepwell, and market. Hostels and guesthouses.", bestFor: "value, balanced" },
+      { area: "Near Umaid Bhawan Road", why: "Quieter, better air. Heritage hotel options.", bestFor: "comfort" },
+    ],
+  },
+
+  Mandu: {
+    destination: "Mandu",
+    mustEat: [
+      {
+        name: "Relax Cafe (near Jahaz Mahal)",
+        area: "Main road, Mandu village",
+        knownFor: "Simple dal, rice, roti, and poha. The only reliable sit-down option in Mandu. Clean, cheap.",
+        price: "\u20b960\u2013120",
+        tip: "Limited menu. Order early \u2014 they run out of items by 1 PM.",
+      },
+      {
+        name: "Government Cafeteria (MP Tourism)",
+        area: "Near Roopmati Pavilion",
+        knownFor: "Standard thali. Useful as a pit stop between the far-spaced sites.",
+        price: "\u20b9120\u2013180",
+      },
+    ],
+    streetFood: [
+      { name: "Poha and chai (morning)", area: "Small stalls near Mandu village", price: "\u20b915\u201330" },
+    ],
+    shopping: [
+      { what: "Mandu not known for shopping \u2014 buy Maheshwari or Chanderi silk in Indore (90 km)", where: "Indore Sarafa Bazaar", priceRange: "\u20b9600\u201310,000" },
+    ],
+    hiddenGems: [
+      {
+        name: "Jahaz Mahal in monsoon",
+        what: "The Ship Palace (110m long, 15m wide) sits between two tanks that fill in monsoon \u2014 literally appears to float",
+        why: "Mandu is best in monsoon (July\u2013September). The plateau turns vivid green, waterfalls appear everywhere, and the ruins glow against storm clouds.",
+        bestTime: "Monsoon season, 8:00\u201310:00 AM",
+      },
+      {
+        name: "Roopmati Pavilion at sunset",
+        what: "A hilltop pavilion on the southern edge of the plateau with views of the Narmada river gorge 300m below",
+        why: "Built by Sultan Baz Bahadur so his singer-queen Roopmati could see the Narmada daily. At sunset the light across the gorge is extraordinary. Almost always quiet.",
+        bestTime: "5:30\u20136:30 PM",
+      },
+    ],
+    avoid: [
+      "Visiting Mandu without a vehicle \u2014 the ruins are spread over 25 km on a plateau. Rent a two-wheeler from Dhar or hire a local jeep.",
+      "Going in summer (April\u2013June) \u2014 exposed plateau ruins with no shade, 44\u00b0C possible.",
+    ],
+    timingTips: [
+      {
+        activity: "Jahaz Mahal",
+        bestTime: "7:00\u20139:00 AM (soft morning light, nearly empty)",
+        tip: "Entry \u20b925 Indians. Walk the full length of the roof terrace for the ship-on-water effect.",
+      },
+      {
+        activity: "Hoshang Shah\u2019s Tomb",
+        bestTime: "Anytime in the morning",
+        tip: "The white marble tomb that influenced the Taj Mahal \u2014 Shah Jahan\u2019s architects visited here to study proportions. Entry free.",
+      },
+    ],
+    localTransport: "Nearest railhead: Ratlam (45 km) or Indore (90 km). Buses from Indore to Mandu (2.5 hrs, \u20b980\u2013150). Within Mandu: rent a scooter or bicycle (available in the village) \u2014 the plateau is too spread out to walk.",
+    knowBeforeYouGo: [
+      "Best months: July\u2013September (monsoon magic) or October\u2013February (clear skies).",
+      "Mandu village has very basic accommodation. Most people day-trip from Indore.",
+      "Carry food and water \u2014 options between ruins are very limited.",
+    ],
+    stayAreas: [
+      { area: "Mandu village (near Jahaz Mahal)", why: "Only accommodation in Mandu. Very basic. MP Tourism rest house is cleanest.", bestFor: "value" },
+      { area: "Indore (base city, 90 km)", why: "Far better hotels and food. Day-trip to Mandu.", bestFor: "balanced, comfort" },
+    ],
+  },
+
+  // ── Batch 3 ───────────────────────────────────────────────────────────────
+
+  Mussoorie: {
+    destination: "Mussoorie",
+    mustEat: [
+      {
+        name: "Tavern Restaurant",
+        area: "The Mall Road, near Picture Palace",
+        knownFor: "Mughlai and Chinese food since 1960. Mussoorie institution. The butter chicken is the real draw.",
+        price: "\u20b9250\u2013500",
+        tip: "Dinner only. Arrives slow but worth waiting. The rooftop has valley views on clear evenings.",
+      },
+      {
+        name: "Whispering Windows Cafe",
+        area: "Clock Tower end of Mall Road",
+        knownFor: "Breakfast spot: maggi, omelette, filter coffee, and Himalayan views. Budget travellers\u2019 favourite.",
+        price: "\u20b980\u2013200",
+      },
+      {
+        name: "Kalsang Restaurant",
+        area: "Gandhi Chowk, Mall Road",
+        knownFor: "Tibetan and Chinese food. Thukpa, momo, and wonton soup. Popular with school groups and families.",
+        price: "\u20b9150\u2013350",
+      },
+    ],
+    streetFood: [
+      { name: "Maggi and instant noodles (hill-station classic)", area: "Any stall on Mall Road", price: "\u20b930\u201360" },
+      { name: "Corn on the cob (bhutta) with butter and spice", area: "Cable car and Kempty Falls area", price: "\u20b920\u201340" },
+    ],
+    shopping: [
+      { what: "Woollen shawls and Himachali caps", where: "Mall Road shops and Tibetan market near Library Chowk", priceRange: "\u20b9200\u20133,000", tip: "Tibetan market near Library has better prices than Mall Road shops. Bargain on shawls." },
+      { what: "Homemade jams (strawberry, apricot)", where: "Landour Bakehouse area shops", priceRange: "\u20b9100\u2013250" },
+    ],
+    hiddenGems: [
+      {
+        name: "Cloud End forest resort area walk (7 km from Mall Road)",
+        what: "A dense deodar forest walk on a quiet road beyond the Gun Hill cable car, virtually tourist-free",
+        why: "Mussoorie\u2019s crowds are entirely concentrated on a 2 km stretch of Mall Road. Cloud End is silent, forested, and the views of Dehradun valley are spectacular.",
+        bestTime: "7:00\u20139:00 AM",
+      },
+      {
+        name: "Landour Clocktower and bakeries (4 km from Mall Road)",
+        what: "The quiet cantonment neighbourhood where Ruskin Bond lives and writes. Charming old bakeries and colonial bungalows.",
+        why: "Mussoorie minus the crowds. Landour Bakehouse has excellent bread and cakes. On lucky mornings, Ruskin Bond is seen at the nearby bookshop.",
+        bestTime: "9:00\u201311:00 AM",
+      },
+    ],
+    avoid: [
+      "Kempty Falls on weekends \u2014 completely overwhelmed with day-trippers from Dehradun.",
+      "The toy train ride on Mall Road \u2014 overpriced for children, useless for adults.",
+      "Hotels right on Mall Road \u2014 loud all night. Stay one lane behind for the same price and real sleep.",
+    ],
+    timingTips: [
+      {
+        activity: "Mall Road walk",
+        bestTime: "6:30\u20138:00 AM (nearly empty, mist still on the valley)",
+        avoidTime: "Saturday and Sunday afternoons (overwhelmed)",
+        tip: "The Mall Road is the only flat surface in Mussoorie. Walk end-to-end before the day-trippers arrive.",
+      },
+      {
+        activity: "Gun Hill ropeway",
+        bestTime: "7:00\u20138:30 AM (clearest Himalayan views before haze builds)",
+        tip: "Ropeway \u20b9150 return. Views include Bandarpunch and parts of the Garhwal range. Goes from Kulri Bazaar end.",
+      },
+    ],
+    localTransport: "Mussoorie is 32 km from Dehradun. Shared Sumo from Dehradun (\u20b960\u201380, 1 hr). Taxis from Dehradun station \u20b9600\u2013800. Within Mussoorie: walking on Mall Road, autos/cabs for Landour and Cloud End.",
+    knowBeforeYouGo: [
+      "Best months: April\u2013June (pleasant, pre-monsoon green), September\u2013November (clear skies, Himalayan views).",
+      "December\u2013February can get snow but roads to Mall Road stay open. Landour can get cut off.",
+      "No vehicles allowed on Mall Road from 8 AM\u20138 PM. Everything is done on foot.",
+    ],
+    stayAreas: [
+      { area: "Kulri Bazaar / Library Chowk (one lane behind Mall Road)", why: "Quieter than Mall Road, same access, better sleep.", bestFor: "value, balanced" },
+      { area: "Landour (4 km from Mall Road)", why: "Peaceful cantonment. Heritage bungalow guesthouses. Far fewer tourists.", bestFor: "comfort" },
+    ],
+  },
+
+  Nainital: {
+    destination: "Nainital",
+    mustEat: [
+      {
+        name: "Sher-e-Punjab Restaurant",
+        area: "Mallital end of Mall Road",
+        knownFor: "Rajma chawal and dal makhani. Locals\u2019 lunch spot for 40 years. No tourist markup.",
+        price: "\u20b9120\u2013200",
+        tip: "Sit inside, not on the pavement. Order the rajma rice \u2014 it\u2019s slow-cooked and excellent.",
+      },
+      {
+        name: "Adarsh Cafe",
+        area: "Near Nainital Bus Stand",
+        knownFor: "Pahadi aloo parathas with thick curd. The best local breakfast in Nainital.",
+        price: "\u20b960\u2013120",
+        tip: "Go before 9 AM for hot parathas. Add ghee \u2014 the mountain curd is exceptional.",
+      },
+      {
+        name: "Sakley's Restaurant & Patisserie",
+        area: "Near the boating point, Mall Road",
+        knownFor: "Old bakery (since 1952). Bread, cakes, and good coffee. Institution status.",
+        price: "\u20b9100\u2013250",
+      },
+    ],
+    streetFood: [
+      { name: "Bal Mithai (chocolate-fudge Kumaoni sweet with white sugar balls)", area: "Shops on Mall Road near Flats", price: "\u20b960\u2013150 for 200g" },
+      { name: "Jhalmuri (spiced puffed rice)", area: "Flats area, lakeside", price: "\u20b915\u201325" },
+    ],
+    shopping: [
+      { what: "Candles and wax items (Nainital cottage industry)", where: "The Flats area shops", priceRange: "\u20b9100\u2013500", tip: "Nainital candles are GI-tagged. Handmade, locally sourced beeswax." },
+      { what: "Bal Mithai and Singori (Kumaoni sweets)", where: "Bora Bazaar sweet shops", priceRange: "\u20b980\u2013200/200g" },
+    ],
+    hiddenGems: [
+      {
+        name: "Tiffin Top (Dorothy's Seat) trek",
+        what: "45-minute walk from Ayarpatta area to a 2,292m hilltop with a panoramic Himalayan view",
+        why: "Nainital\u2019s most rewarding view with no cable car required. Bandarpunch and Nanda Devi visible on clear days. Almost no crowd compared to Snow View Point.",
+        bestTime: "6:30\u20138:00 AM",
+      },
+      {
+        name: "Khurpa Tal (7 km from Nainital)",
+        what: "A smaller, greener lake with no tourist infrastructure, surrounded by oak forests",
+        why: "Nainital has several lakes. Khurpa Tal sees almost no visitors and the reflections are cleaner than Naini Lake.",
+        bestTime: "8:00\u201310:00 AM",
+      },
+    ],
+    avoid: [
+      "Horse rides near the lake \u2014 animal welfare is poor. Skip entirely.",
+      "Naini Lake boating in peak summer weekend afternoons \u2014 overcrowded and feels transactional.",
+      "Staying on Mall Road \u2014 it\u2019s pedestrianised but loud. One lane back is quieter and cheaper.",
+    ],
+    timingTips: [
+      {
+        activity: "Naini Lake boating",
+        bestTime: "6:30\u20137:30 AM (mist on the lake, almost empty)",
+        avoidTime: "Saturday 11 AM\u20133 PM (overwhelmed with day-trippers)",
+        tip: "Pedal boats (\u20b9200/30 min) let you go where you want. Row boats are slower but more peaceful. Bargain for 45-min rate.",
+      },
+      {
+        activity: "Snow View Point",
+        bestTime: "7:00\u20138:30 AM (Himalayan views disappear in haze by 9\u201310 AM)",
+        tip: "Ropeway \u20b9100 return. Views are genuinely good on clear winter mornings (October\u2013February).",
+      },
+    ],
+    localTransport: "Nainital is 35 km from Kathgodam railway station. Taxis from Kathgodam \u20b9700\u2013900. Shared cabs \u20b9200\u2013300. Within Nainital: walking on Mall Road (no vehicles in town centre). Taxis for Tiffin Top and outer lakes.",
+    knowBeforeYouGo: [
+      "Best months: March\u2013June (pleasant, before monsoon crowds) and September\u2013November (clear Himalayan views).",
+      "December\u2013February can see light snowfall on hilltops. Roads stay open but cold.",
+      "Nainital gets extremely crowded in May\u2013June (school summer holidays). Book accommodation 3+ weeks in advance.",
+    ],
+    stayAreas: [
+      { area: "Tallital end of Mall Road", why: "Quieter than Mallital. Lake views, walking distance to boating and temples.", bestFor: "value, balanced" },
+      { area: "Ayarpatta (upper Nainital)", why: "Quieter, higher altitude, better air. Good midrange options.", bestFor: "comfort" },
+    ],
+  },
+
+  Shimla: {
+    destination: "Shimla",
+    mustEat: [
+      {
+        name: "Himachali Rasoi",
+        area: "Near Scandal Point, Mall Road",
+        knownFor: "Traditional Himachali dham \u2014 madra (chickpea in curd gravy), sidu (stuffed bread), and rajma. One of the few places doing authentic Himachali home food.",
+        price: "\u20b9200\u2013400",
+        tip: "The madra with rice is the dish to order. Very different from anything you\u2019ve had before.",
+      },
+      {
+        name: "Baljees Restaurant",
+        area: "The Mall Road, near Scandal Point",
+        knownFor: "Mithai shop and restaurant since 1933. Best rabdi, pedas, and soan papdi in Shimla.",
+        price: "\u20b960\u2013200 (sweets), \u20b9150\u2013300 (meals)",
+        tip: "Buy the sidu (Himachali walnut-stuffed bread) from the bakery section. Available fresh in the morning.",
+      },
+      {
+        name: "Wake & Bake Cafe",
+        area: "Near Christ Church, Ridge",
+        knownFor: "Good filter coffee and European breakfast. Popular with Delhi weekenders.",
+        price: "\u20b9150\u2013300",
+      },
+    ],
+    streetFood: [
+      { name: "Sidu (walnut or poppy-seed stuffed Himachali bread)", area: "Mall Road and Ridge vendors", price: "\u20b930\u201360 per piece" },
+      { name: "Chaat and golgappe", area: "Near Lakkar Bazaar", price: "\u20b920\u201340" },
+    ],
+    shopping: [
+      { what: "Himachali woollen shawls (Kullu pattern)", where: "HPCA Emporium near Scandal Point", priceRange: "\u20b9800\u20136,000", tip: "Government emporium has fixed prices. Handloom wool is significantly warmer than machine-made." },
+      { what: "Wild honey and apricot jam (Himachali)", where: "Shops near Lakkar Bazaar", priceRange: "\u20b9150\u2013600" },
+    ],
+    hiddenGems: [
+      {
+        name: "Annandale Ground (Army-maintained, 2 km from Ridge)",
+        what: "A flat meadow in the middle of Shimla\u2019s hills where British India held polo matches and horse races",
+        why: "Completely unknown to tourists. The Army Heritage Museum here (\u20b910) has fascinating British-era material. The meadow itself is stunning \u2014 surrounded by deodar forest.",
+        bestTime: "9:00\u201311:00 AM",
+      },
+      {
+        name: "Jakhu Temple forest trail (skip the ropeway)",
+        what: "The 2.5 km trek through rhododendron and oak forest to the Hanuman temple at 2,455m",
+        why: "The ropeway gets you there in 5 minutes. The trail takes 45 minutes and passes through forest you\u2019ll remember. Monkeys are manageable early morning.",
+        bestTime: "6:30\u20137:30 AM (monkeys less aggressive when cool)",
+      },
+    ],
+    avoid: [
+      "Mall Road on Saturday afternoons \u2014 impossible crowd from Delhi/Chandigarh buses.",
+      "Kufri in peak tourist season \u2014 the horse rides there are extremely uncomfortable and overpriced (\u20b91,500+).",
+      "Fake snow at tourist traps near Kufri \u2014 the \u2018snow experience\u2019 packages are disappointments.",
+    ],
+    timingTips: [
+      {
+        activity: "Mall Road walk and Scandal Point",
+        bestTime: "7:00\u20138:30 AM (misty, peaceful, locals doing their morning walk)",
+        avoidTime: "Saturday 12\u20135 PM (Delhi weekend crowd peak)",
+        tip: "The Ridge (open ground above Mall Road) gives the best views of the Himalayan ranges to the north. Clear mornings only.",
+      },
+      {
+        activity: "Christ Church (Gothic, 1857)",
+        bestTime: "9:00\u201311:00 AM (opens at 9, best light from the east)",
+        tip: "One of the oldest churches in North India. The stained glass windows are original. Sunday service at 10 AM is open to visitors.",
+      },
+    ],
+    localTransport: "Shimla station serves the Kalka-Shimla Toy Train (UNESCO heritage, 5 hrs from Kalka). Volvo buses from Delhi 8\u201310 hrs. Within Shimla: Mall Road is pedestrianised. Autos and taxis for Jakhu, Kufri, and Annandale.",
+    knowBeforeYouGo: [
+      "Best months: March\u2013June and October\u2013November. December\u2013February can have snowfall (magical but disruptive).",
+      "Altitude is 2,206m \u2014 temperature is 10\u201315\u00b0C cooler than Delhi year-round. Pack layers.",
+      "Carry cash \u2014 ATMs on Mall Road run dry on peak weekends.",
+    ],
+    stayAreas: [
+      { area: "Near Scandal Point / Cart Road", why: "Central, walking distance to Mall Road. Budget guesthouses.", bestFor: "value" },
+      { area: "Lakkar Bazaar area (above Mall Road)", why: "Quieter, still central. Mid-range hotels.", bestFor: "balanced" },
+      { area: "Chail road / Mashobra (8\u201312 km from city)", why: "Forest setting, peace, no crowds. Heritage resort options.", bestFor: "comfort" },
+    ],
+  },
+
+  Lansdowne: {
+    destination: "Lansdowne",
+    mustEat: [
+      {
+        name: "Kashi Vishwanath Dhaba",
+        area: "Near Bhulla Tal, Lansdowne",
+        knownFor: "Dal, roti, aloo sabzi. Simple pahadi food made with local ghee. The kind of meal that warms you after a forest walk.",
+        price: "\u20b960\u2013120",
+      },
+      {
+        name: "Garhwal Terrace (Trishul Hotel restaurant)",
+        area: "Market area, Lansdowne",
+        knownFor: "Best restaurant in Lansdowne. Pahadi chicken, rajma chawal, and forest mushroom dishes.",
+        price: "\u20b9200\u2013400",
+        tip: "Order the local seasonal mushroom preparation if available. Garhwali forest mushrooms are extraordinary.",
+      },
+    ],
+    streetFood: [
+      { name: "Maggi, chai, and bhutta", area: "Tip N Top viewpoint stalls", price: "\u20b920\u201360" },
+    ],
+    shopping: [
+      { what: "Garhwal Rifles regimental souvenirs (belt plates, postcards)", where: "War Museum shop", priceRange: "\u20b950\u2013500" },
+      { what: "Local honey and forest produce", where: "Market road, Lansdowne", priceRange: "\u20b9100\u2013300" },
+    ],
+    hiddenGems: [
+      {
+        name: "Tarkeshwar Mahadev forest temple (38 km from Lansdowne)",
+        what: "Ancient Shiva temple in a pristine deodar forest at 2,092m. The trees here are 500+ years old.",
+        why: "One of the most peaceful Shiva temples in Garhwal. The forest around it is protected and utterly silent. Very few tourists make the effort.",
+        bestTime: "8:00\u201311:00 AM (forest is dewy and atmospheric)",
+      },
+      {
+        name: "Bhulla Tal paddle-boat lake at dawn",
+        what: "A small man-made lake with paddle boats, surrounded by pine forest",
+        why: "At 6:30 AM before the lake opens, the mist sits on the water and the pines drip. Sit on the bank for 20 minutes. Lansdowne\u2019s real charm is this kind of quietude.",
+        bestTime: "6:00\u20137:00 AM",
+      },
+    ],
+    avoid: [
+      "Coming during school summer holidays (May\u2013June) \u2014 Lansdowne gets unexpectedly crowded from Garhwali families.",
+      "Expecting Mussoorie-style entertainment \u2014 Lansdowne has one Mall Road and almost nothing else. It\u2019s a quiet retreat.",
+    ],
+    timingTips: [
+      {
+        activity: "Tip N Top viewpoint",
+        bestTime: "6:00\u20137:00 AM (360\u00b0 Himalayan panorama before clouds build)",
+        tip: "Free viewpoint, 1.5 km from the market. On very clear mornings (October\u2013November) the peaks of Trishul and Nanda Ghunti are visible.",
+      },
+    ],
+    localTransport: "Kotdwar is the nearest major railhead (40 km). Shared taxis from Kotdwar to Lansdowne \u20b9100\u2013150. No local transport within Lansdowne \u2014 everything is walking distance.",
+    knowBeforeYouGo: [
+      "Best months: March\u2013June and September\u2013November.",
+      "Lansdowne is a Garhwal Rifles regimental town \u2014 some areas are cantonment. Respect restrictions.",
+      "Very limited ATMs. Carry cash from Kotdwar.",
+      "No nightlife, no mall. Come for silence, forests, and air.",
+    ],
+    stayAreas: [
+      { area: "Market area (Main Road)", why: "Only accommodation cluster. Walking distance to everything.", bestFor: "value, balanced" },
+      { area: "Forest Rest House (Forest Dept booking)", why: "Inside the forest. Best atmosphere. Book in advance through Uttarakhand Forest Dept.", bestFor: "comfort" },
+    ],
+  },
+
+  // ── Batch 4 ───────────────────────────────────────────────────────────────
+
+  Pench: {
+    destination: "Pench",
+    mustEat: [
+      {
+        name: "Kipling\u2019s Court (Tuli Tiger Resort restaurant)",
+        area: "Near Turia Gate, Pench",
+        knownFor: "Best kitchen in the Pench buffer zone. Butter chicken, dal makhani, and garden-fresh salads.",
+        price: "\u20b9400\u2013800",
+        tip: "Non-guests can dine here. Worth it for a sit-down meal after an early safari.",
+      },
+      {
+        name: "Dhaba near Turia Gate",
+        area: "Turia village, Pench MP side",
+        knownFor: "Dal, roti, egg bhurji. Eaten by forest guides and safari jeep drivers. Authentic and cheap.",
+        price: "\u20b960\u2013120",
+        tip: "Ask the jeep driver where he eats. He\u2019ll take you here rather than a tourist dhaba.",
+      },
+    ],
+    streetFood: [
+      { name: "Makai bhutta (corn on the cob)", area: "Village stalls near Turia Gate", price: "\u20b920\u201340" },
+    ],
+    shopping: [
+      { what: "No significant shopping in Pench. Nearest town: Seoni (30 km) for basic supplies.", where: "Seoni market", priceRange: "\u2014" },
+    ],
+    hiddenGems: [
+      {
+        name: "Pench river boat safari (winter)",
+        what: "Flat-bottom boat ride on the Pench reservoir \u2014 crocodiles basking, kingfishers, lesser adjutant storks",
+        why: "Most visitors only do jeep safaris. The boat safari is quieter, cheaper, and gets you within 5m of mugger crocodiles. November\u2013February only.",
+        bestTime: "7:00\u20139:00 AM",
+      },
+      {
+        name: "Rukhad village walk",
+        what: "Walk through the Gond tribal village adjacent to the buffer zone",
+        why: "Pench\u2019s human story is as interesting as its wildlife. Gond villagers have lived alongside tigers for generations. Their knowledge of animal behaviour is extraordinary.",
+        bestTime: "Evening (5:00\u20136:30 PM)",
+      },
+    ],
+    avoid: [
+      "Booking safaris only from the lodge reception \u2014 rates are inflated. Book directly through MP Online (mponline.gov.in) for official rates.",
+      "Visiting Pench Maharashtra side instead of Pench MP side \u2014 tiger density is higher on the MP side (Turia gate).",
+    ],
+    timingTips: [
+      {
+        activity: "Morning jeep safari (Turia Gate)",
+        bestTime: "Open at 6:00 AM, gate entry. Jeep departs 6:15 AM.",
+        tip: "Book 2 safaris minimum \u2014 sighting probability doubles with two attempts. Pench has one of the highest leopard sighting rates in India.",
+      },
+      {
+        activity: "Evening safari",
+        bestTime: "2:30 PM departure, inside until 5:30 PM",
+        tip: "Big cats are active at dusk near water bodies. Ask your guide to go to the Pench reservoir edge first.",
+      },
+    ],
+    localTransport: "Nagpur airport is 90 km from Pench (Turia Gate). Taxis from Nagpur \u20b91,500\u20132,500. Nearest train station: Seoni (30 km) or Nagpur. No public transport inside the park \u2014 safari jeeps only.",
+    knowBeforeYouGo: [
+      "Best months: October\u2013June. Park closes July\u2013September (monsoon).",
+      "Book safaris at mponline.gov.in or via the park office. Advance booking strongly recommended in peak season (Jan\u2013Mar).",
+      "Binoculars are essential. Bring a zoom lens camera for wildlife.",
+      "Pench is the forest that inspired Rudyard Kipling\u2019s Jungle Book. Mowgli\u2019s village is believed to be in this area.",
+    ],
+    stayAreas: [
+      { area: "Buffer zone near Turia Gate", why: "Best access to morning safari. Several wildlife lodges and budget camps.", bestFor: "value, balanced, comfort" },
+    ],
+  },
+
+  Jabalpur: {
+    destination: "Jabalpur",
+    mustEat: [
+      {
+        name: "Gyan Pansal (Vegetarian Café)",
+        area: "Napier Town, Jabalpur",
+        knownFor: "Traditional Mahakoshal thali: arhar dal, rice, roti, matar paneer, and kheer. Locals\u2019 everyday restaurant.",
+        price: "\u20b9100\u2013180",
+        tip: "The unlimited thali is the best value. Go for lunch (12\u20132 PM).",
+      },
+      {
+        name: "Paan stalls at Gwarighat",
+        area: "Gwarighat, Jabalpur (Narmada ghat)",
+        knownFor: "Fresh meetha paan and masala paan from riverside stalls. The ritual paan after a Narmada dip.",
+        price: "\u20b910\u201330",
+      },
+    ],
+    streetFood: [
+      { name: "Chakki ki shak (waterwheel-ground corn flatbread with spiced vegetables, local specialty)", area: "Old Jabalpur market", price: "\u20b930\u201360" },
+      { name: "Jalebi and fafda (Jabalpur breakfast)", area: "Russell Chowk morning stalls", price: "\u20b920\u201340" },
+    ],
+    shopping: [
+      { what: "Marble handicrafts from Bhedaghat village", where: "Artisan shops in Bhedaghat village, 22 km from city", priceRange: "\u20b9100\u20133,000", tip: "Buy from the artisans directly in their workshops, not from shops on the main tourist approach road." },
+    ],
+    hiddenGems: [
+      {
+        name: "Chausath Yogini Temple (64 Yogini, 10th century)",
+        what: "A circular, roofless tantric temple on a hilltop with 64 goddess niches \u2014 one of only 4 such temples in India",
+        why: "Most visitors skip this for Dhuandhar. The circular design (which influenced the Parliament of India according to one theory) and tantric iconography are unique. Almost no crowd.",
+        bestTime: "8:00\u201310:00 AM",
+      },
+      {
+        name: "Gwarighat at dawn (Narmada ghat in Jabalpur city)",
+        what: "The city\u2019s own Narmada ghat \u2014 ghats, priests, and morning bathers on the river",
+        why: "Tourists go straight to Bhedaghat. But Gwarighat is where Jabalpur\u2019s own spiritual life happens, with no tourist infrastructure and no pricing.",
+        bestTime: "5:30\u20137:00 AM",
+      },
+    ],
+    avoid: [
+      "Dhuandhar Falls at midday \u2014 the spray and crowd are both overwhelming. Go at 8 AM.",
+      "Bhedaghat boat ride pricing \u2014 government boats (\u20b9150) are the same route as private ones (\u20b9300\u2013500). Take the government boat.",
+    ],
+    timingTips: [
+      {
+        activity: "Bhedaghat marble rocks boat ride",
+        bestTime: "7:00\u20138:30 AM (low angle light into the gorge, water glows white)",
+        avoidTime: "Full moon night (beautiful but very crowded)",
+        tip: "The Narmada between 100-foot white marble cliffs is genuinely jaw-dropping. Evening (5\u20136 PM) also works well for the light.",
+      },
+      {
+        activity: "Dhuandhar Falls",
+        bestTime: "7:30\u20139:00 AM",
+        tip: "The falls are 15m wide and the spray creates a constant mist (\u2018dhuan\u2019 = smoke). Best viewed from the ropeway platform (\u20b9100).",
+      },
+    ],
+    localTransport: "Jabalpur Junction is a major railway hub (connected to Delhi, Mumbai, Chennai, Kolkata). Bhedaghat is 22 km from city \u2014 auto \u20b9200\u2013300 return. City taxis and autos available throughout.",
+    knowBeforeYouGo: [
+      "Best months: October\u2013March. Monsoon (July\u2013September) makes the Narmada surge dramatically \u2014 boat rides may be suspended.",
+      "Jabalpur is a base for Kanha and Bandhavgarh safaris (2\u20133 hours by road).",
+      "Bhedaghat is a full half-day outing. Combine with Chausath Yogini for a full day.",
+    ],
+    stayAreas: [
+      { area: "Civil Lines / Napier Town", why: "Central Jabalpur. Good hotels, restaurants, railway connectivity.", bestFor: "value, balanced" },
+      { area: "Near Bhedaghat (22 km from city)", why: "Wake up and walk to the gorge. Forest-edge stay.", bestFor: "comfort" },
+    ],
+  },
+
+  Mumbai: {
+    destination: "Mumbai",
+    mustEat: [
+      {
+        name: "Ashok Vada Pav, Dadar",
+        area: "Dadar West, near flower market",
+        knownFor: "The original vada pav stall. The one every Mumbaikar judges all others against since 1966.",
+        price: "\u20b912\u201318 per vada pav",
+        tip: "The green chutney and dry garlic chutney both go on. Don\u2019t ask for ketchup.",
+      },
+      {
+        name: "Bade Miya\u2019s",
+        area: "Behind Taj Mahal Hotel, Colaba",
+        knownFor: "Seekh kebab rolls and tikka. An open-air grill institution since 1946. Midnight eating spot.",
+        price: "\u20b9150\u2013350",
+        tip: "Go late \u2014 the scene really starts after 10 PM. The tikka rolls are the move, not the full thalis.",
+      },
+      {
+        name: "Kyani & Co.",
+        area: "Jer Mahal Estate, Marine Lines",
+        knownFor: "Irani cafe since 1904. Bun maska with chai, kheema pav, and mawa cake. A Mumbai institution.",
+        price: "\u20b960\u2013150",
+        tip: "Go for breakfast (8\u201310 AM). Ask for the kheema pav and a cutting chai. The marble-top tables are original.",
+      },
+    ],
+    streetFood: [
+      { name: "Pav Bhaji at Juhu Beach", area: "Juhu Beach stalls, evening", price: "\u20b980\u2013150", tip: "The butter quantity is non-negotiable. Ask for extra." },
+      { name: "Pani Puri at Elco Market", area: "Bandra Hill Road, Elco Market", price: "\u20b950\u2013100", tip: "Elco Pani Puri is consistently the best in the city. The meetha chutney is extraordinary." },
+      { name: "Bhel Puri at Chowpatty Beach", area: "Girgaon Chowpatty", price: "\u20b930\u201360" },
+    ],
+    shopping: [
+      { what: "Sarees and fabric at Mangaldas Market", where: "Mangaldas Lane, Masjid Bunder", priceRange: "\u20b9150\u201310,000", tip: "Wholesale market. Buy from shops inside, not touts outside. Authentic Banarasi and Kanjeevaram available at wholesale prices." },
+      { what: "Antiques and curios at Chor Bazaar (Thieves Market)", where: "Mutton Street, Bhendi Bazaar", priceRange: "\u20b9100\u201350,000" },
+    ],
+    hiddenGems: [
+      {
+        name: "Bhau Daji Lad Museum (Dr. Bhau Daji Lad Mumbai City Museum)",
+        what: "Mumbai\u2019s oldest museum (1857) restored to Victorian splendour \u2014 city history, craft, and industrial heritage",
+        why: "Almost no tourists know this. The building itself is a restored jewel. The collection explains Mumbai\u2019s transformation from seven islands to a metropolis. Entry \u20b920.",
+        bestTime: "10:00 AM\u201312:00 PM",
+      },
+      {
+        name: "Dharavi walking tour",
+        what: "Guided walk through Asia\u2019s largest informal settlement \u2014 a functioning industrial city within a city",
+        why: "Dharavi has a \u20b9700 crore annual economy: leather, pottery, recycling, garments. The tour (\u20b9700, book via Reality Tours) dismantles every slum trope.",
+        bestTime: "9:00\u201111:00 AM",
+      },
+    ],
+    avoid: [
+      "Gateway of India area between 11 AM\u20133 PM \u2014 completely overwhelmed. Go at 7 AM for photographs.",
+      "Marine Drive restaurants \u2014 overpriced tourist traps. Walk the promenade, eat elsewhere.",
+      "Taxis from the airport to South Mumbai \u2014 Ola/Uber is 40% cheaper.",
+    ],
+    timingTips: [
+      {
+        activity: "Gateway of India + Elephanta Caves ferry",
+        bestTime: "7:00\u20138:30 AM for Gateway photos. Ferry to Elephanta departs 9\u201310 AM.",
+        avoidTime: "Saturdays and Sundays 10 AM\u20132 PM (overwhelming crowd)",
+        tip: "Ferry to Elephanta \u20b9200 return. The rock-cut Shiva cave (5th century) has a 19-foot Trimurti sculpture that is genuinely magnificent.",
+      },
+      {
+        activity: "Marine Drive sunset walk",
+        bestTime: "6:00\u20137:30 PM (the Queen\u2019s Necklace lights up after dark)",
+        tip: "Sit on the concrete sea-wall with a cutting chai from the bhutta seller. This is the real Mumbai scene.",
+      },
+    ],
+    localTransport: "Local trains are the fastest way: Western, Central, and Harbour lines cover the whole city. \u20b95\u201330 per journey. Ola/Uber for non-peak hours. Auto-rickshaws in suburbs only (not South Mumbai). BEST buses are cheap but slow.",
+    knowBeforeYouGo: [
+      "Best months: November\u2013February. June\u2013September is monsoon \u2014 city floods and travel disrupts.",
+      "Mumbai is expensive vs. other Indian cities. Budget \u20b91,500+ per person/day minimum.",
+      "Local trains are segregated by gender (ladies\u2019 compartment). First and second class are separate.",
+    ],
+    stayAreas: [
+      { area: "Colaba (South Mumbai)", why: "All tourist sites within reach. High density of hostels and midrange hotels.", bestFor: "value, balanced" },
+      { area: "Bandra West", why: "Trendiest neighbourhood. Good restaurants, sea-link access, calmer than Colaba.", bestFor: "comfort" },
+    ],
+  },
+
+  Kolkata: {
+    destination: "Kolkata",
+    mustEat: [
+      {
+        name: "Peter Cat Restaurant",
+        area: "Park Street",
+        knownFor: "Chelo kebab \u2014 the legendary Persian-style kebab platter with buttered rice that put Park Street dining on the map.",
+        price: "\u20b9400\u2013700",
+        tip: "Book for dinner \u2014 it fills up. The chelo kebab is non-negotiable. Ask for extra shashlick.",
+      },
+      {
+        name: "Anadi Cabin",
+        area: "Near Shyambazar, North Kolkata",
+        knownFor: "Kosha mangsho (slow-cooked mutton) with luchi (puffed bread). North Kolkata\u2019s finest Bangali meal.",
+        price: "\u20b9150\u2013300",
+        tip: "Go for Sunday lunch when the kosha mangsho is freshest. Arrive by 12:30 PM.",
+      },
+      {
+        name: "Balaram Mullick & Radharaman Mullick",
+        area: "Paddapukur Road, Bhowanipore",
+        knownFor: "The finest mishti doi (sweet curd) and sandesh in Kolkata. 150-year-old confectioner.",
+        price: "\u20b960\u2013200 for sweets",
+        tip: "Buy nolen gurer sandesh (date palm jaggery sandesh) if in season (December\u2013February). Extraordinary.",
+      },
+    ],
+    streetFood: [
+      { name: "Kathi roll at Nizam\u2019s", area: "Esplanade area", price: "\u20b9100\u2013200", tip: "Nizam\u2019s invented the kathi roll in 1932. The egg chicken roll is the original." },
+      { name: "Phuchka (Kolkata pani puri variant)", area: "Victoria Memorial / Park Street area", price: "\u20b930\u201360 for 6 pieces", tip: "The filling is completely different from Mumbai pani puri \u2014 spiced potato, chickpea, and tamarind water." },
+      { name: "Jhalmuri (spiced puffed rice)", area: "Any street corner", price: "\u20b910\u201320" },
+    ],
+    shopping: [
+      { what: "Kantha stitch sarees and fabric", where: "Gariahat market", priceRange: "\u20b9500\u201310,000", tip: "Kantha is Kolkata\u2019s signature textile \u2014 running stitch on old fabric. Original is softer than new." },
+      { what: "Clay Durga idols (miniature, post-Puja season)", where: "Kumartuli, North Kolkata", priceRange: "\u20b9200\u20132,000" },
+    ],
+    hiddenGems: [
+      {
+        name: "Kumartuli potter\u2019s quarter at 8 AM",
+        what: "The North Kolkata neighbourhood where clay idol makers (kumars) work year-round making Durga, Kali, and Saraswati idols",
+        why: "Every studio is open to walk through. You can watch an artist sculpt a 10-foot Durga from straw and clay. Best-preserved craft neighbourhood in any Indian city.",
+        bestTime: "7:30\u20139:30 AM (artists working in morning cool)",
+      },
+      {
+        name: "College Street Sunday book market",
+        what: "The famous Boi Para \u2014 a kilometre of pavement booksellers with secondhand books in Bengali, English, and Hindi",
+        why: "The density of books, the smell of old paper, and the possibility of finding a 1940s edition of something for \u20b920 is unlike anywhere else in India.",
+        bestTime: "9:00\u201311:00 AM Sunday",
+      },
+    ],
+    avoid: [
+      "Yellow Ambassador taxi from Howrah station \u2014 they don\u2019t use meters reliably. Use Ola or the Kolkata metro.",
+      "Victoria Memorial on Republic Day / Independence Day \u2014 massive crowds and half the exhibits are closed.",
+      "Park Street at 1 PM on a weekday (office lunch rush, impossible to get a table).",
+    ],
+    timingTips: [
+      {
+        activity: "Howrah Bridge at sunset",
+        bestTime: "5:00\u20136:30 PM (golden light on the cantilever spans)",
+        tip: "Walk across from the Howrah side. Stop midway for the river view. The flower market (Malik Ghat) below the bridge is best at 6\u20138 AM.",
+      },
+      {
+        activity: "Victoria Memorial",
+        bestTime: "10:00 AM (opens) on weekdays",
+        tip: "Entry \u20b930 Indians. The museum inside is excellent \u2014 Raj-era paintings and Kolkata history. Allow 2 hours. The garden is free.",
+      },
+    ],
+    localTransport: "Kolkata Metro is the fastest (Blue Line, North\u2013South). Local buses are cheap but confusing. Ola/Uber and yellow taxis widely available. Howrah and Sealdah are the two main stations.",
+    knowBeforeYouGo: [
+      "Best months: October\u2013February. Durga Puja (October) is the best time to visit \u2014 the city transforms.",
+      "Kolkata is India\u2019s cheapest major city for accommodation and food.",
+      "Language: Bengali is the primary language. English is widely understood in most areas.",
+    ],
+    stayAreas: [
+      { area: "Park Street / Esplanade (Central Kolkata)", why: "Restaurants, Metro access, Victoria Memorial nearby.", bestFor: "value, balanced" },
+      { area: "Salt Lake City (Bidhannagar)", why: "Modern, clean, quieter. 30 min Metro from central.", bestFor: "comfort" },
+    ],
+  },
+
 };
 
 // ── Lookup function ───────────────────────────────────────────────────────────
